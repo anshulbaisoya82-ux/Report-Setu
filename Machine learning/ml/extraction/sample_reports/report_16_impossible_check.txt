@@ -1,0 +1,6 @@
+METROPOLIS HEALTHCARE
+Date: 2026-10-12
+SUSPECT INPUT REPORT
+Haemoglobin : 150 g/dL (12.0 - 15.0)
+Platelet Count : 320 10^3/uL (150 - 450)
+HbA1c : 6.3 % (< 5.7)

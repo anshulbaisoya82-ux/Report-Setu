@@ -1,0 +1,6 @@
+DR LAL PATHLABS
+Date: 2026-10-10
+ALERT: CRITICAL VALUE
+Platelet Count : 35 10^3/uL (150 - 450)
+Haemoglobin : 11.0 g/dL (12.0 - 15.5)
+TLC : 8.1 10^3/uL (4.0 - 10.0)

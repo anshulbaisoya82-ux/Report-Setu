@@ -1,0 +1,10 @@
+{
+  "test_code": "HBA1C",
+  "horizon_days": 90,
+  "estimate": 6.7,
+  "low": 6.4,
+  "high": 7.0,
+  "n_points": 4,
+  "baseline_estimate": 6.4,
+  "warning": null
+}

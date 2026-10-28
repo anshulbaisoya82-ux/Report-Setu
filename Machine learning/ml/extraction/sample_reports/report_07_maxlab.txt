@@ -1,0 +1,6 @@
+MAX LAB PATHOLOGY
+Date: 2026-09-02
+HbA1c (Glycosylated Hemoglobin) : 8.1 % (4.0 - 5.6)
+Hemoglobin : 13.0 g/dL (12.0 - 15.5)
+Platelets : 225 10^3/uL (150 - 450)
+WBC : 7.0 10^3/uL (4.0 - 11.0)

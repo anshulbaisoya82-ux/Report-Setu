@@ -1,0 +1,10 @@
+SUBURBAN DIAGNOSTICS
+Date: 2026-03-29
+CBC WITH DIFFERENTIAL
+Hemoglobin : 14.0 g/dL (13.0 - 17.0)
+WBC Count : 9.1 10^3/uL (4.0 - 11.0)
+Platelets : 260 10^3/uL (150 - 450)
+Neutrophil : 68 % (40 - 75)
+Lymphocyte : 25 % (20 - 45)
+Eosinophil : 4 % (1 - 6)
+Monocyte : 3 % (2 - 10)

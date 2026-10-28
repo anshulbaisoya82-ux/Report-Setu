@@ -1,0 +1,6 @@
+QUEST DIAGNOSTICS
+Date: 2026-01-22
+Hemoglobin : 15.4 g/dL (13.5 - 17.5)
+Platelet Count : 205 10^3/uL (150 - 450)
+WBC : 5.5 10^3/uL (4.5 - 11.0)
+Hematocrit : 46.0 % (40.0 - 52.0)

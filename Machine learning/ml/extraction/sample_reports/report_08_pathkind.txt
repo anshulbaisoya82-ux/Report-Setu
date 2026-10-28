@@ -1,0 +1,7 @@
+PATHKIND LABS
+Report Date: 2026-04-14
+Haemoglobin (Hb) : 11.2 g/dL (12.0 - 16.0)
+Erythrocyte Count : 4.1 10^6/uL (4.0 - 5.2)
+TLC : 6.4 10^3/uL (4.0 - 10.0)
+Platelet Count : 175 10^3/uL (150 - 450)
+HbA1c : 6.2 % (< 5.7)
