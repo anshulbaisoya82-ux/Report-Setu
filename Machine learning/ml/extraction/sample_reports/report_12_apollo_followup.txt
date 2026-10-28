@@ -1,0 +1,6 @@
+APOLLO DIAGNOSTICS
+Date: 2026-10-01
+Haemoglobin : 9.5 g/dL (12.0 - 15.0)
+Total Leucocyte Count : 11.8 10^3/uL (4.0 - 11.0)
+Platelet Count : 185 10^3/uL (150 - 450)
+HbA1c : 7.1 % (4.0 - 5.6)

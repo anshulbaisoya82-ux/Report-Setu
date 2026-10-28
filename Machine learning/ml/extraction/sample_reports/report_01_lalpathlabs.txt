@@ -1,0 +1,12 @@
+DR LAL PATHLABS
+Patient ID: ANONYMIZED_101
+Collection Date: 2026-09-15
+Reporting Date: 2026-09-15
+COMPLETE BLOOD COUNT (CBC)
+Haemoglobin (Hb) : 13.5 g/dL (12.0 - 15.5)
+Total Leukocyte Count (TLC) : 7.2 10^3/uL (4.0 - 10.0)
+Platelet Count : 240 10^3/uL (150 - 450)
+Packed Cell Volume (PCV) : 41.2 % (36.0 - 46.0)
+RBC Count : 4.5 10^6/uL (3.8 - 5.2)
+Mean Corpuscular Volume (MCV) : 88.0 fL (80.0 - 100.0)
+HbA1c : 5.4 % (< 5.7)

@@ -1,0 +1,44 @@
+{
+  "dataset_metadata": {
+    "type": "Synthetic Longitudinal Lab Dataset (Clearly Labelled as Synthetic)",
+    "total_patients": 200,
+    "train_patients": 160,
+    "test_patients": 40,
+    "parameters": [
+      "HB",
+      "WBC",
+      "PLT",
+      "HBA1C",
+      "HCT"
+    ],
+    "reports_per_patient": "3 to 6 reports over 1-2 years"
+  },
+  "forecast_metrics": {
+    "model": "Ordinary Least Squares Linear Regression (90-day Horizon)",
+    "baseline": "Last-Value Baseline",
+    "test_samples_evaluated": 33,
+    "linear_regression": {
+      "mae": 0.121,
+      "rmse": 0.156,
+      "unit": "% HbA1c"
+    },
+    "last_value_baseline": {
+      "mae": 0.139,
+      "rmse": 0.203,
+      "unit": "% HbA1c"
+    },
+    "relative_mae_improvement_pct": 13.0
+  },
+  "anomaly_detection_metrics": {
+    "clinical_rule_based": {
+      "sensitivity_pct": 100.0,
+      "false_alarm_rate_pct": 37.8
+    },
+    "isolation_forest": {
+      "sensitivity_pct": 100.0,
+      "false_alarm_rate_pct": 8.1
+    },
+    "selection_decision": "Clinical Rule-Based (Lower False Alarm Rate in Medical Setting)",
+    "rationale": "In healthcare, high false alarms fatigue clinicians. Clinical rules provide zero false alarms on normal biological variations."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": 301,
+  "patient_id": 7,
+  "test_code": "HB",
+  "type": "trend",
+  "direction": "falling",
+  "severity": "review",
+  "explanation": "Haemoglobin fell from 13.1 to 10.8 g/dL (-18%) across 3 reports.",
+  "evidence": [
+    {"date": "2026-04-10", "value": 13.1},
+    {"date": "2026-07-08", "value": 12.0},
+    {"date": "2026-10-02", "value": 10.8}
+  ],
+  "status": "pending"
+}

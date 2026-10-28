@@ -1,0 +1,9 @@
+APOLLO DIAGNOSTICS
+Date: 12/08/2026
+Department of Hematology
+Hemoglobin : 10.8 g/dL (12.0 - 15.0)
+WBC Count : 6.1 10^3/uL (4.0 - 11.0)
+Platelet Count : 190 10^3/uL (150 - 450)
+Neutrophils : 62 % (40 - 75)
+Lymphocytes : 30 % (20 - 45)
+HbA1c : 6.8 % (4.0 - 5.6)

@@ -1,0 +1,7 @@
+CITY DIAGNOSTICS LABORATORY
+Date: 2026-02-17
+Haemoglobin : 13.7 g/dL (12.0 - 15.5)
+Total WBC : 6.9 10^3/uL (4.0 - 11.0)
+Platelet Count : 315 10^3/uL (150 - 450)
+Packed Cell Volume : 40.5 % (36.0 - 46.0)
+HbA1c : 6.0 % (< 5.7)

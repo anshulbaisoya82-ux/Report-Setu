@@ -1,0 +1,12 @@
+{
+  "report_id": 12,
+  "test_code": "HBA1C",
+  "test_name": "HbA1c",
+  "value": 6.4,
+  "unit": "%",
+  "ref_low": 4.0,
+  "ref_high": 5.7,
+  "date": "2026-10-02",
+  "flag": "high",
+  "needs_check": false
+}

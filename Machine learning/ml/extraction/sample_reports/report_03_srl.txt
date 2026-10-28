@@ -1,0 +1,12 @@
+SRL DIAGNOSTICS
+Dated: 2026-07-20
+TEST REPORT
+Hb : 14.2 g/dL (13.0 - 17.0)
+Total RBC : 4.9 10^6/uL (4.5 - 5.5)
+TLC : 8.5 10^3/uL (4.0 - 11.0)
+Platelets : 310 10^3/uL (150 - 450)
+PCV : 44.0 % (40.0 - 50.0)
+MCV : 89.8 fL (82.0 - 98.0)
+MCH : 29.0 pg (27.0 - 32.0)
+MCHC : 32.3 g/dL (32.0 - 36.0)
+RDW : 12.8 % (11.5 - 14.5)
