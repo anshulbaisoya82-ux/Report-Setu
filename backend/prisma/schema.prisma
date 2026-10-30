@@ -1,0 +1,359 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  patient
+  doctor
+  admin
+  anonymous
+}
+
+enum DoctorVerificationStatus {
+  pending
+  verified
+  rejected
+}
+
+enum ConnectionStatus {
+  pending
+  connected
+  revoked
+  rejected
+}
+
+enum ReportStatus {
+  Critical
+  Unbalanced
+  Normal
+}
+
+enum ReportReviewStatus {
+  pending
+  in_review
+  approved
+}
+
+enum AppointmentStatus {
+  Confirmed
+  Pending
+  Completed
+  Cancelled
+}
+
+enum AppointmentType {
+  In_person
+  Video_call
+  Phone_call
+}
+
+enum MedicineState {
+  Pending
+  Taken
+  Missed
+  Snoozed
+}
+
+model User {
+  id                 String         @id @default(uuid())
+  role               UserRole
+  phone              String?        @unique
+  email              String?        @unique
+  passwordHash       String?
+  isActive           Boolean        @default(true)
+  isVerified         Boolean        @default(false)
+  failedLoginAttempts Int           @default(0)
+  lockUntil          DateTime?
+  lastLoginAt        DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  doctorProfile      DoctorProfile?
+  patientProfile     PatientProfile?
+  refreshTokens      RefreshToken[]
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+  verifiedDoctors    DoctorProfile[] @relation("DoctorVerifier")
+}
+
+model DoctorProfile {
+  id                 String                   @id @default(uuid())
+  userId             String                   @unique
+  name               String
+  email              String                   @unique
+  phone              String
+  registrationNumber String                   @unique
+  medicalCouncil     String
+  specialty          String
+  clinic             Json
+  verificationStatus DoctorVerificationStatus @default(pending)
+  verifiedAt         DateTime?
+  verifiedBy         String?
+  rejectionReason    String?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  user               User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verifier           User?                    @relation("DoctorVerifier", fields: [verifiedBy], references: [id], onDelete: SetNull)
+  patientConnections Connection[]
+  appointments       Appointment[]
+  prescriptions      Prescription[]
+  doctorNotes        DoctorNote[]
+  reportsReviewed    Report[]                 @relation("ReportReviewer")
+  chatMessages       ChatMessage[]
+}
+
+model PatientProfile {
+  id                    String         @id @default(uuid())
+  userId                String         @unique
+  rsId                  String         @unique
+  name                  String
+  phone                 String         @unique
+  avatar                String?
+  age                   Int
+  gender                String
+  bloodGroup            String
+  conditions            String[]       @default([])
+  location              String
+  status                String
+  lastVisitDate         String?
+  lastReportTime        String?
+  lastReportName        String?
+  notificationPreferences Json?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connections            Connection[]
+  reports               Report[]
+  appointments          Appointment[]
+  prescriptions         Prescription[]
+  medicineSchedules     MedicineSchedule[]
+  chatMessages          ChatMessage[]
+  doctorNotes           DoctorNote[]
+  connectCodes          ConnectCode[]
+  auditLogs             AuditLog[]
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  userId     String
+  tokenId    String   @unique
+  family     String
+  tokenHash  String
+  isRevoked  Boolean  @default(false)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, isRevoked])
+  @@index([family])
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  phone     String
+  otpHash   String
+  attempts  Int      @default(0)
+  maxAttempts Int    @default(3)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([phone, expiresAt])
+}
+
+model Connection {
+  id              String           @id @default(uuid())
+  patientId       String
+  doctorId        String
+  status          ConnectionStatus  @default(pending)
+  vcodeHash       String?
+  connectCodeHash String?
+  codeExpiresAt   DateTime?
+  attempts        Int              @default(0)
+  maxAttempts     Int              @default(5)
+  connectedAt     DateTime?
+  revokedAt       DateTime?
+  revokedBy       String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  patient         PatientProfile   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor          DoctorProfile    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  @@unique([patientId, doctorId])
+}
+
+model ConnectCode {
+  id         String         @id @default(uuid())
+  patientId  String
+  rsId       String
+  codeHash   String
+  attempts   Int            @default(0)
+  maxAttempts Int           @default(5)
+  expiresAt  DateTime
+  createdAt  DateTime       @default(now())
+  patient    PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  @@index([rsId, expiresAt])
+}
+
+model Report {
+  id             String             @id @default(uuid())
+  patientId      String
+  patientName    String
+  patientAvatar  String?
+  name           String
+  category       String
+  labName        String
+  collectionDate DateTime
+  reportedDate   DateTime
+  specimen       String?
+  status         ReportStatus       @default(Normal)
+  reviewStatus   ReportReviewStatus @default(pending)
+  reviewed       Boolean            @default(false)
+  reviewedAt     DateTime?
+  reviewedBy     String?
+  doctorNotes    String?
+  parameters     Json               @default("[]")
+  aiOverview     Json?
+  doctorSummary  Json?
+  rawFile        Json?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  patient        PatientProfile     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  reviewer       DoctorProfile?     @relation("ReportReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  doctorNotesRel DoctorNote[]
+  @@index([patientId, collectionDate])
+  @@index([status, reviewed])
+}
+
+model Appointment {
+  id          String            @id @default(uuid())
+  patientId   String
+  patientName String
+  patientRsId String
+  doctorId    String
+  doctorName  String
+  reason      String
+  date        String
+  slotDate    String
+  time        String
+  type        AppointmentType   @default(In_person)
+  status      AppointmentStatus @default(Pending)
+  requestedAt String?
+  notes       String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  patient     PatientProfile    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor      DoctorProfile     @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  @@index([patientId, status])
+  @@index([doctorId, status])
+  @@unique([doctorId, slotDate, time, status])
+}
+
+model Prescription {
+  id           String         @id @default(uuid())
+  patientId    String
+  doctorId     String
+  doctorName   String
+  name         String
+  instructions String
+  startDate    DateTime
+  endDate      DateTime
+  totalDays    Int
+  status       String
+  advice       String[]       @default([])
+  medicines    Json?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  patient      PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor       DoctorProfile  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  schedules    MedicineSchedule[]
+}
+
+model MedicineSchedule {
+  id             String        @id @default(uuid())
+  patientId      String
+  prescriptionId String?
+  name           String
+  dose           String
+  timing         String
+  scheduledTime  String
+  date           String
+  state          MedicineState @default(Pending)
+  takenAt        String?
+  instructions   String?
+  snoozedUntil   DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  patient        PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  prescription   Prescription? @relation(fields: [prescriptionId], references: [id], onDelete: SetNull)
+  @@index([patientId, date])
+}
+
+model ChatMessage {
+  id                String         @id @default(uuid())
+  patientId         String
+  doctorId          String?
+  sender            String
+  text              String
+  threadId          String
+  isMedicineQuestion Boolean       @default(false)
+  category          String
+  escalated         Boolean        @default(false)
+  triageTag         String?
+  citations         Json           @default("[]")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  patient           PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor            DoctorProfile? @relation(fields: [doctorId], references: [id], onDelete: SetNull)
+  @@index([patientId, threadId, createdAt])
+}
+
+model DoctorNote {
+  id         String         @id @default(uuid())
+  doctorId   String
+  patientId  String
+  reportId   String?
+  note       String
+  category   String
+  priority   String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  doctor     DoctorProfile  @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient    PatientProfile @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  report     Report?        @relation(fields: [reportId], references: [id], onDelete: SetNull)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  data      Json?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, isRead, createdAt])
+}
+
+model AuditLog {
+  id           String          @id @default(uuid())
+  userId       String?
+  userRole     UserRole
+  action       String
+  resourceType String
+  resourceId   String?
+  patientId    String?
+  purpose      String
+  ipAddress    String
+  userAgent    String?
+  metadata     Json?
+  details      Json?
+  createdAt    DateTime        @default(now())
+  user         User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  patient      PatientProfile? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  @@index([userId, createdAt])
+  @@index([patientId, createdAt])
+}
