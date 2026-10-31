@@ -1,0 +1,214 @@
+{
+  "info": {
+    "name": "ReportSetu API Collection",
+    "_postman_id": "reportsetu-collection-v1",
+    "description": "Production Postman Collection for ReportSetu with automated Bearer token chaining.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+    { "key": "doctorToken", "value": "" },
+    { "key": "patientToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health Probes",
+      "item": [
+        {
+          "name": "Liveness Probe",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/../../health/live"
+          }
+        },
+        {
+          "name": "Readiness Probe",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/../../health/ready"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Send OTP (Patient)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/otp/send",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+919876543210\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Verify OTP (Patient)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.accessToken) {",
+                  "    pm.collectionVariables.set('patientToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/otp/verify",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+919876543210\",\n  \"code\": \"123456\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Doctor Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.accessToken) {",
+                  "    pm.collectionVariables.set('doctorToken', json.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/doctor/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+919876500001\",\n  \"password\": \"DoctorPassword123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patient Connect & Reports",
+      "item": [
+        {
+          "name": "Generate Connect Code (Patient)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/connections/code/generate",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{patientToken}}", "type": "string" }]
+            }
+          }
+        },
+        {
+          "name": "Claim Connect Code (Doctor)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/connections/code/claim",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{doctorToken}}", "type": "string" }]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"RS1234\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Get Reports (Patient)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/reports",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{patientToken}}", "type": "string" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Agents & Chat",
+      "item": [
+        {
+          "name": "Ask Doctor / Patient QA",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/patient/chat",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{patientToken}}", "type": "string" }]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"What does my report say about my platelet recovery?\",\n  \"lang\": \"en\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Doctor AI Overview",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reports/:id/ai-overview",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{doctorToken}}", "type": "string" }]
+            }
+          }
+        },
+        {
+          "name": "Doctor Copilot Search",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/doctor/copilot/search?priority=critical",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{doctorToken}}", "type": "string" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Privacy Operations",
+      "item": [
+        {
+          "name": "Export Patient Data (GDPR/DPDP)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/patient/privacy/export",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{patientToken}}", "type": "string" }]
+            }
+          }
+        },
+        {
+          "name": "Right to Be Forgotten / Account Erasure",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/patient/privacy/account",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{patientToken}}", "type": "string" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

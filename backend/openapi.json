@@ -1,0 +1,429 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ReportSetu Healthcare Platform API",
+    "version": "1.0.0",
+    "description": "Production-grade REST and Real-Time clinical communication API for ReportSetu. Powers patient care, doctor triage, laboratory report pipelines, medication adherence, and dual AI agents."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/v1",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Access token in Authorization header: Bearer <token>"
+      }
+    }
+  },
+  "paths": {
+    "/auth/otp/send": {
+      "post": {
+        "summary": "Send OTP to mobile number",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone"],
+                "properties": {
+                  "phone": { "type": "string", "example": "+919876543210" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP dispatched successfully" }
+        }
+      }
+    },
+    "/auth/otp/verify": {
+      "post": {
+        "summary": "Verify OTP and obtain JWT tokens",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone", "code"],
+                "properties": {
+                  "phone": { "type": "string", "example": "+919876543210" },
+                  "code": { "type": "string", "example": "123456" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Authenticated successfully with tokens and profile" }
+        }
+      }
+    },
+    "/auth/tokens/refresh": {
+      "post": {
+        "summary": "Rotate refresh token and issue fresh access token",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Token refreshed successfully" }
+        }
+      }
+    },
+    "/connections/code/generate": {
+      "post": {
+        "summary": "Generate 6-character patient Connect Code with QR payload",
+        "tags": ["Connections"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Connect code generated with 15-minute TTL" }
+        }
+      }
+    },
+    "/connections/code/claim": {
+      "post": {
+        "summary": "Doctor claims patient Connect Code to establish active link",
+        "tags": ["Connections"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code"],
+                "properties": {
+                  "code": { "type": "string", "example": "AB12CD" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Patient-Doctor connection established" }
+        }
+      }
+    },
+    "/reports/upload": {
+      "post": {
+        "summary": "Upload and parse clinical laboratory report",
+        "tags": ["Reports"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": { "type": "string", "format": "binary" },
+                  "category": { "type": "string", "example": "CBC" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Report uploaded and parameters extracted" }
+        }
+      }
+    },
+    "/reports/{id}/confirm": {
+      "put": {
+        "summary": "Patient confirms or manually corrects extracted parameter values",
+        "tags": ["Reports"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "parameters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "value": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Report parameters confirmed" }
+        }
+      }
+    },
+    "/reports/{id}/ai-overview": {
+      "post": {
+        "summary": "Generate structured clinical AI Overview for doctor review",
+        "tags": ["AI Agents"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Structured AI Overview with key findings and points to consider" }
+        }
+      }
+    },
+    "/reports/{id}/generate-draft": {
+      "post": {
+        "summary": "Generate draft summary in English and Hindi for doctor approval",
+        "tags": ["AI Agents"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Draft generated and stored in pending status" }
+        }
+      }
+    },
+    "/reports/{id}/review": {
+      "put": {
+        "summary": "Doctor approves report, summary, and next test date",
+        "tags": ["Reports"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["summaryText"],
+                "properties": {
+                  "summaryText": { "type": "string" },
+                  "nextTestDate": { "type": "string" },
+                  "medicinesStatus": { "type": "string", "enum": ["No change", "Changed"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Report reviewed and approved" }
+        }
+      }
+    },
+    "/doctor/patients": {
+      "get": {
+        "summary": "Doctor patient triage directory with search and priority filtering",
+        "tags": ["Doctor"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "priority", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of connected patients with priority ranking" }
+        }
+      }
+    },
+    "/doctor/copilot/search": {
+      "get": {
+        "summary": "Doctor Copilot search across connected patients and clinical flags",
+        "tags": ["AI Agents"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "query", "in": "query", "schema": { "type": "string" } },
+          { "name": "testCode", "in": "query", "schema": { "type": "string" } },
+          { "name": "priority", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Matched patient clinical findings" }
+        }
+      }
+    },
+    "/doctor/threads/{id}/suggest-reply": {
+      "post": {
+        "summary": "Generate contextual draft reply for patient question",
+        "tags": ["AI Agents"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Suggested clinical reply generated" }
+        }
+      }
+    },
+    "/prescriptions": {
+      "post": {
+        "summary": "Doctor creates new digital prescription with medicine schedule",
+        "tags": ["Prescriptions"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["patientId", "name", "startDate", "totalDays", "instructions"],
+                "properties": {
+                  "patientId": { "type": "string" },
+                  "name": { "type": "string" },
+                  "startDate": { "type": "string" },
+                  "totalDays": { "type": "number" },
+                  "instructions": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Prescription created and schedule synced" }
+        }
+      }
+    },
+    "/medicines/today": {
+      "get": {
+        "summary": "Patient gets today's scheduled medicines",
+        "tags": ["Medicines"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "List of today's doses" }
+        }
+      }
+    },
+    "/medicines/{id}/action": {
+      "post": {
+        "summary": "Record dose taken, snoozed, or missed",
+        "tags": ["Medicines"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["action"],
+                "properties": {
+                  "action": { "type": "string", "enum": ["take", "snooze", "miss"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Dose status recorded" }
+        }
+      }
+    },
+    "/appointments/request": {
+      "post": {
+        "summary": "Patient requests new appointment slot with anti-double-booking protection",
+        "tags": ["Appointments"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["doctorId", "date", "slotDate", "time", "reason"],
+                "properties": {
+                  "doctorId": { "type": "string" },
+                  "date": { "type": "string" },
+                  "slotDate": { "type": "string" },
+                  "time": { "type": "string" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Appointment request submitted" }
+        }
+      }
+    },
+    "/patient/chat": {
+      "post": {
+        "summary": "Ask Doctor / Grounded Patient QA assistant with clinical safety guardrails",
+        "tags": ["AI Agents"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": { "type": "string" },
+                  "lang": { "type": "string", "enum": ["en", "hi"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Grounded answer with citations or medical safety escalation" }
+        }
+      }
+    },
+    "/patient/privacy/export": {
+      "get": {
+        "summary": "GDPR/DPDP patient health data export",
+        "tags": ["Privacy"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Complete personal health data package" }
+        }
+      }
+    },
+    "/patient/privacy/account": {
+      "delete": {
+        "summary": "Right to be forgotten: account and records erasure",
+        "tags": ["Privacy"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Account and clinical records permanently erased" }
+        }
+      }
+    },
+    "/health/live": {
+      "get": {
+        "summary": "Liveness probe",
+        "tags": ["Health"],
+        "responses": {
+          "200": { "description": "Service is alive" }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Readiness probe checking database connectivity",
+        "tags": ["Health"],
+        "responses": {
+          "200": { "description": "Database connected and ready" },
+          "503": { "description": "Database unavailable" }
+        }
+      }
+    }
+  }
+}

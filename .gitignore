@@ -1,0 +1,128 @@
+# ==============================================================================
+# ReportSetu Root .gitignore
+# Production rules covering Backend (Node/TS/Prisma), Frontend (Vite/React/TS),
+# and Machine Learning (Python/FastAPI/Pytest).
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment Variables & Credentials (CRITICAL: Never commit secrets)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+!*.env.example
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+secrets/
+credentials.json
+
+# ------------------------------------------------------------------------------
+# 2. Node & Frontend Dependencies and Build Outputs
+# ------------------------------------------------------------------------------
+node_modules/
+*/node_modules/
+dist/
+*/dist/
+build/
+*/build/
+out/
+.next/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Prisma generated client
+/backend/src/generated/prisma/
+src/generated/prisma/
+
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# 3. Python & Machine Learning
+# ------------------------------------------------------------------------------
+__pycache__/
+**/__pycache__/
+*/*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+eggs/
+.eggs/
+parts/
+var/
+sdist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+**/.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ------------------------------------------------------------------------------
+# 4. OS, IDE & Editor Specific Files
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+*~
+
+# ------------------------------------------------------------------------------
+# 5. Large Binary Archives, Mockups & Temporary Files
+# ------------------------------------------------------------------------------
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+Frames/
+tmp/
+temp/
+scratch/
+*.log
+logs/
+*.sqlite
+*.sqlite3
