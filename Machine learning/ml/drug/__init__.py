@@ -17,6 +17,7 @@ from .language import draft_summary, patient_chat
 from .analysis import analyze_patient
 from .forecast import forecast_hba1c
 from .agents import triage
+from .drug_service import get_drug_indication, get_drug_info
 
 __all__ = [
     "extract_report",
@@ -25,4 +26,6 @@ __all__ = [
     "analyze_patient",
     "forecast_hba1c",
     "triage",
+    "get_drug_indication",
+    "get_drug_info",
 ]
