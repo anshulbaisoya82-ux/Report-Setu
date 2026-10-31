@@ -15,6 +15,7 @@ import {
   HeartPulse,
   User,
 } from 'lucide-react';
+import { PrescribeDialog } from '../../components/prescriptions/PrescribeDialog';
 
 export const DoctorPatientMedicines: React.FC = () => {
   const navigate = useNavigate();
@@ -35,9 +36,8 @@ export const DoctorPatientMedicines: React.FC = () => {
   }, []);
 
   const patient =
-    patients.find((p) => p.id === patientId || p.rsId === patientId || (p as any)._id === patientId) ||
-    patients[0] ||
-    null;
+    // Never fall back to a different patient: prescribing to the wrong person is a safety risk.
+    patients.find((p) => p.id === patientId || p.rsId === patientId || (p as any)._id === patientId) || null;
 
   useEffect(() => {
     if (patient) {
@@ -46,14 +46,7 @@ export const DoctorPatientMedicines: React.FC = () => {
     }
   }, [patient?.id]);
 
-  const [newMedName, setNewMedName] = useState('');
-  const [newDose, setNewDose] = useState('1 tablet');
-  const [newFrequency, setNewFrequency] = useState('Morning and Night');
-  const [newDuration, setNewDuration] = useState('30');
-  const [newAdvice, setNewAdvice] = useState('Take with water after meals. Walk 30 minutes daily.');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [prescribedSuccess, setPrescribedSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showPrescribe, setShowPrescribe] = useState(false);
 
   const patientPrescriptions = patient
     ? prescriptions.filter((p) => p.patientId === patient.id || (patient as any)._id === p.patientId)
@@ -62,40 +55,6 @@ export const DoctorPatientMedicines: React.FC = () => {
   const activePrescriptions = patientPrescriptions.filter((p) => p.status === 'Active');
   const endedPrescriptions = patientPrescriptions.filter((p) => p.status === 'Ended');
   const activePrescription = activePrescriptions[0] || null;
-
-  const handleCreatePrescription = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMedName.trim() || !patient) return;
-
-    setIsSubmitting(true);
-    setErrorMsg(null);
-
-    try {
-      await createPrescription({
-        patientId: patient.id,
-        name: newMedName.trim(),
-        instructions: `${newDose} · ${newFrequency} · after food`,
-        totalDays: Number(newDuration) || 30,
-        advice: newAdvice.trim() ? [newAdvice.trim()] : [],
-        medicines: [
-          {
-            name: newMedName.trim(),
-            dose: newDose,
-            timing: newFrequency,
-            instructions: 'after food',
-          },
-        ],
-      });
-
-      setPrescribedSuccess(true);
-      setNewMedName('');
-      setTimeout(() => setPrescribedSuccess(false), 2500);
-    } catch (err: any) {
-      setErrorMsg(err?.message || 'Failed to issue prescription');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   if (!patient) {
     return (
@@ -276,113 +235,18 @@ export const DoctorPatientMedicines: React.FC = () => {
             </div>
           </div>
 
-          {prescribedSuccess && (
-            <div className="bg-[#E4EDE8] text-[#2B5246] p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#2E9E6B]" />
-              <span>Prescription & reminders saved successfully!</span>
-            </div>
-          )}
-
-          {errorMsg && (
-            <div className="bg-rose-100 text-rose-900 p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleCreatePrescription} className="space-y-4 text-xs">
-            <div>
-              <label className="block font-semibold text-stone-700 mb-1">Medicine name & strength *</label>
-              <input
-                type="text"
-                value={newMedName}
-                onChange={(e) => setNewMedName(e.target.value)}
-                placeholder="e.g. Metformin 500 mg"
-                required
-                className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35]"
-              />
-              <div className="flex items-center gap-1.5 flex-wrap pt-1.5">
-                {[
-                  'Metformin 500 mg',
-                  'Amoxicillin 500 mg',
-                  'Pantoprazole 40 mg',
-                  'Atorvastatin 10 mg',
-                  'Telmisartan 40 mg',
-                  'Paracetamol 650 mg',
-                ].map((med) => (
-                  <button
-                    type="button"
-                    key={med}
-                    onClick={() => setNewMedName(med)}
-                    className="text-[10px] font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 px-2 py-0.5 rounded-md transition-all cursor-pointer"
-                  >
-                    + {med}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Dose *</label>
-                <input
-                  type="text"
-                  value={newDose}
-                  onChange={(e) => setNewDose(e.target.value)}
-                  placeholder="1 tablet"
-                  required
-                  className="w-full px-3.5 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
-                />
-              </div>
-
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">Duration (days) *</label>
-                <input
-                  type="number"
-                  value={newDuration}
-                  onChange={(e) => setNewDuration(e.target.value)}
-                  placeholder="30"
-                  min="1"
-                  required
-                  className="w-full px-3.5 py-2 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block font-semibold text-stone-700 mb-1">Frequency & Timing *</label>
-              <select
-                value={newFrequency}
-                onChange={(e) => setNewFrequency(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-stone-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
-              >
-                <option value="Morning and Night">Morning and Night (Twice daily)</option>
-                <option value="Morning only">Morning only (8:00 AM)</option>
-                <option value="Night only">Night only (9:00 PM)</option>
-                <option value="Thrice daily">Thrice daily (Morning, Noon, Night)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block font-semibold text-stone-700 mb-1">Clinical Instructions & Advice</label>
-              <textarea
-                value={newAdvice}
-                onChange={(e) => setNewAdvice(e.target.value)}
-                rows={2}
-                placeholder="e.g. Take with water after meals, walk 30 mins daily"
-                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-[#1E3F35] hover:bg-[#16322A] text-white py-2.5 rounded-xl font-bold shadow-sm transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-50"
-            >
-              <Pill className="w-4 h-4" />
-              <span>{isSubmitting ? 'Prescribing...' : 'Prescribe & Schedule Doses'}</span>
-            </button>
-          </form>
+          <p className="text-sm text-stone-600 leading-relaxed">
+            Add one or more medicines with dose, course length, reminder times and food instructions.
+            The patient gets a reminder at each time you pick.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowPrescribe(true)}
+            className="w-full bg-forest-900 hover:bg-forest-850 text-white py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> New prescription
+          </button>
+          <PrescribeDialog open={showPrescribe} onClose={() => setShowPrescribe(false)} patient={{ id: patient.id, name: patient.name, rsId: patient.rsId }} />
         </div>
       </div>
     </div>

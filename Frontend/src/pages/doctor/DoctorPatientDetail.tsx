@@ -34,6 +34,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { formatDate } from '../../utils/format';
+import { PrescribeDialog } from '../../components/prescriptions/PrescribeDialog';
 
 interface DoctorPatientDetailProps {
   initialTab?: 'Overview' | 'Lab Reports' | 'Appointments' | 'Medicines' | 'Notes';
@@ -187,68 +188,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     return true;
   });
 
-  // Prescribe form states
+  // Prescribe dialog (multi-medicine form lives in components/prescriptions)
   const [showPrescribeModal, setShowPrescribeModal] = useState(false);
-  const [prescribeName, setPrescribeName] = useState('');
-  const [prescribeDose, setPrescribeDose] = useState('1 tablet');
-  const [prescribeFrequency, setPrescribeFrequency] = useState('Morning and Night');
-  const [prescribeTimings, setPrescribeTimings] = useState<string[]>(['Morning', 'Night']);
-  const [prescribeMeal, setPrescribeMeal] = useState('After food');
-  const [prescribeDuration, setPrescribeDuration] = useState('30');
-  const [prescribeAdvice, setPrescribeAdvice] = useState('Take with full glass of water. Maintain consistent daily timing.');
-  const [isPrescribing, setIsPrescribing] = useState(false);
-  const [prescribeSuccess, setPrescribeSuccess] = useState(false);
-  const [prescribeError, setPrescribeError] = useState<string | null>(null);
-
-  const toggleTiming = (t: string) => {
-    if (prescribeTimings.includes(t)) {
-      if (prescribeTimings.length > 1) {
-        setPrescribeTimings(prescribeTimings.filter((item) => item !== t));
-      }
-    } else {
-      setPrescribeTimings([...prescribeTimings, t]);
-    }
-  };
-
-  const handlePrescribeSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!patient || !prescribeName.trim()) return;
-
-    setIsPrescribing(true);
-    setPrescribeError(null);
-
-    const timingStr = prescribeTimings.join(' and ');
-    const fullInstructions = `${prescribeDose} · ${timingStr || prescribeFrequency} · ${prescribeMeal}`;
-
-    try {
-      await createPrescription({
-        patientId: patient.id,
-        name: prescribeName.trim(),
-        instructions: fullInstructions,
-        totalDays: Number(prescribeDuration) || 30,
-        advice: prescribeAdvice.trim() ? [prescribeAdvice.trim()] : [],
-        medicines: [
-          {
-            name: prescribeName.trim(),
-            dose: prescribeDose,
-            timing: timingStr || prescribeFrequency,
-            instructions: prescribeMeal,
-          },
-        ],
-      });
-
-      setPrescribeSuccess(true);
-      setPrescribeName('');
-      setTimeout(() => {
-        setPrescribeSuccess(false);
-        setShowPrescribeModal(false);
-      }, 1500);
-    } catch (err: any) {
-      setPrescribeError(err?.message || 'Failed to issue prescription');
-    } finally {
-      setIsPrescribing(false);
-    }
-  };
 
   const handleScheduleAppointmentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1296,185 +1237,11 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
         </>
       )}
 
-      {/* ==================================================================== */}
-      {/* MODAL: PRESCRIBE MEDICINE                                            */}
-      {/* ==================================================================== */}
-      {showPrescribeModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-stone-200 max-h-[90vh] overflow-y-auto space-y-5 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-stone-100 pb-4">
-              <div>
-                <h3 className="text-lg font-bold text-[#172B25] flex items-center gap-2">
-                  <Pill className="w-5 h-5 text-emerald-700" />
-                  <span>Prescribe Medicine</span>
-                </h3>
-                <p className="text-xs text-stone-500">Patient: {patient.name} ({patient.rsId})</p>
-              </div>
-              <button
-                onClick={() => setShowPrescribeModal(false)}
-                className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-500 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {prescribeSuccess && (
-              <div className="p-3.5 rounded-xl bg-emerald-100 text-emerald-900 text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Prescription saved! Doses and reminders dispatched to patient.</span>
-              </div>
-            )}
-
-            {prescribeError && (
-              <div className="p-3.5 rounded-xl bg-rose-100 text-rose-900 text-xs font-semibold flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600" />
-                <span>{prescribeError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handlePrescribeSubmit} className="space-y-4 text-xs">
-              {/* Medicine Name */}
-              <div className="space-y-1.5">
-                <label className="font-bold text-stone-700 block">Medicine & Strength *</label>
-                <input
-                  type="text"
-                  value={prescribeName}
-                  onChange={(e) => setPrescribeName(e.target.value)}
-                  placeholder="e.g. Metformin 500 mg, Amoxicillin 500 mg"
-                  required
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm"
-                />
-                <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                  {[
-                    'Metformin 500 mg',
-                    'Amoxicillin 500 mg',
-                    'Pantoprazole 40 mg',
-                    'Atorvastatin 10 mg',
-                    'Telmisartan 40 mg',
-                    'Paracetamol 650 mg',
-                  ].map((med) => (
-                    <button
-                      type="button"
-                      key={med}
-                      onClick={() => setPrescribeName(med)}
-                      className="text-[10px] px-2 py-0.5 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium cursor-pointer"
-                    >
-                      {med}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Dosage & Course Duration */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="font-bold text-stone-700 block">Dosage Quantity</label>
-                  <input
-                    type="text"
-                    value={prescribeDose}
-                    onChange={(e) => setPrescribeDose(e.target.value)}
-                    placeholder="e.g. 1 tablet, 5 ml"
-                    className="w-full px-3 py-2 rounded-xl border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="font-bold text-stone-700 block">Course (Days)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={prescribeDuration}
-                    onChange={(e) => setPrescribeDuration(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
-                  />
-                </div>
-              </div>
-
-              {/* Timings Multi-select */}
-              <div className="space-y-1.5">
-                <label className="font-bold text-stone-700 block">Dose Timing Slots (Creates daily reminders)</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {[
-                    { label: 'Morning', time: '08:00 AM' },
-                    { label: 'Noon', time: '01:00 PM' },
-                    { label: 'Evening', time: '06:30 PM' },
-                    { label: 'Night', time: '09:00 PM' },
-                  ].map((slot) => {
-                    const active = prescribeTimings.includes(slot.label);
-                    return (
-                      <button
-                        type="button"
-                        key={slot.label}
-                        onClick={() => toggleTiming(slot.label)}
-                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
-                          active
-                            ? 'bg-[#1E3F35] text-white border-[#1E3F35] shadow-xs'
-                            : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'
-                        }`}
-                      >
-                        <p className="font-bold text-xs">{slot.label}</p>
-                        <p className={`text-[10px] ${active ? 'text-emerald-200' : 'text-stone-400'}`}>
-                          {slot.time}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Meal Relationship */}
-              <div className="space-y-1.5">
-                <label className="font-bold text-stone-700 block">Food / Meal Instructions</label>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {['After food', 'Before food', 'With meals', 'Empty stomach'].map((meal) => (
-                    <button
-                      type="button"
-                      key={meal}
-                      onClick={() => setPrescribeMeal(meal)}
-                      className={`px-3 py-1.5 rounded-xl border text-xs font-semibold cursor-pointer ${
-                        prescribeMeal === meal
-                          ? 'bg-emerald-800 text-white border-emerald-900 shadow-2xs'
-                          : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'
-                      }`}
-                    >
-                      {meal}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Clinical & Lifestyle Advice */}
-              <div className="space-y-1.5">
-                <label className="font-bold text-stone-700 block">Lifestyle & Clinical Advice for Patient</label>
-                <textarea
-                  rows={2}
-                  value={prescribeAdvice}
-                  onChange={(e) => setPrescribeAdvice(e.target.value)}
-                  placeholder="e.g. Maintain hydration. Avoid high sodium. Monitor fasting glucose."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 text-xs"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-3 border-t border-stone-100">
-                <button
-                  type="button"
-                  onClick={() => setShowPrescribeModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-600 hover:bg-stone-100 font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPrescribing}
-                  className="px-5 py-2.5 rounded-xl bg-[#1E3F35] hover:bg-[#16322A] text-white font-bold shadow-sm transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
-                >
-                  <Pill className="w-4 h-4" />
-                  <span>{isPrescribing ? 'Prescribing...' : 'Prescribe & Set Reminders'}</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <PrescribeDialog
+        open={showPrescribeModal}
+        onClose={() => setShowPrescribeModal(false)}
+        patient={{ id: patient.id, name: patient.name, rsId: patient.rsId }}
+      />
 
       {/* ==================================================================== */}
       {/* MODAL: SCHEDULE NEW APPOINTMENT WITH PATIENT                         */}

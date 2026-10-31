@@ -3,6 +3,21 @@
 @tailwind utilities;
 
 @layer base {
+  /* The app is designed light-only. Without this, a dark-mode OS/browser paints
+     unstyled inputs black (the dark Prescribe Medicine fields). */
+  :root {
+    color-scheme: light;
+  }
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  textarea,
+  select {
+    background-color: #ffffff;
+    color: #172B25;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: #9AABA3;
+  }
   body {
     background-color: #ECF2ED;
     color: #172B25;

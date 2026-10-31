@@ -123,9 +123,10 @@ export const DoctorAppointments: React.FC = () => {
     e.preventDefault();
     setActionError(null);
 
-    const patient = patients.find((p) => p.id === selectedPatientId) || patients[0];
+    // Require an explicit choice: never book for a default patient.
+    const patient = patients.find((p) => p.id === selectedPatientId);
     if (!patient) {
-      setActionError('Please connect with a patient before scheduling an appointment.');
+      setActionError(patients.length ? 'Choose a patient for this appointment.' : 'Please connect with a patient before scheduling an appointment.');
       return;
     }
     if (!reason.trim()) {

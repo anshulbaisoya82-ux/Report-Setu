@@ -159,12 +159,13 @@ export const DoctorReportDetail: React.FC = () => {
   };
 
   const patient = patients.find(p => p.id === currentReport?.patientId) || {
-    id: currentReport?.patientId || 'p-unknown',
-    name: currentReport?.patientName || 'Rishabh',
-    rsId: 'RS-1HEAL',
-    age: 28,
-    gender: 'Male',
-    phone: '+919415211069',
+    // Patient list not loaded yet: show only what the report itself says.
+    id: currentReport?.patientId || '',
+    name: currentReport?.patientName || 'Patient',
+    rsId: '',
+    age: undefined as unknown as number,
+    gender: '',
+    phone: '',
   };
 
   // Tone changer
