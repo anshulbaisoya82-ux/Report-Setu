@@ -138,10 +138,16 @@ export const PatientLayout: React.FC = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <div className="p-8 max-w-[1400px] w-full mx-auto flex-1">
-          <Outlet />
-        </div>
+      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {location.pathname.startsWith('/patient/ask-doctor') ? (
+          <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
+            <Outlet />
+          </div>
+        ) : (
+          <div className="p-8 max-w-[1400px] w-full mx-auto flex-1 overflow-y-auto">
+            <Outlet />
+          </div>
+        )}
       </main>
     </div>
   );

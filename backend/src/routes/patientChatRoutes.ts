@@ -6,6 +6,7 @@ import {
   getPatientChatThread,
   getDoctorQuestionThreads,
   replyToPatientQuestion,
+  toggleAiTakeover,
 } from '../controllers/patientChatController';
 
 const router = Router();
@@ -15,8 +16,9 @@ router.post('/patient/chat', authenticate, requireRole('patient'), sendPatientMe
 router.get('/patient/chat/history', authenticate, requireRole('patient'), getPatientChatHistory);
 router.get('/patient/chat/thread', authenticate, requireRole('patient'), getPatientChatThread);
 
-// Doctor Questions Inbox & Replies
+// Doctor Questions Inbox, Replies & AI Takeover Control
 router.get('/doctor/questions', authenticate, requireRole('doctor'), getDoctorQuestionThreads);
 router.post('/doctor/questions/:threadId/reply', authenticate, requireRole('doctor'), replyToPatientQuestion);
+router.post('/doctor/questions/:threadId/toggle-ai', authenticate, requireRole('doctor'), toggleAiTakeover);
 
 export default router;

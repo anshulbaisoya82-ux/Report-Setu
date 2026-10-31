@@ -237,6 +237,13 @@ export const doctorApi = {
     });
   },
 
+  toggleAi: async (threadId: string, action: 'takeover' | 'resume') => {
+    return await apiFetch<any>(`/doctor/questions/${threadId}/toggle-ai`, {
+      method: 'POST',
+      body: JSON.stringify({ action }),
+    });
+  },
+
   getPatients: async (params: { search?: string; condition?: string; status?: string; page?: number; limit?: number } = {}) => {
     const query = new URLSearchParams();
     if (params.search) query.append('search', params.search);
@@ -590,6 +597,30 @@ export const adminApi = {
     return await apiFetch<{ message: string; count: number }>('/admin/doctors/verify-all?adminKey=reportsetu_admin_secret_key_12345', {
       method: 'POST',
       headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
+    });
+  },
+};
+
+/* =======================================================================
+ * Connections API
+ * ======================================================================= */
+export const connectionApi = {
+  getMyConnections: async () => {
+    const res = await apiFetch<{ connections: any[] }>('/connections/my');
+    return res?.connections || [];
+  },
+  getPatientPendingRequests: async () => {
+    return await apiFetch<any[]>('/connections/patient/pending');
+  },
+  approveConnection: async (connectionId: string) => {
+    return await apiFetch<any>('/connections/patient/approve', {
+      method: 'POST',
+      body: JSON.stringify({ connectionId }),
+    });
+  },
+  generateCode: async () => {
+    return await apiFetch<any>('/connections/patient/generate-code', {
+      method: 'POST',
     });
   },
 };
