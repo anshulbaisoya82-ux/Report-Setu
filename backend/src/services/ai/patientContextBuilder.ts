@@ -59,6 +59,36 @@ export interface ActivePrescriptionContext {
   endDate: string;
 }
 
+export interface AppointmentContext {
+  id: string;
+  doctorName: string;
+  date: string;
+  time: string;
+  type: string;
+  status: string;
+  reason: string;
+  notes?: string;
+}
+
+export interface MedicineScheduleContext {
+  id: string;
+  name: string;
+  dose: string;
+  timing: string;
+  scheduledTime: string;
+  date: string;
+  state: string;
+  takenAt?: string;
+  instructions?: string;
+}
+
+export interface ConnectedDoctorContext {
+  id: string;
+  name: string;
+  specialty: string;
+  clinic?: any;
+}
+
 export interface ConversationHistoryContext {
   sender: 'patient' | 'assistant' | 'doctor';
   text: string;
@@ -72,6 +102,9 @@ export interface PatientContext {
   trends: LongitudinalTrendContext[];
   approvedSummaries: ApprovedSummaryContext[];
   activePrescriptions: ActivePrescriptionContext[];
+  appointments: AppointmentContext[];
+  medicineSchedules: MedicineScheduleContext[];
+  connectedDoctors: ConnectedDoctorContext[];
   recentConversation: ConversationHistoryContext[];
   // Metadata verifying strict safety boundary
   sanitizedAt: string;
@@ -235,7 +268,59 @@ export async function buildPatientContext(patientId: string): Promise<PatientCon
     endDate: new Date(p.endDate).toISOString().split('T')[0],
   }));
 
-  // 5. Fetch recent conversation history
+  // 5. Fetch Appointments (Upcoming and Past)
+  const appointmentRecords = await prisma.appointment.findMany({
+    where: { patientId: profile.id },
+    orderBy: { date: 'desc' },
+    take: 8,
+  });
+
+  const appointments: AppointmentContext[] = appointmentRecords.map((a) => ({
+    id: a.id,
+    doctorName: a.doctorName,
+    date: a.date,
+    time: a.time,
+    type: a.type,
+    status: a.status,
+    reason: a.reason,
+    notes: a.notes || undefined,
+  }));
+
+  // 6. Fetch Recent Medicine Schedules (Today and Upcoming)
+  const scheduleRecords = await prisma.medicineSchedule.findMany({
+    where: { patientId: profile.id },
+    orderBy: [{ date: 'desc' }, { scheduledTime: 'asc' }],
+    take: 12,
+  });
+
+  const medicineSchedules: MedicineScheduleContext[] = scheduleRecords.map((s) => ({
+    id: s.id,
+    name: s.name,
+    dose: s.dose,
+    timing: s.timing,
+    scheduledTime: s.scheduledTime,
+    date: s.date,
+    state: s.state,
+    takenAt: s.takenAt || undefined,
+    instructions: s.instructions || undefined,
+  }));
+
+  // 7. Fetch Connected Doctors
+  const connectionRecords = await prisma.connection.findMany({
+    where: { patientId: profile.id, status: 'connected' },
+    include: { doctor: true },
+  });
+
+  const connectedDoctors: ConnectedDoctorContext[] = connectionRecords
+    .filter((c) => Boolean(c.doctor))
+    .map((c) => ({
+      id: c.doctor.id,
+      name: c.doctor.name,
+      specialty: c.doctor.specialty,
+      clinic: c.doctor.clinic,
+    }));
+
+  // 8. Fetch recent conversation history
   const messages = await prisma.chatMessage.findMany({
     where: { patientId: profile.id },
     orderBy: { createdAt: 'desc' },
@@ -257,6 +342,9 @@ export async function buildPatientContext(patientId: string): Promise<PatientCon
     trends,
     approvedSummaries,
     activePrescriptions,
+    appointments,
+    medicineSchedules,
+    connectedDoctors,
     recentConversation,
     sanitizedAt: new Date().toISOString(),
     hasPrivateNotes: false,

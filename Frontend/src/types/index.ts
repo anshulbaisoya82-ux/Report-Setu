@@ -125,7 +125,7 @@ export interface Appointment {
 
 export interface ChatMessage {
   id: string;
-  sender: 'patient' | 'assistant' | 'doctor';
+  sender: 'patient' | 'assistant' | 'doctor' | 'system';
   text: string;
   timestamp: string;
   isMedicineQuestion?: boolean;
@@ -147,6 +147,8 @@ export interface PatientQuestionThread {
   category: 'General' | 'Medicine' | 'Report';
   unreadCount: number;
   lastMessageTime: string;
+  isAiPaused?: boolean;
+  doctorName?: string;
   messages: ChatMessage[];
   suggestedReply?: string;
 }

@@ -3,22 +3,25 @@ import { Link } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import { 
   MessageSquare, AlertTriangle, CheckCircle, Clock, Send, 
-  Sparkles, Phone, User, Check, Search
+  Sparkles, Phone, User, Check, Search, PauseCircle, Stethoscope
 } from 'lucide-react';
+import { doctorApi } from '../../api';
 
 export const DoctorPatientQuestions: React.FC = () => {
-  const { questionThreads, fetchQuestionThreads, sendDoctorReply } = useStore();
+  const { questionThreads, fetchQuestionThreads, sendDoctorReply, currentUser } = useStore();
   const [activeTab, setActiveTab] = useState<'all' | 'unanswered' | 'medicine' | 'resolved'>('all');
   const [selectedThreadId, setSelectedThreadId] = useState<string>(questionThreads[0]?.id || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [replyText, setReplyText] = useState('');
-  const [successToast, setSuccessToast] = useState(false);
+  const [isTogglingAi, setIsTogglingAi] = useState(false);
+  const [toastInfo, setToastInfo] = useState<{ message: string; sub?: string } | null>(null);
 
   React.useEffect(() => {
     void fetchQuestionThreads();
   }, [fetchQuestionThreads]);
 
   const selectedThread = questionThreads.find(t => t.id === selectedThreadId) || questionThreads[0];
+  const currentDoctorName = currentUser?.name || selectedThread?.doctorName || 'Dr. Attending Physician';
 
   const filteredThreads = questionThreads.filter(t => {
     if (activeTab === 'unanswered' && t.unreadCount === 0) return false;
@@ -42,14 +45,45 @@ export const DoctorPatientQuestions: React.FC = () => {
     }
   };
 
-  const handleSendReply = (e: React.FormEvent) => {
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!replyText.trim() || !selectedThread) return;
 
-    void sendDoctorReply(selectedThread.id, replyText);
+    const textToSend = replyText;
     setReplyText('');
-    setSuccessToast(true);
-    setTimeout(() => setSuccessToast(false), 3000);
+
+    try {
+      await sendDoctorReply(selectedThread.id, textToSend);
+      setToastInfo({
+        message: `Reply sent to ${selectedThread.patientName}!`,
+        sub: 'Patient has received an instant notification in their portal.',
+      });
+      setTimeout(() => setToastInfo(null), 3500);
+    } catch (err: any) {
+      console.error('Error sending reply:', err);
+      alert(err.message || 'Failed to send reply');
+    }
+  };
+
+  const handleToggleAi = async (action: 'takeover' | 'resume') => {
+    if (!selectedThread || isTogglingAi) return;
+    setIsTogglingAi(true);
+    try {
+      await doctorApi.toggleAi(selectedThread.id, action);
+      await fetchQuestionThreads();
+      setToastInfo({
+        message: action === 'takeover' ? 'Conversation Taken Over' : 'AI Assistant Resumed',
+        sub: action === 'takeover'
+          ? `AI automated replies are paused. You are now handling patient ${selectedThread.patientName} directly.`
+          : `Setu AI Assistant is resumed and will answer report & appointment questions for ${selectedThread.patientName}.`,
+      });
+      setTimeout(() => setToastInfo(null), 4000);
+    } catch (err: any) {
+      console.error('Error toggling AI state:', err);
+      alert(err.message || 'Failed to toggle AI');
+    } finally {
+      setIsTogglingAi(false);
+    }
   };
 
   const insertQuickTemplate = (template: string) => {
@@ -59,12 +93,12 @@ export const DoctorPatientQuestions: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Toast Notification */}
-      {successToast && (
+      {toastInfo && (
         <div className="fixed top-6 right-6 z-50 bg-[#1E3F35] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-forest-700 animate-in fade-in slide-in-from-top-4">
-          <CheckCircle className="w-5 h-5 text-accent-teal" />
+          <CheckCircle className="w-5 h-5 text-accent-teal shrink-0" />
           <div>
-            <p className="font-semibold text-sm">Reply sent to {selectedThread?.patientName}!</p>
-            <p className="text-xs text-forest-200">Patient has received an instant push notification & WhatsApp message.</p>
+            <p className="font-semibold text-sm">{toastInfo.message}</p>
+            {toastInfo.sub && <p className="text-xs text-forest-200">{toastInfo.sub}</p>}
           </div>
         </div>
       )}
@@ -110,7 +144,7 @@ export const DoctorPatientQuestions: React.FC = () => {
             }`}
           >
             <AlertTriangle className="w-3 h-3 text-amber-600" />
-            Medicine related ({questionThreads.filter(t => t.category === 'Medicine').length})
+            Medicine / Prescription ({questionThreads.filter(t => t.category === 'Medicine').length})
           </button>
           <button
             onClick={() => setActiveTab('resolved')}
@@ -178,17 +212,27 @@ export const DoctorPatientQuestions: React.FC = () => {
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {thread.category === 'Medicine' && (
                       <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-200 flex items-center gap-1">
-                        <AlertTriangle className="w-2.5 h-2.5" /> Medicine Alert
+                        <AlertTriangle className="w-2.5 h-2.5" /> Rx / Medicine
+                      </span>
+                    )}
+
+                    {thread.isAiPaused ? (
+                      <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[10px] font-semibold border border-amber-300 flex items-center gap-1">
+                        <PauseCircle className="w-2.5 h-2.5 text-amber-700" /> AI Paused
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-medium border border-emerald-200 flex items-center gap-1">
+                        <Sparkles className="w-2.5 h-2.5 text-emerald-600" /> AI Active
                       </span>
                     )}
 
                     {thread.unreadCount > 0 ? (
                       <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-bold border border-red-200">
-                        Needs Doctor Reply ({thread.unreadCount})
+                        Needs Reply ({thread.unreadCount})
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-medium border border-emerald-200 flex items-center gap-0.5">
-                        <Check className="w-2.5 h-2.5" /> Answered
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-medium border border-slate-200 flex items-center gap-0.5">
+                        <Check className="w-2.5 h-2.5" /> Handled
                       </span>
                     )}
                   </div>
@@ -208,7 +252,7 @@ export const DoctorPatientQuestions: React.FC = () => {
         <div className="lg:col-span-7 flex flex-col bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
           {selectedThread ? (
             <>
-              {/* Patient Banner */}
+              {/* Patient Banner with AI Takeover Toggle Button */}
               <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#1E3F35] text-white font-bold flex items-center justify-center text-sm shadow-xs">
@@ -227,20 +271,37 @@ export const DoctorPatientQuestions: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => alert(`Initiating direct voice call to patient: +91 98765 43210`)}
-                    className="p-2 text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 shadow-2xs"
-                    title="Direct Call"
-                  >
-                    <Phone className="w-4 h-4 text-forest-700" />
-                  </button>
+                {/* AI Takeover / Handback Controls */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {selectedThread.isAiPaused ? (
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAi('resume')}
+                      disabled={isTogglingAi}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-300 rounded-xl hover:bg-emerald-100 transition-colors shadow-2xs cursor-pointer"
+                      title="Re-enable Gemini clinical assistant for this patient"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{isTogglingAi ? 'Updating...' : 'Resume AI Assistant'}</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAi('takeover')}
+                      disabled={isTogglingAi}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-900 bg-amber-50 border border-amber-300 rounded-xl hover:bg-amber-100 transition-colors shadow-2xs cursor-pointer"
+                      title="Pause AI assistant and take over direct communication"
+                    >
+                      <PauseCircle className="w-3.5 h-3.5 text-amber-700" />
+                      <span>{isTogglingAi ? 'Updating...' : 'Take Over Conversation'}</span>
+                    </button>
+                  )}
 
                   <Link
                     to={`/doctor/patients/${selectedThread.patientId}`}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-forest-800 bg-forest-50 border border-forest-200 rounded-xl hover:bg-forest-100 transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-forest-800 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shadow-2xs"
                   >
-                    <User className="w-3.5 h-3.5" /> Full Record
+                    <User className="w-3.5 h-3.5" /> Profile
                   </Link>
                 </div>
               </div>
@@ -250,7 +311,7 @@ export const DoctorPatientQuestions: React.FC = () => {
                 <div className="bg-[#FFF8E6] border-b border-[#F7E7B4] px-4 py-3 flex items-center gap-3">
                   <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
                   <p className="text-xs text-amber-900 leading-snug">
-                    <span className="font-bold">Medicine inquiry safety protocol:</span> Patient is inquiring about stopping or changing dose. Review patient active medications before replying.
+                    <span className="font-bold">Clinical Safety Protocol:</span> Patient inquired about prescription or dosage alterations. Automated AI is paused so you can advise directly.
                   </p>
                 </div>
               )}
@@ -260,6 +321,19 @@ export const DoctorPatientQuestions: React.FC = () => {
                 {selectedThread.messages.map(msg => {
                   const isDoctor = msg.sender === 'doctor';
                   const isAssistant = msg.sender === 'assistant';
+                  const isSystem = msg.sender === 'system';
+
+                  if (isSystem) {
+                    return (
+                      <div key={msg.id} className="flex justify-center my-2">
+                        <div className="bg-slate-200/80 text-slate-700 text-[11px] font-medium px-3.5 py-1 rounded-full border border-slate-300 flex items-center gap-1.5 shadow-2xs">
+                          <Clock className="w-3 h-3 text-slate-500" />
+                          <span>{msg.text}</span>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <div 
                       key={msg.id} 
@@ -267,7 +341,17 @@ export const DoctorPatientQuestions: React.FC = () => {
                     >
                       <div className="flex items-center gap-1.5 mb-1 px-1">
                         <span className="text-[10px] font-bold text-slate-600">
-                          {isDoctor ? 'Dr. Priya Mehta' : isAssistant ? 'Setu Assistant' : selectedThread.patientName}
+                          {isDoctor ? (
+                            <span className="text-forest-900 flex items-center gap-1">
+                              <Stethoscope className="w-3 h-3 text-forest-700" /> {currentDoctorName}
+                            </span>
+                          ) : isAssistant ? (
+                            <span className="text-[#0C736A] flex items-center gap-1">
+                              <Sparkles className="w-3 h-3 text-[#0A887D]" /> Setu AI Assistant
+                            </span>
+                          ) : (
+                            selectedThread.patientName
+                          )}
                         </span>
                         <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
                       </div>

@@ -53,15 +53,41 @@ export class MockAIProvider implements IAIProvider {
     _options?: AICompletionOptions
   ): Promise<AICompletionResult> {
     const textPrompt = normalizePromptText(prompt);
-    let responseText =
-      'Based on verified clinical lab values, your health metrics are being monitored according to clinical guidelines. Consult Dr. Priya Mehta for repeat test timings.';
+    const lowerPrompt = textPrompt.toLowerCase();
+    
+    // Extract doctor name if present in prompt
+    const docMatch = textPrompt.match(/Connected Treating Doctor:\s*([^\n\r(]+)/i) || textPrompt.match(/Dr\.\s*([A-Za-z]+)/i);
+    const doctorName = docMatch ? docMatch[1].trim() : 'your doctor';
 
-    if (textPrompt.toLowerCase().includes('json') || _options?.jsonMode) {
+    let responseText = `Based on your medical records and care plan with Dr. ${doctorName}, your health indicators are monitored in line with clinical guidelines. Please reach out to Dr. ${doctorName} for any adjustments.`;
+
+    if (lowerPrompt.includes('appointment')) {
+      const appMatch = textPrompt.match(/- (\d{4}-\d{2}-\d{2}[^\n\r]*)/i);
+      if (appMatch) {
+        responseText = `You have an appointment on ${appMatch[1]}. You can also book or reschedule consultations directly through the Appointments section.`;
+      } else {
+        responseText = `You do not have any upcoming appointments scheduled currently. You can request a consultation with Dr. ${doctorName} from the Appointments tab.`;
+      }
+    } else if (lowerPrompt.includes('medicine') || lowerPrompt.includes('medication') || lowerPrompt.includes('schedule') || lowerPrompt.includes('dose') || lowerPrompt.includes('pill')) {
+      const medLines = textPrompt.split('\n').filter((l: string) => l.trim().startsWith('- ') && (l.includes('mg') || l.includes('tab') || l.includes('AM') || l.includes('PM')));
+      if (medLines.length > 0) {
+        responseText = `Your current scheduled medicines on file include:\n${medLines.slice(0, 3).join('\n')}\nPlease take them strictly as advised by Dr. ${doctorName}.`;
+      } else {
+        responseText = `There are currently no active medication schedules logged for today. Please consult Dr. ${doctorName} for any prescription questions.`;
+      }
+    } else if (lowerPrompt.includes('platelet') || lowerPrompt.includes('plt')) {
+      const pltMatch = textPrompt.match(/platelet[^\n\r]*?:\s*([^\n\r]+)/i);
+      if (pltMatch) {
+        responseText = `According to your verified lab report, your platelet count is ${pltMatch[1]}. Please consult Dr. ${doctorName} to discuss these findings.`;
+      } else {
+        responseText = `Please check your latest lab report in the My Reports section for your exact platelet count, or consult Dr. ${doctorName}.`;
+      }
+    } else if (lowerPrompt.includes('json') || _options?.jsonMode) {
       responseText = JSON.stringify({
         summary: 'Parameters evaluated with regular reference intervals.',
         confidence: 0.95,
         clinicalFlag: 'Normal',
-        recommendation: 'Continue prescribed medications and routine test schedule.',
+        recommendation: `Continue prescribed medications and routine schedule under Dr. ${doctorName}.`,
       });
     }
 
