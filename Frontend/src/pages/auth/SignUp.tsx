@@ -65,11 +65,11 @@ const PatientSignUp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#ECF2ED] p-6">
+    <div className="min-h-screen flex items-center justify-center bg-canvas p-6">
       <div className="w-full max-w-md bg-white rounded-3xl p-8 sm:p-10 shadow-card border border-stone-200/60">
         <Logo size="lg" />
         <div className="mt-8 mb-6">
-          <h1 className="text-2xl font-bold text-[#172B25]">Create your patient account</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Create your patient account</h1>
           <p className="text-sm text-stone-500 mt-1">Use your mobile number to securely access your health reports.</p>
         </div>
         {errorMessage && <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</div>}
@@ -83,7 +83,7 @@ const PatientSignUp: React.FC = () => {
               Mobile number
               <input value={phone} onChange={(e) => setPhone(e.target.value)} required name="phone" inputMode="tel" className="mt-1.5 w-full rounded-xl border border-stone-200 px-4 py-3" placeholder="10-digit mobile number" />
             </label>
-            <button disabled={isLoading} className="w-full rounded-xl bg-[#1E3F35] py-3 text-sm font-semibold text-white disabled:opacity-60">
+            <button disabled={isLoading} className="w-full rounded-xl bg-forest-900 py-3 text-sm font-semibold text-white disabled:opacity-60">
               {isLoading ? 'Sending code...' : 'Send verification code'}
             </button>
           </form>
@@ -92,14 +92,14 @@ const PatientSignUp: React.FC = () => {
             <p className="text-sm text-stone-600">Enter the 6-digit code sent to {phone}.</p>
             {devCode && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">Development code: {devCode}</p>}
             <input value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required inputMode="numeric" pattern="\d{6}" maxLength={6} className="w-full rounded-xl border border-stone-200 px-4 py-3 text-center text-lg tracking-[0.4em]" placeholder="000000" />
-            <button disabled={isLoading} className="w-full rounded-xl bg-[#1E3F35] py-3 text-sm font-semibold text-white disabled:opacity-60">
+            <button disabled={isLoading} className="w-full rounded-xl bg-forest-900 py-3 text-sm font-semibold text-white disabled:opacity-60">
               {isLoading ? 'Creating account...' : 'Verify and create account'}
             </button>
             <button type="button" onClick={() => setOtpSent(false)} className="w-full text-sm text-stone-500 hover:text-stone-800">Use a different number</button>
           </form>
         )}
         <p className="mt-6 text-center text-sm text-stone-500">
-          Already registered? <Link to="/login" className="font-semibold text-[#B53629] hover:underline">Log in</Link>
+          Already registered? <Link to="/login" className="font-semibold text-red-600 hover:underline">Log in</Link>
         </p>
       </div>
     </div>
@@ -197,9 +197,9 @@ export const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#ECF2ED]">
+    <div className="min-h-screen flex bg-canvas">
       {/* Left Branding Panel */}
-      <div className="hidden lg:flex lg:w-5/12 bg-[#1E3F35] text-white p-12 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-5/12 bg-forest-900 text-white p-12 flex-col justify-between relative overflow-hidden">
         <div className="absolute -top-32 -right-32 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -207,7 +207,7 @@ export const SignUp: React.FC = () => {
           <Logo size="lg" />
 
           <div className="mt-20 space-y-6 max-w-md">
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-white">
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
               Lab reports,
               <br />
               understood in seconds.
@@ -269,14 +269,14 @@ export const SignUp: React.FC = () => {
       <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
         <div className="flex justify-end items-center text-xs sm:text-sm">
           <span className="text-stone-500 mr-2">Already registered?</span>
-          <Link to="/login" className="font-semibold text-[#B53629] hover:underline">
+          <Link to="/login" className="font-semibold text-red-600 hover:underline">
             Log in
           </Link>
         </div>
 
         <div className="w-full max-w-xl mx-auto my-6 bg-white rounded-3xl p-8 sm:p-10 shadow-card border border-stone-200/60">
           <div className="mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
               Create your doctor account
             </h2>
             <p className="text-sm text-stone-500 mt-1">
@@ -307,7 +307,7 @@ export const SignUp: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     required
                     placeholder="Dr. Priya Mehta"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                   />
                 </div>
               </div>
@@ -325,7 +325,7 @@ export const SignUp: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                     required
                     placeholder="+91 98765 43210"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export const SignUp: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   placeholder="doctor@clinic.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                 />
               </div>
             </div>
@@ -363,7 +363,7 @@ export const SignUp: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, regNumber: e.target.value })}
                     required
                     placeholder="e.g. 12345"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                   />
                 </div>
               </div>
@@ -376,7 +376,7 @@ export const SignUp: React.FC = () => {
                   name="regCouncil"
                   value={formData.regCouncil}
                   onChange={(e) => setFormData({ ...formData, regCouncil: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25] bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink bg-white"
                 >
                   <option value="Delhi Medical Council">Delhi Medical Council</option>
                   <option value="Maharashtra Medical Council">Maharashtra Medical Council</option>
@@ -396,7 +396,7 @@ export const SignUp: React.FC = () => {
                   name="specialty"
                   value={formData.specialty}
                   onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25] bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink bg-white"
                 >
                   <option value="General Physician">General Physician</option>
                   <option value="Internal Medicine">Internal Medicine</option>
@@ -419,7 +419,7 @@ export const SignUp: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, clinicName: e.target.value })}
                     required
                     placeholder="Name of your clinic"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                   />
                 </div>
               </div>
@@ -439,7 +439,7 @@ export const SignUp: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     placeholder="Create a password"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                   />
                   <button
                     type="button"
@@ -464,15 +464,15 @@ export const SignUp: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
                     placeholder="Re-enter password"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                   />
                 </div>
               </div>
             </div>
 
             {/* Verification Info Box */}
-            <div className="bg-[#EBF4F0] border border-[#C6DBD0] rounded-xl p-3.5 flex items-start gap-3 text-xs text-[#2A554A]">
-              <Info className="w-4 h-4 text-[#35695C] flex-shrink-0 mt-0.5" />
+            <div className="bg-forest-50 border border-stone-300 rounded-xl p-3.5 flex items-start gap-3 text-xs text-forest-800">
+              <Info className="w-4 h-4 text-forest-700 flex-shrink-0 mt-0.5" />
               <span>
                 We verify your registration number before you can access patient data. Use at least 8
                 characters with a number and a symbol.
@@ -487,7 +487,7 @@ export const SignUp: React.FC = () => {
                 checked={formData.agreeTerms}
                 onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
                 required
-                className="rounded text-[#1E3F35] focus:ring-[#1E3F35]"
+                className="rounded text-forest-900 focus:ring-forest-900"
               />
               <label htmlFor="terms">
                 I agree to the <span className="font-semibold text-stone-800">Terms of Use</span>{' '}
@@ -498,7 +498,7 @@ export const SignUp: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#1E3F35] hover:bg-[#16322A] text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all mt-2"
+              className="w-full bg-forest-900 hover:bg-forest-950 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all mt-2"
             >
               <span>{isLoading ? 'Creating account...' : 'Create account'}</span>
               {!isLoading && <ArrowRight className="w-4 h-4" />}

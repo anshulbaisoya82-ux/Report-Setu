@@ -186,8 +186,8 @@ export const PatientAskDoctor: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-white animate-pulse">
-        <Sparkles className="w-8 h-8 text-[#0A887D] animate-spin mb-3" />
+      <div className="w-full h-full flex flex-col items-center justify-center bg-white">
+        <Sparkles className="w-8 h-8 text-teal-600 animate-spin mb-3" />
         <span className="text-xs text-slate-500 font-medium">Connecting to your clinical care thread...</span>
       </div>
     );
@@ -250,7 +250,7 @@ export const PatientAskDoctor: React.FC = () => {
 
   // ─── FULL SCREEN CHAT TAKEOVER ───────────────────────────────────────────
   return (
-    <div className="w-full h-full flex flex-col bg-[#F8FAF9] overflow-hidden">
+    <div className="w-full h-full flex flex-col bg-stone-50 overflow-hidden">
       {/* Top Header Bar */}
       <div className="bg-white border-b border-slate-200/80 px-6 py-3 flex items-center justify-between shrink-0 shadow-2xs z-10">
         {/* Doctor Information & Multi-Doctor Switcher */}
@@ -274,7 +274,7 @@ export const PatientAskDoctor: React.FC = () => {
                   ))}
                 </select>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-500 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <span className="text-[10px] text-emerald-700 font-medium block">
+                <span className="text-xs text-emerald-700 font-medium block">
                   Click to switch connected doctor
                 </span>
               </div>
@@ -283,7 +283,7 @@ export const PatientAskDoctor: React.FC = () => {
                 <h2 className="font-bold text-slate-900 text-xs sm:text-sm font-serif">
                   Dr. {activeDoctor?.name?.replace(/^(Dr\.|Doctor)\s+/i, '')}
                 </h2>
-                <span className="text-[11px] text-slate-500 font-medium flex items-center gap-1.5">
+                <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   {activeDoctor?.specialty || 'General Physician'} · Connected Care
                 </span>
@@ -295,13 +295,13 @@ export const PatientAskDoctor: React.FC = () => {
         {/* Live Status Badge & Session Reset */}
         <div className="flex items-center gap-3">
           {isAiPaused ? (
-            <div className="flex items-center gap-1.5 bg-[#FFF4E5] border border-[#FFD9A8] text-amber-950 px-3 py-1 rounded-full text-[11px] font-semibold shadow-2xs">
+            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-950 px-3 py-1 rounded-full text-xs font-semibold shadow-2xs">
               <PauseCircle className="w-3.5 h-3.5 text-amber-700" />
               <span>AI Paused · Doctor Escalated</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-[#E0F7F5] border border-[#80D7CE] text-[#0C736A] px-3 py-1 rounded-full text-[11px] font-semibold shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-[#0A887D]" />
+            <div className="flex items-center gap-1.5 bg-teal-50 border border-teal-300 text-teal-700 px-3 py-1 rounded-full text-xs font-semibold shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-teal-600" />
               <span>Setu AI Active</span>
             </div>
           )}
@@ -309,7 +309,7 @@ export const PatientAskDoctor: React.FC = () => {
           <button
             type="button"
             onClick={handleResetChat}
-            className="flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200/70 px-3 py-1.5 rounded-xl border border-slate-200 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200/70 px-3 py-1.5 rounded-xl border border-slate-200 transition-colors cursor-pointer"
             title="Start a fresh chat conversation"
           >
             <RotateCcw className="w-3 h-3 text-slate-500" />
@@ -338,7 +338,7 @@ export const PatientAskDoctor: React.FC = () => {
             if (isSystem) {
               return (
                 <div key={msg.id} className="flex justify-center w-full my-2">
-                  <div className="bg-slate-200/70 text-slate-600 text-[11px] font-medium px-4 py-1 rounded-full flex items-center gap-1.5 shadow-2xs border border-slate-300/60">
+                  <div className="bg-slate-200/70 text-slate-600 text-xs font-medium px-4 py-1 rounded-full flex items-center gap-1.5 shadow-2xs border border-slate-300/60">
                     <Clock className="w-3.5 h-3.5 text-slate-500" />
                     <span>{msg.text}</span>
                   </div>
@@ -350,12 +350,12 @@ export const PatientAskDoctor: React.FC = () => {
               return (
                 <div key={msg.id} className="flex justify-end w-full">
                   <div className="flex flex-col items-end max-w-[85%] sm:max-w-xl">
-                    <div className="flex items-center gap-1.5 mb-1 px-1 text-[10px] text-slate-400 font-medium">
+                    <div className="flex items-center gap-1.5 mb-1 px-1 text-xs text-slate-400 font-medium">
                       <span>You</span>
                       <span>·</span>
                       <span>{msg.timestamp}</span>
                     </div>
-                    <div className="bg-[#1E3F35] text-white rounded-2xl rounded-tr-xs px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-2xs">
+                    <div className="bg-forest-900 text-white rounded-2xl rounded-tr-xs px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-2xs">
                       <p className="whitespace-pre-wrap">{msg.text}</p>
                     </div>
                   </div>
@@ -370,13 +370,13 @@ export const PatientAskDoctor: React.FC = () => {
                     {getInitials(activeDoctor?.name)}
                   </div>
                   <div className="flex flex-col items-start max-w-[85%] sm:max-w-2xl">
-                    <div className="flex items-center gap-1.5 mb-1 px-1 text-[11px] font-medium text-slate-500">
+                    <div className="flex items-center gap-1.5 mb-1 px-1 text-xs font-medium text-slate-500">
                       <span className="font-bold text-forest-950 flex items-center gap-1">
                         <Stethoscope className="w-3.5 h-3.5 text-forest-700" /> Dr. {activeDoctor?.name?.replace(/^(Dr\.|Doctor)\s+/i, '')}
                       </span>
-                      <span className="bg-forest-100 text-forest-800 text-[9px] px-1.5 py-0.2 rounded font-semibold uppercase">Doctor</span>
+                      <span className="bg-forest-100 text-forest-800 text-xs px-1.5 py-0.2 rounded font-semibold uppercase">Doctor</span>
                       <span>·</span>
-                      <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
+                      <span className="text-xs text-slate-400">{msg.timestamp}</span>
                     </div>
                     <div className="bg-[#F2FAF6] text-forest-950 border border-forest-600/30 rounded-2xl rounded-tl-xs px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-2xs">
                       <p className="whitespace-pre-wrap font-medium">{msg.text}</p>
@@ -389,14 +389,14 @@ export const PatientAskDoctor: React.FC = () => {
             // Assistant Message
             return (
               <div key={msg.id} className="flex items-start gap-3 w-full">
-                <div className="w-8 h-8 rounded-full bg-[#E0F7F5] border border-[#80D7CE] text-[#0A887D] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                  <Sparkles className="w-4 h-4 text-[#0A887D]" />
+                <div className="w-8 h-8 rounded-full bg-teal-50 border border-teal-300 text-teal-600 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <Sparkles className="w-4 h-4 text-teal-600" />
                 </div>
                 <div className="flex flex-col items-start max-w-[85%] sm:max-w-2xl">
-                  <div className="flex items-center gap-1.5 mb-1 px-1 text-[11px] font-medium text-slate-500">
-                    <span className="font-semibold text-[#0C736A]">Setu AI Assistant</span>
+                  <div className="flex items-center gap-1.5 mb-1 px-1 text-xs font-medium text-slate-500">
+                    <span className="font-semibold text-teal-700">Setu AI Assistant</span>
                     <span>·</span>
-                    <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
+                    <span className="text-xs text-slate-400">{msg.timestamp}</span>
                   </div>
                   <div className="bg-white text-slate-800 border border-slate-200/90 rounded-2xl rounded-tl-xs px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-2xs">
                     <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -405,7 +405,7 @@ export const PatientAskDoctor: React.FC = () => {
                         {msg.citations.map((c, idx) => (
                           <span
                             key={idx}
-                            className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] px-2 py-0.5 rounded-md font-medium flex items-center gap-1"
+                            className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs px-2 py-0.5 rounded-md font-medium flex items-center gap-1"
                           >
                             <FileText className="w-3 h-3 text-emerald-700" /> {c.testName}: {c.value} {c.unit}
                           </span>
@@ -420,10 +420,10 @@ export const PatientAskDoctor: React.FC = () => {
 
           {isTyping && (
             <div className="flex items-start gap-3 w-full">
-              <div className="w-8 h-8 rounded-full bg-[#E0F7F5] border border-[#80D7CE] text-[#0A887D] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                <Sparkles className="w-4 h-4 text-[#0A887D] animate-spin" />
+              <div className="w-8 h-8 rounded-full bg-teal-50 border border-teal-300 text-teal-600 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                <Sparkles className="w-4 h-4 text-teal-600 animate-spin" />
               </div>
-              <div className="bg-white/90 border border-slate-200/80 rounded-2xl rounded-tl-xs px-4 py-2.5 text-xs text-slate-500 italic flex items-center gap-2 shadow-2xs animate-pulse">
+              <div className="bg-white/90 border border-slate-200/80 rounded-2xl rounded-tl-xs px-4 py-2.5 text-xs text-slate-500 italic flex items-center gap-2 shadow-2xs">
                 <span>Checking your approved reports…</span>
               </div>
             </div>
@@ -434,9 +434,9 @@ export const PatientAskDoctor: React.FC = () => {
       </div>
 
       {/* Suggestion Chips Bar */}
-      <div className="bg-white/90 backdrop-blur-xs border-t border-slate-200/60 py-2.5 px-4 sm:px-8 shrink-0">
-        <div className="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto text-[11px] no-scrollbar">
-          <span className="text-slate-400 font-semibold uppercase text-[10px] shrink-0">Quick Ask:</span>
+      <div className="bg-white/90 border-t border-slate-200/60 py-2.5 px-4 sm:px-8 shrink-0">
+        <div className="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto text-xs no-scrollbar">
+          <span className="text-slate-400 font-semibold uppercase text-xs shrink-0">Quick Ask:</span>
           <button
             type="button"
             onClick={() => handleUsePrompt('When is my next appointment with doctor?')}
@@ -494,7 +494,7 @@ export const PatientAskDoctor: React.FC = () => {
             <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </form>
-        <div className="max-w-4xl mx-auto mt-1.5 flex items-center justify-between text-[10px] text-slate-400 px-1">
+        <div className="max-w-4xl mx-auto mt-1.5 flex items-center justify-between text-xs text-slate-400 px-1">
           <span>Grounded in verified doctor summaries & lab parameters.</span>
           <span>Prescription requests require physician evaluation.</span>
         </div>

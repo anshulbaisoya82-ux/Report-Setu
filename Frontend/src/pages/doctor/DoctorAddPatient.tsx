@@ -171,7 +171,7 @@ export const DoctorAddPatient: React.FC = () => {
       </button>
 
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
           Connect new patient
         </h1>
         <p className="text-xs sm:text-sm text-stone-500 mt-1">
@@ -185,11 +185,11 @@ export const DoctorAddPatient: React.FC = () => {
           onClick={() => setCurrentStep('request')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
             currentStep === 'request'
-              ? 'bg-[#1E3F35] text-white shadow-xs'
+              ? 'bg-forest-900 text-white shadow-xs'
               : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
           }`}
         >
-          <span className="w-4 h-4 rounded-full bg-white/20 text-center text-[10px] leading-4 font-bold">1</span>
+          <span className="w-4 h-4 rounded-full bg-white/20 text-center text-xs leading-4 font-bold">1</span>
           <span>Send Request</span>
         </div>
 
@@ -199,18 +199,18 @@ export const DoctorAddPatient: React.FC = () => {
           onClick={() => setCurrentStep('verify')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
             currentStep === 'verify'
-              ? 'bg-[#1E3F35] text-white shadow-xs'
+              ? 'bg-forest-900 text-white shadow-xs'
               : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
           }`}
         >
-          <span className="w-4 h-4 rounded-full bg-white/20 text-center text-[10px] leading-4 font-bold">2</span>
+          <span className="w-4 h-4 rounded-full bg-white/20 text-center text-xs leading-4 font-bold">2</span>
           <span>Verify 2-Min Code</span>
         </div>
       </div>
 
       {/* Alerts */}
       {errorMessage && (
-        <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl text-xs text-rose-700 flex items-center justify-between gap-3 animate-in fade-in">
+        <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl text-xs text-rose-700 flex items-center justify-between gap-3">
           <div className="flex items-start gap-2.5">
             <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-rose-600" />
             <div className="space-y-0.5">
@@ -223,7 +223,7 @@ export const DoctorAddPatient: React.FC = () => {
             errorMessage.toLowerCase().includes('token')) && (
             <Link
               to="/login"
-              className="px-3.5 py-1.5 bg-[#B53629] text-white font-semibold rounded-xl hover:bg-[#962B20] transition-colors whitespace-nowrap text-xs shadow-xs flex-shrink-0"
+              className="px-3.5 py-1.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-[#962B20] transition-colors whitespace-nowrap text-xs shadow-xs flex-shrink-0"
             >
               Log in again
             </Link>
@@ -241,7 +241,7 @@ export const DoctorAddPatient: React.FC = () => {
       )}
 
       {successMessage && !errorMessage && (
-        <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-xs text-emerald-800 flex items-center gap-2.5 animate-in fade-in">
+        <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-xs text-emerald-800 flex items-center gap-2.5">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600" />
           <span className="font-medium">{successMessage}</span>
         </div>
@@ -256,10 +256,10 @@ export const DoctorAddPatient: React.FC = () => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-bold text-xs">
+                  <span className="w-6 h-6 rounded-full bg-forest-900 text-white flex items-center justify-center font-bold text-xs">
                     1
                   </span>
-                  <h3 className="font-bold text-sm text-[#172B25]">Enter patient's ReportSetu ID</h3>
+                  <h3 className="font-bold text-sm text-ink">Enter patient's ReportSetu ID</h3>
                 </div>
                 <p className="text-xs text-stone-500 pl-8">
                   Ask the patient for their ReportSetu ID (found on their home screen or profile).
@@ -272,19 +272,19 @@ export const DoctorAddPatient: React.FC = () => {
                       value={rsId}
                       onChange={(e) => setRsId(e.target.value.toUpperCase())}
                       placeholder="e.g. RS-10475"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 font-mono text-sm text-[#172B25] focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35]"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 font-mono text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={handleSendRequest}
                     disabled={requestLoading}
-                    className="bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2 active:scale-95 disabled:opacity-50"
+                    className="bg-forest-900 hover:bg-forest-950 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
                   >
                     {requestLoading ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <Send className="w-3.5 h-3.5 text-[#52B788]" />
+                      <Send className="w-3.5 h-3.5 text-emerald-400" />
                     )}
                     <span>Send Request</span>
                   </button>
@@ -293,12 +293,12 @@ export const DoctorAddPatient: React.FC = () => {
 
               {/* Informational Workflow Callout */}
               <div className="pl-8">
-                <div className="bg-[#EBF4F0] border border-[#C6DBD0] rounded-2xl p-4 text-xs text-[#2A554A] space-y-2">
-                  <div className="flex items-center gap-1.5 font-bold text-[#1E3F35]">
+                <div className="bg-forest-50 border border-stone-300 rounded-2xl p-4 text-xs text-forest-800 space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-forest-900">
                     <ShieldCheck className="w-4 h-4" />
                     <span>How the connection protocol works:</span>
                   </div>
-                  <ol className="list-decimal list-inside space-y-1 text-[11px] text-[#2A554A]/90 pl-1">
+                  <ol className="list-decimal list-inside space-y-1 text-xs text-forest-800/90 pl-1">
                     <li>You send a request with the patient's RS-ID.</li>
                     <li>Patient receives an in-app alert under <strong>Doctor Requests</strong>.</li>
                     <li>Patient reviews your credentials and taps <strong>Approve</strong>.</li>
@@ -314,7 +314,7 @@ export const DoctorAddPatient: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setCurrentStep('verify')}
-                  className="font-bold text-[#1E3F35] hover:underline flex items-center gap-1"
+                  className="font-bold text-forest-900 hover:underline flex items-center gap-1"
                 >
                   <span>Enter Code →</span>
                 </button>
@@ -324,21 +324,21 @@ export const DoctorAddPatient: React.FC = () => {
 
           {/* STEP 2: CODE VERIFICATION (DEDICATED VIEW) */}
           {currentStep === 'verify' && (
-            <div className="space-y-6 animate-in fade-in">
+            <div className="space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-bold text-xs">
+                    <span className="w-6 h-6 rounded-full bg-forest-900 text-white flex items-center justify-center font-bold text-xs">
                       2
                     </span>
-                    <h3 className="font-bold text-sm text-[#172B25]">
+                    <h3 className="font-bold text-sm text-ink">
                       Enter patient's 2-minute verification code
                     </h3>
                   </div>
 
                   <button
                     onClick={() => setCurrentStep('request')}
-                    className="text-[11px] font-semibold text-stone-500 hover:text-stone-800"
+                    className="text-xs font-semibold text-stone-500 hover:text-stone-800"
                   >
                     Change RS-ID ({rsId})
                   </button>
@@ -361,13 +361,13 @@ export const DoctorAddPatient: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleCodeChange(idx, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(idx, e)}
-                      className="w-11 h-12 text-center text-lg font-bold font-mono rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/30 focus:border-[#1E3F35] bg-stone-50 uppercase"
+                      className="w-11 h-12 text-center text-lg font-bold font-mono rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-forest-900/30 focus:border-forest-900 bg-stone-50 uppercase"
                     />
                   ))}
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-stone-400">
-                  <Clock className="w-3.5 h-3.5 text-[#52B788]" />
+                <div className="flex items-center gap-2 text-xs text-stone-400">
+                  <Clock className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Codes are valid for 2 minutes from when the patient approves.</span>
                 </div>
 
@@ -375,7 +375,7 @@ export const DoctorAddPatient: React.FC = () => {
                   <button
                     onClick={handleVerifyCode}
                     disabled={verifyLoading || success}
-                    className="w-full py-3 bg-[#1E3F35] hover:bg-[#16322A] text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                    className="w-full py-3 bg-forest-900 hover:bg-forest-950 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 "
                   >
                     {verifyLoading ? (
                       <>
@@ -384,12 +384,12 @@ export const DoctorAddPatient: React.FC = () => {
                       </>
                     ) : success ? (
                       <>
-                        <CheckCircle2 className="w-4 h-4 text-[#52B788]" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                         <span>Connected! Redirecting...</span>
                       </>
                     ) : (
                       <>
-                        <UserCheck className="w-4 h-4 text-[#52B788]" />
+                        <UserCheck className="w-4 h-4 text-emerald-400" />
                         <span>Verify Code & Connect Patient</span>
                       </>
                     )}
@@ -408,7 +408,7 @@ export const DoctorAddPatient: React.FC = () => {
               <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500">
                 Pending Requests Sent
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
                 {pendingRequests.length} pending
               </span>
             </div>
@@ -428,14 +428,14 @@ export const DoctorAddPatient: React.FC = () => {
                       <span className="font-bold text-stone-800 block">
                         {req.patientName || 'Patient'}
                       </span>
-                      <span className="font-mono text-[10px] text-stone-500">
+                      <span className="font-mono text-xs text-stone-500">
                         {req.patientRsId}
                       </span>
                     </div>
 
                     <button
                       onClick={() => selectPendingRequest(req)}
-                      className="px-2.5 py-1 bg-[#1E3F35] text-white text-[11px] font-semibold rounded-lg hover:bg-[#16322A] transition-colors"
+                      className="px-2.5 py-1 bg-forest-900 text-white text-xs font-semibold rounded-lg hover:bg-forest-950 transition-colors"
                     >
                       Enter Code
                     </button>
@@ -446,9 +446,9 @@ export const DoctorAddPatient: React.FC = () => {
           </div>
 
           {/* Privacy & Clinical Consent Card */}
-          <div className="bg-[#1E3F35] text-white rounded-3xl p-6 shadow-card space-y-3">
+          <div className="bg-forest-900 text-white rounded-3xl p-6 shadow-card space-y-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#52B788]" />
+              <ShieldCheck className="w-5 h-5 text-emerald-400" />
               <h4 className="font-bold text-sm">Doctor-Patient Consent</h4>
             </div>
             <p className="text-xs text-white/80 leading-relaxed">

@@ -34,11 +34,11 @@ export const PatientReportDetail: React.FC = () => {
 
   if (!report) {
     return (
-      <div className="mx-auto max-w-xl rounded-3xl bg-white p-10 text-center shadow-card">
+      <div className="mx-auto max-w-xl rounded-2xl border border-line bg-white p-10 text-center">
         {loaded ? (
           <>
             <FileText className="mx-auto h-8 w-8 text-stone-400" />
-            <h1 className="mt-3 text-lg font-semibold text-ink">Report not found</h1>
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Report not found</h1>
             <p className="mt-1 text-sm text-stone-500">It may have been removed, or the link is incorrect.</p>
           </>
         ) : (
@@ -80,13 +80,13 @@ export const PatientReportDetail: React.FC = () => {
       </div>
 
       {/* Header */}
-      <section className="flex flex-col gap-5 rounded-3xl bg-white p-5 shadow-card sm:p-6 md:flex-row md:items-center">
+      <section className="flex flex-col gap-5 rounded-2xl border border-line bg-white p-5 sm:p-6 md:flex-row md:items-center">
         <div className="flex flex-1 items-start gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-terracotta-500/15 text-terracotta-600">
             <FileText className="h-6 w-6" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{report.name}</h1>
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">{report.name}</h1>
             <p className="mt-1 text-sm text-stone-500">
               {report.labName} · Collected {formatDate(report.collectionDate)}
             </p>
@@ -151,7 +151,7 @@ export const PatientReportDetail: React.FC = () => {
 
       {/* Results + explanation */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="rounded-3xl bg-white p-4 shadow-card sm:p-6">
+        <section className="rounded-2xl border border-line bg-white p-4 sm:p-6">
           <h2 className="text-base font-semibold text-ink">Your results</h2>
           <p className="text-xs text-stone-500">Tap a value to see what it means</p>
 
@@ -198,7 +198,7 @@ export const PatientReportDetail: React.FC = () => {
         </section>
 
         {selected && sel && (
-          <aside className="h-fit rounded-3xl bg-sage-50 p-5 shadow-card lg:sticky lg:top-6" aria-live="polite">
+          <aside className="h-fit rounded-2xl border border-line bg-stone-50 p-5 lg:sticky lg:top-6" aria-live="polite">
             <div className="flex items-start justify-between gap-3">
               <h2 className="text-lg font-semibold text-ink">{selected.name}</h2>
               <button type="button" aria-label="Close explanation" onClick={() => setSelected(null)} className="rounded-lg p-1 text-stone-500 hover:bg-white">

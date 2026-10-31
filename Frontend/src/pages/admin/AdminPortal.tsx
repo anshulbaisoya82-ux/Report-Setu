@@ -223,7 +223,7 @@ export const AdminPortal: React.FC = () => {
         {/* Feedback Alert */}
         {feedbackMessage && (
           <div
-            className={`p-4 rounded-2xl text-xs font-medium flex items-center justify-between gap-3 animate-in fade-in ${
+            className={`p-4 rounded-2xl text-xs font-medium flex items-center justify-between gap-3 ${
               feedbackMessage.type === 'success'
                 ? 'bg-emerald-50 text-emerald-900 border border-emerald-200 shadow-xs'
                 : 'bg-rose-50 text-rose-900 border border-rose-200 shadow-xs'
@@ -258,11 +258,11 @@ export const AdminPortal: React.FC = () => {
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Awaiting Verification</span>
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Awaiting Verification</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
             </div>
-            <div className="text-2xl font-black text-amber-600 tracking-tight">{stats.pendingDoctors}</div>
-            <span className="text-[11px] text-stone-400 mt-1 block">Doctors awaiting review</span>
+            <div className="text-2xl font-semibold text-amber-600 tracking-tight">{stats.pendingDoctors}</div>
+            <span className="text-xs text-stone-400 mt-1 block">Doctors awaiting review</span>
           </div>
 
           {/* Verified Doctors */}
@@ -275,11 +275,11 @@ export const AdminPortal: React.FC = () => {
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Verified Doctors</span>
+              <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Verified Doctors</span>
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             </div>
-            <div className="text-2xl font-black text-emerald-700 tracking-tight">{stats.verifiedDoctors}</div>
-            <span className="text-[11px] text-stone-400 mt-1 block">Active clinical access</span>
+            <div className="text-2xl font-semibold text-emerald-700 tracking-tight">{stats.verifiedDoctors}</div>
+            <span className="text-xs text-stone-400 mt-1 block">Active clinical access</span>
           </div>
 
           {/* Rejected */}
@@ -292,11 +292,11 @@ export const AdminPortal: React.FC = () => {
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Rejected</span>
+              <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Rejected</span>
               <XCircle className="w-4 h-4 text-rose-500" />
             </div>
-            <div className="text-2xl font-black text-rose-600 tracking-tight">{stats.rejectedDoctors}</div>
-            <span className="text-[11px] text-stone-400 mt-1 block">Failed council validation</span>
+            <div className="text-2xl font-semibold text-rose-600 tracking-tight">{stats.rejectedDoctors}</div>
+            <span className="text-xs text-stone-400 mt-1 block">Failed council validation</span>
           </div>
 
           {/* Total Registered Doctors */}
@@ -304,36 +304,36 @@ export const AdminPortal: React.FC = () => {
             onClick={() => setStatusFilter('all')}
             className={`p-4 rounded-2xl border transition-all cursor-pointer ${
               statusFilter === 'all'
-                ? 'bg-[#1E3F35]/10 border-[#1E3F35] ring-2 ring-[#1E3F35]/20 shadow-sm'
+                ? 'bg-forest-900/10 border-forest-900 ring-2 ring-forest-900/20 shadow-sm'
                 : 'bg-white border-stone-200/80 hover:border-stone-400'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Total Doctors</span>
-              <Stethoscope className="w-4 h-4 text-[#1E3F35]" />
+              <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Total Doctors</span>
+              <Stethoscope className="w-4 h-4 text-forest-900" />
             </div>
-            <div className="text-2xl font-black text-stone-800 tracking-tight">{stats.totalDoctors}</div>
-            <span className="text-[11px] text-stone-400 mt-1 block">All registered practitioners</span>
+            <div className="text-2xl font-semibold text-stone-800 tracking-tight">{stats.totalDoctors}</div>
+            <span className="text-xs text-stone-400 mt-1 block">All registered practitioners</span>
           </div>
 
           {/* Total Patients */}
           <div className="p-4 rounded-2xl bg-white border border-stone-200/80 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Total Patients</span>
+              <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Total Patients</span>
               <Users className="w-4 h-4 text-blue-500" />
             </div>
-            <div className="text-2xl font-black text-blue-700 tracking-tight">{stats.totalPatients}</div>
-            <span className="text-[11px] text-stone-400 mt-1 block">Protected by consent</span>
+            <div className="text-2xl font-semibold text-blue-700 tracking-tight">{stats.totalPatients}</div>
+            <span className="text-xs text-stone-400 mt-1 block">Protected by consent</span>
           </div>
 
           {/* Total Reports */}
           <div className="p-4 rounded-2xl bg-white border border-stone-200/80 shadow-xs">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">Lab Reports</span>
+              <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">Lab Reports</span>
               <FileText className="w-4 h-4 text-indigo-500" />
             </div>
-            <div className="text-2xl font-black text-indigo-700 tracking-tight">{stats.totalReports}</div>
-            <span className="text-[11px] text-stone-400 mt-1 block">Encrypted health records</span>
+            <div className="text-2xl font-semibold text-indigo-700 tracking-tight">{stats.totalReports}</div>
+            <span className="text-xs text-stone-400 mt-1 block">Encrypted health records</span>
           </div>
         </div>
 
@@ -359,7 +359,7 @@ export const AdminPortal: React.FC = () => {
             >
               <span>Pending Review</span>
               {stats.pendingDoctors > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-white text-amber-700 font-extrabold">
+                <span className="px-1.5 py-0.2 rounded-full text-xs bg-white text-amber-700 font-semibold">
                   {stats.pendingDoctors}
                 </span>
               )}
@@ -395,7 +395,7 @@ export const AdminPortal: React.FC = () => {
                 placeholder="Search name, council, reg #..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] transition-all"
+                className="w-full pl-9 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 transition-all"
               />
             </form>
 
@@ -404,14 +404,14 @@ export const AdminPortal: React.FC = () => {
               title="Refresh Queue"
               className="p-2 rounded-2xl border border-stone-200 hover:bg-stone-50 text-stone-600 transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#1E3F35]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-forest-900' : ''}`} />
             </button>
 
             {stats.pendingDoctors > 0 && (
               <button
                 onClick={handleVerifyAll}
                 disabled={isActionLoading === 'all'}
-                className="px-4 py-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 whitespace-nowrap disabled:opacity-50"
+                className="px-4 py-2 rounded-2xl hover: hover: text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 whitespace-nowrap disabled:opacity-50"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                 <span>{isActionLoading === 'all' ? 'Verifying...' : `Approve All (${stats.pendingDoctors})`}</span>
@@ -424,7 +424,7 @@ export const AdminPortal: React.FC = () => {
         <div className="bg-white rounded-3xl border border-stone-200/80 shadow-card overflow-hidden">
           <div className="p-4 sm:p-6 border-b border-stone-100 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-[#172B25]">Registered Medical Practitioners</h2>
+              <h2 className="text-base font-bold text-ink">Registered Medical Practitioners</h2>
               <p className="text-xs text-stone-500">
                 Review credential authenticity against State Medical Councils (e.g. DMC, MMC, MCI)
               </p>
@@ -436,7 +436,7 @@ export const AdminPortal: React.FC = () => {
 
           {isLoading ? (
             <div className="py-20 flex flex-col items-center justify-center gap-3 text-stone-400">
-              <RefreshCw className="w-6 h-6 animate-spin text-[#1E3F35]" />
+              <RefreshCw className="w-6 h-6 animate-spin text-forest-900" />
               <span className="text-xs font-medium">Fetching doctor verification registry...</span>
             </div>
           ) : filteredDoctors.length === 0 ? (
@@ -465,21 +465,21 @@ export const AdminPortal: React.FC = () => {
                     {/* Left: Doctor Details */}
                     <div className="space-y-3 flex-1">
                       <div className="flex flex-wrap items-center gap-2.5">
-                        <div className="w-10 h-10 rounded-2xl bg-[#1E3F35] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                        <div className="w-10 h-10 rounded-2xl bg-forest-900 text-white flex items-center justify-center font-bold text-sm shadow-xs">
                           {doc.name?.replace('Dr. ', '').charAt(0) || 'D'}
                         </div>
 
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-sm text-[#172B25]">{doc.name}</h3>
+                            <h3 className="font-bold text-sm text-ink">{doc.name}</h3>
                             {isCurrentLoggedIn && (
-                              <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold border border-amber-200">
+                              <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold border border-amber-200">
                                 Currently Logged In
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-[#1E3F35] font-semibold flex items-center gap-1.5">
-                            <Stethoscope className="w-3 h-3 text-[#1E3F35]" />
+                          <p className="text-xs text-forest-900 font-semibold flex items-center gap-1.5">
+                            <Stethoscope className="w-3 h-3 text-forest-900" />
                             <span>{doc.specialty || 'General Physician'}</span>
                           </p>
                         </div>
@@ -487,7 +487,7 @@ export const AdminPortal: React.FC = () => {
                         {/* Status Badge */}
                         <div className="ml-auto lg:ml-2">
                           {isPending && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 animate-pulse">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
                               <Clock className="w-3.5 h-3.5 text-amber-700" />
                               <span>Pending Verification</span>
                             </span>
@@ -513,7 +513,7 @@ export const AdminPortal: React.FC = () => {
                         <div className="flex items-center gap-2 p-2 rounded-xl bg-stone-100/70 border border-stone-200/60">
                           <FileBadge className="w-4 h-4 text-stone-500 flex-shrink-0" />
                           <div className="truncate">
-                            <span className="text-[10px] font-bold uppercase text-stone-400 block">Registration #</span>
+                            <span className="text-xs font-bold uppercase text-stone-400 block">Registration #</span>
                             <span className="font-mono font-bold text-stone-800">{doc.registrationNumber || 'Pending'}</span>
                           </div>
                           {doc.registrationNumber && (
@@ -535,7 +535,7 @@ export const AdminPortal: React.FC = () => {
                         <div className="flex items-center gap-2 p-2 rounded-xl bg-stone-100/70 border border-stone-200/60">
                           <Building2 className="w-4 h-4 text-stone-500 flex-shrink-0" />
                           <div className="truncate">
-                            <span className="text-[10px] font-bold uppercase text-stone-400 block">Medical Council</span>
+                            <span className="text-xs font-bold uppercase text-stone-400 block">Medical Council</span>
                             <span className="font-semibold text-stone-800 truncate block">
                               {doc.medicalCouncil || 'State Medical Council'}
                             </span>
@@ -546,7 +546,7 @@ export const AdminPortal: React.FC = () => {
                         <div className="flex items-center gap-2 p-2 rounded-xl bg-stone-100/70 border border-stone-200/60">
                           <Building2 className="w-4 h-4 text-stone-500 flex-shrink-0" />
                           <div className="truncate">
-                            <span className="text-[10px] font-bold uppercase text-stone-400 block">Clinic Practice</span>
+                            <span className="text-xs font-bold uppercase text-stone-400 block">Clinic Practice</span>
                             <span className="font-semibold text-stone-800 truncate block">
                               {doc.clinic?.name || 'Private Clinic'} • {doc.clinic?.city || 'Delhi NCR'}
                             </span>
@@ -564,7 +564,7 @@ export const AdminPortal: React.FC = () => {
                           <Phone className="w-3 h-3 text-stone-400" />
                           <span>{doc.phone}</span>
                         </span>
-                        <span className="text-[11px] text-stone-400">
+                        <span className="text-xs text-stone-400">
                           Submitted on {new Date(doc.createdAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -586,7 +586,7 @@ export const AdminPortal: React.FC = () => {
                           <button
                             onClick={() => handleVerify(doc.id, doc.name)}
                             disabled={isActionLoading === doc.id}
-                            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#1E3F35] hover:bg-[#172B25] text-white text-xs font-bold shadow-md shadow-[#1E3F35]/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-forest-900 hover:bg-ink text-white text-xs font-bold shadow-md shadow-forest-900/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
                           >
                             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                             <span>{isActionLoading === doc.id ? 'Approving...' : 'Approve Doctor'}</span>

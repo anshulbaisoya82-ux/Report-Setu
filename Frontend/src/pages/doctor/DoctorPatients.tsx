@@ -43,7 +43,7 @@ export const DoctorPatients: React.FC = () => {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">Patients</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Patients</h1>
           <p className="text-xs sm:text-sm text-stone-500 mt-1">
             {patients.length} registered patient{patients.length === 1 ? '' : 's'} under your care
           </p>
@@ -53,12 +53,12 @@ export const DoctorPatients: React.FC = () => {
           <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-600 shadow-sm">
             <Bell className="w-4 h-4" />
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-semibold text-xs shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-forest-900 text-white flex items-center justify-center font-semibold text-xs shadow-sm">
             {patients.length > 0 ? patients[0].avatar : 'DR'}
           </div>
           <button
             onClick={() => navigate('/doctor/add-patient')}
-            className="flex items-center gap-2 bg-[#32A299] hover:bg-[#288E86] text-white px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm shadow-sm transition-all"
+            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm shadow-sm transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Add patient</span>
@@ -76,7 +76,7 @@ export const DoctorPatients: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search patient by name, RS ID, or condition..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
             />
           </div>
 
@@ -85,7 +85,7 @@ export const DoctorPatients: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="appearance-none bg-stone-50 border border-stone-200 text-stone-700 text-xs font-semibold py-2.5 pl-3 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 cursor-pointer"
+                className="appearance-none bg-stone-50 border border-stone-200 text-stone-700 text-xs font-semibold py-2.5 pl-3 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest-900/20 cursor-pointer"
               >
                 <option value="Criticality">Sort by: Criticality</option>
                 <option value="Name">Sort by: Name</option>
@@ -102,7 +102,7 @@ export const DoctorPatients: React.FC = () => {
             onClick={() => setActiveFilter('All')}
             className={`px-3.5 py-1.5 rounded-full font-semibold transition-all flex-shrink-0 ${
               activeFilter === 'All'
-                ? 'bg-[#1E3F35] text-white shadow-sm'
+                ? 'bg-forest-900 text-white shadow-sm'
                 : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
             }`}
           >
@@ -112,7 +112,7 @@ export const DoctorPatients: React.FC = () => {
             onClick={() => setActiveFilter('Needs review')}
             className={`px-3.5 py-1.5 rounded-full font-semibold transition-all flex-shrink-0 ${
               activeFilter === 'Needs review'
-                ? 'bg-[#1E3F35] text-white shadow-sm'
+                ? 'bg-forest-900 text-white shadow-sm'
                 : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
             }`}
           >
@@ -122,7 +122,7 @@ export const DoctorPatients: React.FC = () => {
             onClick={() => setActiveFilter('Follow-up due')}
             className={`px-3.5 py-1.5 rounded-full font-semibold transition-all flex-shrink-0 ${
               activeFilter === 'Follow-up due'
-                ? 'bg-[#1E3F35] text-white shadow-sm'
+                ? 'bg-forest-900 text-white shadow-sm'
                 : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
             }`}
           >
@@ -132,7 +132,7 @@ export const DoctorPatients: React.FC = () => {
             onClick={() => setActiveFilter('Up to date')}
             className={`px-3.5 py-1.5 rounded-full font-semibold transition-all flex-shrink-0 ${
               activeFilter === 'Up to date'
-                ? 'bg-[#1E3F35] text-white shadow-sm'
+                ? 'bg-forest-900 text-white shadow-sm'
                 : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
             }`}
           >
@@ -151,15 +151,15 @@ export const DoctorPatients: React.FC = () => {
             <div
               key={patient.id}
               onClick={() => navigate(`/doctor/patients/${patient.id}`)}
-              className="bg-white rounded-2xl p-4 sm:p-5 shadow-card border border-stone-200/70 hover:border-[#1E3F35]/40 hover:shadow-hover transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
+              className="bg-white rounded-2xl p-4 sm:p-5 shadow-card border border-stone-200/70 hover:border-forest-900/40 hover:shadow-hover transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div className="flex items-start sm:items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#E4EDE8] text-[#1E3F35] font-bold text-sm flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-forest-50 text-forest-900 font-bold text-sm flex items-center justify-center flex-shrink-0">
                   {patient.avatar}
                 </div>
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
-                    <h3 className="font-bold text-base text-[#172B25]">{patient.name}</h3>
+                    <h3 className="font-bold text-base text-ink">{patient.name}</h3>
                     <span className="text-xs font-mono text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
                       {patient.rsId}
                     </span>
@@ -172,7 +172,7 @@ export const DoctorPatients: React.FC = () => {
                     {patient.conditions.map((cond) => (
                       <span
                         key={cond}
-                        className="text-[11px] font-medium bg-[#EBF4F0] text-[#2A554A] px-2.5 py-0.5 rounded-full"
+                        className="text-xs font-medium bg-forest-50 text-forest-800 px-2.5 py-0.5 rounded-full"
                       >
                         {cond}
                       </span>
@@ -188,10 +188,10 @@ export const DoctorPatients: React.FC = () => {
                 <span
                   className={`text-xs font-bold px-3 py-1 rounded-full ${
                     isCritical
-                      ? 'bg-[#FDF2F0] text-[#B53629] border border-[#F6C4C0]'
+                      ? 'bg-red-50 text-red-600 border border-red-200'
                       : isUnbalanced
-                      ? 'bg-[#FEF3D6] text-[#8C6200] border border-[#FCE299]'
-                      : 'bg-[#E4EDE8] text-[#2B5246]'
+                      ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                      : 'bg-forest-50 text-forest-800'
                   }`}
                 >
                   {patient.status}
@@ -202,7 +202,7 @@ export const DoctorPatients: React.FC = () => {
                     e.stopPropagation();
                     navigate(`/doctor/patients/${patient.id}`);
                   }}
-                  className="bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+                  className="bg-forest-900 hover:bg-forest-950 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1.5"
                 >
                   <span>View file</span>
                   <ArrowRight className="w-3.5 h-3.5" />

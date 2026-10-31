@@ -82,7 +82,7 @@ export const PatientSettings: React.FC = () => {
     <div className="space-y-6 pb-12 max-w-4xl mx-auto">
       {/* Toast Alert */}
       {toastMsg && (
-        <div className="fixed top-6 right-6 z-50 bg-[#1E3F35] text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-forest-700 animate-in fade-in">
+        <div className="fixed top-6 right-6 z-50 bg-forest-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-forest-700">
           <CheckCircle className="w-4 h-4 text-accent-teal" />
           <span className="text-xs font-semibold">{toastMsg}</span>
         </div>
@@ -90,7 +90,7 @@ export const PatientSettings: React.FC = () => {
 
       {/* Header */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
-        <h1 className="text-2xl font-bold text-forest-950 font-serif tracking-tight">Account & Security Settings</h1>
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Account & Security Settings</h1>
         <p className="text-xs text-slate-500 mt-1">
           Control your Universal Health ID, clinic pairing codes, consent permissions, and notifications
         </p>
@@ -105,14 +105,14 @@ export const PatientSettings: React.FC = () => {
               <ShieldCheck className="w-5 h-5 text-forest-700" />
               <h3 className="text-sm font-bold text-slate-900 font-serif">Your ReportSetu ID</h3>
             </div>
-            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">
               Share only with your doctor
             </span>
           </div>
 
           <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center space-y-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Your Unique Identifier</span>
-            <div className="text-3xl font-extrabold font-mono text-forest-950 tracking-wider">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">Your Unique Identifier</span>
+            <div className="text-3xl font-semibold font-mono text-forest-950 tracking-wider">
               {currentPatient?.rsId || 'Not available'}
             </div>
             <p className="text-xs text-slate-500">
@@ -139,9 +139,9 @@ export const PatientSettings: React.FC = () => {
         </div>
 
         {/* Temporary Doctor Connect Code (Figma highlight) */}
-        <div className="bg-[#1E3F35] bg-gradient-to-br from-[#1E3F35] to-[#264E42] rounded-2xl p-5 text-white shadow-xs space-y-4">
+        <div className="bg-forest-900 rounded-2xl p-5 text-white shadow-xs space-y-4">
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
-            <span className="text-[10px] font-bold tracking-wider uppercase text-accent-teal">
+            <span className="text-xs font-bold tracking-wider uppercase text-accent-teal">
               In-Clinic Pairing Code
             </span>
             <span className="text-xs text-forest-200 flex items-center gap-1">
@@ -151,10 +151,10 @@ export const PatientSettings: React.FC = () => {
 
           <div className="text-center space-y-1.5 py-1">
             <span className="text-xs text-forest-100">Tell your doctor's receptionist:</span>
-            <div className="text-3xl font-mono font-extrabold text-white tracking-widest bg-white/10 py-2.5 px-4 rounded-xl border border-white/15">
+            <div className="text-3xl font-mono font-semibold text-white tracking-widest bg-white/10 py-2.5 px-4 rounded-xl border border-white/15">
               {connectCode}
             </div>
-            <p className="text-[11px] text-forest-200">
+            <p className="text-xs text-forest-200">
               Allows any authorized clinic to securely pull your report history for 1 consultation.
             </p>
           </div>
@@ -179,7 +179,7 @@ export const PatientSettings: React.FC = () => {
           </div>
           <button
             onClick={() => window.location.href = '/patient/doctors'}
-            className="text-xs font-bold text-[#1E3F35] hover:underline"
+            className="text-xs font-bold text-forest-900 hover:underline"
           >
             Manage in My Doctors →
           </button>
@@ -194,12 +194,12 @@ export const PatientSettings: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="text-xs font-bold text-slate-900 font-serif">{doc.name}</h4>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
                     Consented
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 mt-0.5">{doc.hospital}</p>
-                <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-1">
+                <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
                   <span>Scope: {doc.access}</span>
                   <span>·</span>
                   <span>Granted: {doc.grantedDate}</span>
@@ -243,7 +243,7 @@ export const PatientSettings: React.FC = () => {
             }`}
           >
             <span className="text-xs font-bold block">English</span>
-            <span className="text-[10px] opacity-80 block">Default terminology</span>
+            <span className="text-xs opacity-80 block">Default terminology</span>
           </button>
 
           <button
@@ -256,7 +256,7 @@ export const PatientSettings: React.FC = () => {
             }`}
           >
             <span className="text-xs font-bold block">हिन्दी (Hindi)</span>
-            <span className="text-[10px] opacity-80 block">सरल हिन्दी व्याख्या</span>
+            <span className="text-xs opacity-80 block">सरल हिन्दी व्याख्या</span>
           </button>
         </div>
       </div>
@@ -275,7 +275,7 @@ export const PatientSettings: React.FC = () => {
           <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 opacity-60 cursor-not-allowed">
             <div>
               <span className="text-xs font-bold text-slate-900 block">WhatsApp updates <span className="font-medium text-slate-500">· not available yet</span></span>
-              <span className="text-[11px] text-slate-500">Doctor summaries are delivered in the app and by SMS today</span>
+              <span className="text-xs text-slate-500">Doctor summaries are delivered in the app and by SMS today</span>
             </div>
             <input
               type="checkbox"
@@ -289,7 +289,7 @@ export const PatientSettings: React.FC = () => {
           <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
             <div>
               <span className="text-xs font-bold text-slate-900 block">SMS Critical Lab Alerts</span>
-              <span className="text-[11px] text-slate-500">Immediate SMS alerts for out-of-range parameters (e.g. low platelets)</span>
+              <span className="text-xs text-slate-500">Immediate SMS alerts for out-of-range parameters (e.g. low platelets)</span>
             </div>
             <input
               type="checkbox"
@@ -302,7 +302,7 @@ export const PatientSettings: React.FC = () => {
           <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
             <div>
               <span className="text-xs font-bold text-slate-900 block">Daily Medication Dosage Reminders</span>
-              <span className="text-[11px] text-slate-500">Morning, afternoon and bedtime alerts to maintain adherence streak</span>
+              <span className="text-xs text-slate-500">Morning, afternoon and bedtime alerts to maintain adherence streak</span>
             </div>
             <input
               type="checkbox"

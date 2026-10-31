@@ -350,7 +350,7 @@ export const PatientUploadReport: React.FC = () => {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight font-serif">
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
             Upload report
           </h1>
           <p className="text-xs sm:text-sm text-stone-500 mt-1">
@@ -375,13 +375,13 @@ export const PatientUploadReport: React.FC = () => {
           {/* Step 1: Choose file */}
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
-              currentStep > 1 ? 'bg-[#1E3F35] text-white' : 'bg-[#1E3F35] text-white'
+              currentStep > 1 ? 'bg-forest-900 text-white' : 'bg-forest-900 text-white'
             }`}>
               {currentStep > 1 ? <Check className="w-4 h-4 text-white" /> : '1'}
             </div>
             <div className="hidden sm:block">
-              <span className="font-bold text-xs text-[#172B25] block">Choose file</span>
-              <span className="text-[11px] text-stone-400 block">Upload your report</span>
+              <span className="font-bold text-xs text-ink block">Choose file</span>
+              <span className="text-xs text-stone-400 block">Upload your report</span>
             </div>
           </div>
 
@@ -391,20 +391,20 @@ export const PatientUploadReport: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
               currentStep > 2
-                ? 'bg-[#1E3F35] text-white'
+                ? 'bg-forest-900 text-white'
                 : currentStep === 2
                 ? !isRecognized
-                  ? 'bg-[#C45749] text-white'
-                  : 'bg-[#1E3F35] text-white'
-                : 'bg-[#E5ECE8] text-stone-500'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-forest-900 text-white'
+                : 'bg-stone-200 text-stone-500'
             }`}>
               {currentStep > 2 ? <Check className="w-4 h-4 text-white" /> : '2'}
             </div>
             <div className="hidden sm:block">
-              <span className={`font-bold text-xs block ${currentStep >= 2 ? 'text-[#172B25]' : 'text-stone-400'}`}>
+              <span className={`font-bold text-xs block ${currentStep >= 2 ? 'text-ink' : 'text-stone-400'}`}>
                 Read report
               </span>
-              <span className="text-[11px] text-stone-400 block">We find the test and values</span>
+              <span className="text-xs text-stone-400 block">We find the test and values</span>
             </div>
           </div>
 
@@ -413,15 +413,15 @@ export const PatientUploadReport: React.FC = () => {
           {/* Step 3: Check values */}
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
-              currentStep > 3 ? 'bg-[#1E3F35] text-white' : currentStep === 3 ? 'bg-[#1E3F35] text-white' : 'bg-[#E5ECE8] text-stone-500'
+              currentStep > 3 ? 'bg-forest-900 text-white' : currentStep === 3 ? 'bg-forest-900 text-white' : 'bg-stone-200 text-stone-500'
             }`}>
               {currentStep > 3 ? <Check className="w-4 h-4 text-white" /> : '3'}
             </div>
             <div className="hidden sm:block">
-              <span className={`font-bold text-xs block ${currentStep >= 3 ? 'text-[#172B25]' : 'text-stone-400'}`}>
+              <span className={`font-bold text-xs block ${currentStep >= 3 ? 'text-ink' : 'text-stone-400'}`}>
                 Check values
               </span>
-              <span className="text-[11px] text-stone-400 block">You confirm them</span>
+              <span className="text-xs text-stone-400 block">You confirm them</span>
             </div>
           </div>
 
@@ -430,15 +430,15 @@ export const PatientUploadReport: React.FC = () => {
           {/* Step 4: Sent to doctor */}
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
-              currentStep === 4 ? 'bg-[#1E3F35] text-white' : 'bg-[#E5ECE8] text-stone-500'
+              currentStep === 4 ? 'bg-forest-900 text-white' : 'bg-stone-200 text-stone-500'
             }`}>
               4
             </div>
             <div className="hidden sm:block">
-              <span className={`font-bold text-xs block ${currentStep === 4 ? 'text-[#172B25]' : 'text-stone-400'}`}>
+              <span className={`font-bold text-xs block ${currentStep === 4 ? 'text-ink' : 'text-stone-400'}`}>
                 Sent to doctor
               </span>
-              <span className="text-[11px] text-stone-400 block">Dr. Mehta reviews</span>
+              <span className="text-xs text-stone-400 block">Dr. Mehta reviews</span>
             </div>
           </div>
         </div>
@@ -471,15 +471,15 @@ export const PatientUploadReport: React.FC = () => {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`rounded-3xl border-2 border-dashed p-8 sm:p-16 text-center flex flex-col items-center justify-center transition-all ${
-              isDragging ? 'border-[#32A299] bg-[#EBF7F2]/40' : 'border-[#CFE2DA] hover:border-[#32A299]/70'
+              isDragging ? 'border-teal-500 bg-forest-50/40' : 'border-[#CFE2DA] hover:border-teal-500/70'
             }`}
           >
             {/* Soft terracotta upload icon */}
-            <div className="w-14 h-14 rounded-2xl bg-[#FDF1EF] text-[#C45749] flex items-center justify-center mb-5 shadow-2xs">
+            <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center mb-5 shadow-2xs">
               <Upload className="w-6 h-6" />
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-bold text-[#172B25] font-serif mb-1.5">
+            <h2 className="text-xl sm:text-2xl font-bold text-ink font-serif mb-1.5">
               Drop your report here
             </h2>
             <p className="text-xs text-stone-400 mb-7">
@@ -490,7 +490,7 @@ export const PatientUploadReport: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-[#32A299] hover:bg-[#288E86] text-white px-6 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-xs cursor-pointer active:scale-95 transition-all"
+                className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-xs cursor-pointer transition-all"
               >
                 <Upload className="w-4 h-4" />
                 <span>Upload report</span>
@@ -499,7 +499,7 @@ export const PatientUploadReport: React.FC = () => {
               <button
                 type="button"
                 onClick={() => cameraInputRef.current?.click()}
-                className="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 px-6 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-xs cursor-pointer active:scale-95 transition-all"
+                className="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 px-6 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-xs cursor-pointer transition-all"
               >
                 <Camera className="w-4 h-4 text-stone-600" />
                 <span>Take a photo</span>
@@ -509,7 +509,7 @@ export const PatientUploadReport: React.FC = () => {
             {/* Sample files: developer and demo builds only */}
             {(import.meta.env.DEV || isDemoMode) && (
             <div className="mt-8 pt-6 border-t border-stone-200/60 w-full max-w-md">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-stone-400 block mb-3">
                 Developer samples (synthetic):
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -521,9 +521,9 @@ export const PatientUploadReport: React.FC = () => {
                     const file = new File([content], 'CBC_DrLalPathLabs_Normal.txt', { type: 'text/plain' });
                     processUploadedFile({ name: file.name, size: file.size, rawFile: file });
                   }}
-                  className="px-3 py-2 bg-stone-50 hover:bg-[#EBF7F2] text-stone-700 hover:text-[#1E3F35] border border-stone-200 hover:border-[#32A299] rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
+                  className="px-3 py-2 bg-stone-50 hover:bg-forest-50 text-stone-700 hover:text-forest-900 border border-stone-200 hover:border-teal-500 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-[#32A299]" />
+                  <Sparkles className="w-3.5 h-3.5 text-teal-500" />
                   <span>Normal CBC Report</span>
                 </button>
 
@@ -535,9 +535,9 @@ export const PatientUploadReport: React.FC = () => {
                     const file = new File([content], 'CBC_DrLalPathLabs_Critical.txt', { type: 'text/plain' });
                     processUploadedFile({ name: file.name, size: file.size, rawFile: file });
                   }}
-                  className="px-3 py-2 bg-stone-50 hover:bg-[#FDF2F0] text-stone-700 hover:text-[#B53629] border border-stone-200 hover:border-[#F6C4C0] rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
+                  className="px-3 py-2 bg-stone-50 hover:bg-red-50 text-stone-700 hover:text-red-600 border border-stone-200 hover:border-red-200 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
                 >
-                  <AlertTriangle className="w-3.5 h-3.5 text-[#B53629]" />
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
                   <span>Critical CBC (35k Plt)</span>
                 </button>
               </div>
@@ -554,13 +554,13 @@ export const PatientUploadReport: React.FC = () => {
       {currentStep === 2 && isRecognized && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xs border border-stone-200/60 max-w-3xl mx-auto space-y-6">
           {/* File Header Strip */}
-          <div className="bg-[#F3F6F4] rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-stone-100 rounded-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-white text-forest-800 flex items-center justify-center shrink-0 border border-stone-200/50 shadow-2xs">
-                <FileText className="w-5 h-5 text-[#1E3F35]" />
+                <FileText className="w-5 h-5 text-forest-900" />
               </div>
               <div>
-                <h4 className="font-semibold text-sm text-[#172B25]">{fileName}</h4>
+                <h4 className="font-semibold text-sm text-ink">{fileName}</h4>
                 <p className="text-xs text-stone-400 mt-0.5">{fileSizeFormatted} · uploaded just now</p>
               </div>
             </div>
@@ -579,32 +579,32 @@ export const PatientUploadReport: React.FC = () => {
           <div className="space-y-5 px-2">
             {/* Step A: Uploaded */}
             <div className="flex items-start gap-3.5">
-              <div className="w-6 h-6 rounded-full bg-[#2E9E6B] text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
                 <Check className="w-3.5 h-3.5" />
               </div>
               <div>
-                <h4 className="font-bold text-sm text-[#172B25]">Uploaded</h4>
+                <h4 className="font-bold text-sm text-ink">Uploaded</h4>
                 <p className="text-xs text-stone-500 mt-0.5">Your file arrived safely</p>
               </div>
             </div>
 
             {/* Step B: We found your report */}
             <div className="flex items-start gap-3.5">
-              <div className="w-6 h-6 rounded-full bg-[#2E9E6B] text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+              <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
                 <Check className="w-3.5 h-3.5" />
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-sm text-[#172B25]">We found your report</h4>
+                <h4 className="font-bold text-sm text-ink">We found your report</h4>
                 <p className="text-xs text-stone-500 mt-0.5">Detected from the file — no need to pick a type</p>
 
                 {/* Detected Report Tag Box */}
-                <div className="bg-[#EBF7F2] border border-[#CDE5DA] rounded-xl p-3 flex items-center gap-3 mt-2.5 max-w-md shadow-2xs">
-                  <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-[#2E9E6B] shrink-0 shadow-2xs">
+                <div className="bg-forest-50 border border-[#CDE5DA] rounded-xl p-3 flex items-center gap-3 mt-2.5 max-w-md shadow-2xs">
+                  <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-emerald-500 shrink-0 shadow-2xs">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div>
-                    <h5 className="font-bold text-xs text-[#172B25]">{detectedReportType}</h5>
-                    <p className="text-[11px] text-stone-500">{detectedLab}</p>
+                    <h5 className="font-bold text-xs text-ink">{detectedReportType}</h5>
+                    <p className="text-xs text-stone-500">{detectedLab}</p>
                   </div>
                 </div>
               </div>
@@ -612,19 +612,19 @@ export const PatientUploadReport: React.FC = () => {
 
             {/* Step C: Reading the values */}
             <div className="flex items-start gap-3.5">
-              <div className="w-6 h-6 rounded-full border-2 border-[#1E3F35] flex items-center justify-center text-[#1E3F35] shrink-0 mt-0.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#1E3F35] animate-pulse" />
+              <div className="w-6 h-6 rounded-full border-2 border-forest-900 flex items-center justify-center text-forest-900 shrink-0 mt-0.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-forest-900" />
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-sm text-[#172B25]">Reading the values</h4>
+                <h4 className="font-bold text-sm text-ink">Reading the values</h4>
                 <p className="text-xs text-stone-500 mt-0.5">
                   {valuesReadCount} of {totalValuesCount} values read
                 </p>
 
                 {/* Progress Bar */}
-                <div className="w-full bg-[#E5ECE8] h-2 rounded-full overflow-hidden mt-2.5">
+                <div className="w-full bg-stone-200 h-2 rounded-full overflow-hidden mt-2.5">
                   <div 
-                    className="bg-[#2E9E6B] h-2 rounded-full transition-all duration-300"
+                    className="bg-emerald-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${Math.round((valuesReadCount / totalValuesCount) * 100)}%` }}
                   />
                 </div>
@@ -633,7 +633,7 @@ export const PatientUploadReport: React.FC = () => {
 
             {/* Step D: Check the values with you */}
             <div className="flex items-start gap-3.5">
-              <div className="w-6 h-6 rounded-full bg-[#E5ECE8] shrink-0 mt-0.5" />
+              <div className="w-6 h-6 rounded-full bg-stone-200 shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-medium text-sm text-stone-400">Check the values with you</h4>
                 <p className="text-xs text-stone-400 mt-0.5">Next step · you confirm before your doctor sees anything</p>
@@ -646,7 +646,7 @@ export const PatientUploadReport: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsChangeModalOpen(true)}
-              className="text-[#C45749] text-xs font-semibold hover:underline text-left cursor-pointer"
+              className="text-red-500 text-xs font-semibold hover:underline text-left cursor-pointer"
             >
               Not the right test? Change report type
             </button>
@@ -669,13 +669,13 @@ export const PatientUploadReport: React.FC = () => {
       {currentStep === 2 && !isRecognized && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xs border border-stone-200/60 max-w-3xl mx-auto space-y-6">
           {/* File Header Strip */}
-          <div className="bg-[#F3F6F4] rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-stone-100 rounded-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-white text-forest-800 flex items-center justify-center shrink-0 border border-stone-200/50 shadow-2xs">
-                <FileText className="w-5 h-5 text-[#1E3F35]" />
+                <FileText className="w-5 h-5 text-forest-900" />
               </div>
               <div>
-                <h4 className="font-semibold text-sm text-[#172B25]">{fileName}</h4>
+                <h4 className="font-semibold text-sm text-ink">{fileName}</h4>
                 <p className="text-xs text-stone-400 mt-0.5">{fileSizeFormatted} · uploaded just now</p>
               </div>
             </div>
@@ -691,13 +691,13 @@ export const PatientUploadReport: React.FC = () => {
           </div>
 
           {/* Not Recognised Alert Card */}
-          <div className="bg-[#FDF1EF] border border-[#FADCD7] rounded-2xl p-6 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-white text-[#C45749] border border-[#FADCD7] flex items-center justify-center mx-auto shadow-2xs">
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-white text-red-500 border border-red-200 flex items-center justify-center mx-auto shadow-2xs">
               <FileQuestion className="w-6 h-6" />
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-[#172B25] font-serif">
+              <h3 className="text-lg font-bold text-ink font-serif">
                 We couldn't identify this report type
               </h3>
               <p className="text-xs text-stone-600 mt-1 max-w-md mx-auto leading-relaxed">
@@ -708,7 +708,7 @@ export const PatientUploadReport: React.FC = () => {
 
           {/* Selectable Test Types Grid */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-[#172B25] uppercase tracking-wider block">
+            <label className="text-xs font-bold text-ink uppercase tracking-wider block">
               Choose the correct test:
             </label>
 
@@ -725,7 +725,7 @@ export const PatientUploadReport: React.FC = () => {
                   onClick={() => setSelectedFallbackType(test.key as any)}
                   className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3 ${
                     selectedFallbackType === test.key
-                      ? 'border-[#32A299] bg-[#EBF7F2] shadow-2xs'
+                      ? 'border-teal-500 bg-forest-50 shadow-2xs'
                       : 'border-stone-200/80 bg-white hover:bg-stone-50/60'
                   }`}
                 >
@@ -734,11 +734,11 @@ export const PatientUploadReport: React.FC = () => {
                     name="fallbackTest"
                     checked={selectedFallbackType === test.key}
                     onChange={() => setSelectedFallbackType(test.key as any)}
-                    className="mt-0.5 text-[#32A299] focus:ring-[#32A299]"
+                    className="mt-0.5 text-teal-500 focus:ring-teal-500"
                   />
                   <div>
-                    <h5 className="text-xs font-bold text-[#172B25]">{test.name}</h5>
-                    <p className="text-[11px] text-stone-500 mt-0.5">{test.subtitle}</p>
+                    <h5 className="text-xs font-bold text-ink">{test.name}</h5>
+                    <p className="text-xs text-stone-500 mt-0.5">{test.subtitle}</p>
                   </div>
                 </div>
               ))}
@@ -767,7 +767,7 @@ export const PatientUploadReport: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleConfirmFallbackType(selectedFallbackType as any)}
-                className="bg-[#32A299] hover:bg-[#288E86] text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer flex items-center gap-1.5"
+                className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
               >
                 <span>Continue reading test</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -781,10 +781,10 @@ export const PatientUploadReport: React.FC = () => {
       {/* MODAL: CHANGE REPORT TYPE (When clicking "Not the right test? Change report type") */}
       {/* ========================================================================= */}
       {isChangeModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-xl border border-stone-200 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-sm border border-stone-200 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-stone-100">
-              <h3 className="font-bold text-base text-[#172B25] font-serif">Change Report Type</h3>
+              <h3 className="font-bold text-base text-ink font-serif">Change Report Type</h3>
               <button
                 type="button"
                 onClick={() => setIsChangeModalOpen(false)}
@@ -812,12 +812,12 @@ export const PatientUploadReport: React.FC = () => {
                   onClick={() => handleConfirmFallbackType(t.key as any)}
                   className={`w-full text-left p-3 rounded-xl border text-xs font-semibold transition-all flex items-center justify-between ${
                     detectedCategory === t.key
-                      ? 'border-[#32A299] bg-[#EBF7F2] text-[#1E3F35]'
+                      ? 'border-teal-500 bg-forest-50 text-forest-900'
                       : 'border-stone-200 hover:bg-stone-50 text-stone-800'
                   }`}
                 >
                   <span>{t.name}</span>
-                  {detectedCategory === t.key && <Check className="w-4 h-4 text-[#32A299]" />}
+                  {detectedCategory === t.key && <Check className="w-4 h-4 text-teal-500" />}
                 </button>
               ))}
             </div>
@@ -842,8 +842,8 @@ export const PatientUploadReport: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/80 shadow-2xs space-y-6">
             <div>
-              <span className="text-xs font-bold text-[#1E3F35] uppercase tracking-wider">Step 3 of 4</span>
-              <h2 className="text-2xl font-bold text-[#172B25] font-serif mt-1">Check your values</h2>
+              <span className="text-xs font-bold text-forest-900 uppercase tracking-wider">Step 3 of 4</span>
+              <h2 className="text-2xl font-bold text-ink font-serif mt-1">Check your values</h2>
               <p className="text-xs text-stone-500 mt-0.5">
                 We read these from your file. Fix anything that doesn't match your paper report.
               </p>
@@ -857,7 +857,7 @@ export const PatientUploadReport: React.FC = () => {
                   type="text" 
                   value={labName} 
                   onChange={(e) => setLabName(e.target.value)}
-                  className="w-full text-xs sm:text-sm bg-[#F8FAF9] border border-stone-200 rounded-xl p-3 text-[#172B25] font-medium focus:outline-none focus:bg-white focus:border-[#32A299] focus:ring-2 focus:ring-[#32A299]/20 transition-all"
+                  className="w-full text-xs sm:text-sm bg-stone-50 border border-stone-200 rounded-xl p-3 text-ink font-medium focus:outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
                 />
               </div>
               <div>
@@ -866,7 +866,7 @@ export const PatientUploadReport: React.FC = () => {
                   type="date" 
                   value={testDate} 
                   onChange={(e) => setTestDate(e.target.value)}
-                  className="w-full text-xs sm:text-sm bg-[#F8FAF9] border border-stone-200 rounded-xl p-3 text-[#172B25] font-medium focus:outline-none focus:bg-white focus:border-[#32A299] focus:ring-2 focus:ring-[#32A299]/20 transition-all"
+                  className="w-full text-xs sm:text-sm bg-stone-50 border border-stone-200 rounded-xl p-3 text-ink font-medium focus:outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"
                 />
               </div>
             </div>
@@ -876,7 +876,7 @@ export const PatientUploadReport: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="bg-[#F8FAF9] text-stone-600 font-semibold border-b border-stone-200">
+                    <tr className="bg-stone-50 text-stone-600 font-semibold border-b border-stone-200">
                       <th className="py-3 px-4">Parameter</th>
                       <th className="py-3 px-4 text-center">Value</th>
                       <th className="py-3 px-4">Unit</th>
@@ -894,10 +894,10 @@ export const PatientUploadReport: React.FC = () => {
                               placeholder="Parameter name"
                               value={p.name}
                               onChange={(e) => handleParamFieldChange(p.id, 'name', e.target.value)}
-                              className="text-xs font-semibold text-[#172B25] bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 w-full max-w-xs focus:outline-none focus:ring-1 focus:ring-[#32A299]"
+                              className="text-xs font-semibold text-ink bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 w-full max-w-xs focus:outline-none focus:ring-1 focus:ring-teal-500"
                             />
                           ) : (
-                            <span className="font-semibold text-[#172B25] text-xs sm:text-sm">{p.name}</span>
+                            <span className="font-semibold text-ink text-xs sm:text-sm">{p.name}</span>
                           )}
                         </td>
                         <td className="py-2 px-4 text-center">
@@ -905,7 +905,7 @@ export const PatientUploadReport: React.FC = () => {
                             type="text"
                             value={p.value}
                             onChange={(e) => handleValueChange(p.id, e.target.value)}
-                            className="w-20 sm:w-24 text-center font-bold text-sm text-[#172B25] bg-white border border-stone-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#32A299]/30 focus:border-[#32A299] shadow-2xs transition-all"
+                            className="w-20 sm:w-24 text-center font-bold text-sm text-ink bg-white border border-stone-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 shadow-2xs transition-all"
                             aria-label={`Value for ${p.name || 'parameter'}`}
                           />
                         </td>
@@ -916,20 +916,20 @@ export const PatientUploadReport: React.FC = () => {
                               placeholder="Unit"
                               value={p.unit}
                               onChange={(e) => handleParamFieldChange(p.id, 'unit', e.target.value)}
-                              className="text-xs text-stone-600 bg-white border border-stone-200 rounded-lg px-2 py-1 w-16 focus:outline-none focus:ring-1 focus:ring-[#32A299]"
+                              className="text-xs text-stone-600 bg-white border border-stone-200 rounded-lg px-2 py-1 w-16 focus:outline-none focus:ring-1 focus:ring-teal-500"
                             />
                           ) : (
                             p.unit
                           )}
                         </td>
-                        <td className="py-3 px-4 text-stone-600 font-mono text-[11px]">
+                        <td className="py-3 px-4 text-stone-600 font-mono text-xs">
                           {!p.referenceRange && p.name === '' ? (
                             <input
                               type="text"
                               placeholder="Normal range"
                               value={p.referenceRange}
                               onChange={(e) => handleParamFieldChange(p.id, 'referenceRange', e.target.value)}
-                              className="text-xs font-mono text-stone-600 bg-white border border-stone-200 rounded-lg px-2 py-1 w-24 focus:outline-none focus:ring-1 focus:ring-[#32A299]"
+                              className="text-xs font-mono text-stone-600 bg-white border border-stone-200 rounded-lg px-2 py-1 w-24 focus:outline-none focus:ring-1 focus:ring-teal-500"
                             />
                           ) : (
                             p.referenceRange
@@ -959,7 +959,7 @@ export const PatientUploadReport: React.FC = () => {
                 onClick={handleAddTest}
                 className="border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 self-start sm:self-auto"
               >
-                <Plus className="w-3.5 h-3.5 text-[#32A299]" />
+                <Plus className="w-3.5 h-3.5 text-teal-500" />
                 <span>Add a test</span>
               </button>
 
@@ -975,7 +975,7 @@ export const PatientUploadReport: React.FC = () => {
                   type="button"
                   disabled={isSubmitting}
                   onClick={handleConfirmAndSend}
-                  className="bg-[#32A299] hover:bg-[#288E86] disabled:opacity-60 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer flex items-center gap-2"
+                  className="bg-teal-500 hover:bg-teal-600 disabled:opacity-60 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
@@ -994,8 +994,8 @@ export const PatientUploadReport: React.FC = () => {
           </div>
 
           {/* Prototype disclaimer strip matching Figma */}
-          <div className="bg-[#EBF7F2] border border-[#CDEAE1] rounded-2xl p-4 flex items-center gap-3 text-xs text-[#1E3F35]">
-            <div className="w-5 h-5 rounded-full bg-[#32A299]/20 flex items-center justify-center shrink-0 text-[#1E3F35] font-bold text-[11px]">
+          <div className="bg-forest-50 border border-[#CDEAE1] rounded-2xl p-4 flex items-center gap-3 text-xs text-forest-900">
+            <div className="w-5 h-5 rounded-full bg-teal-500/20 flex items-center justify-center shrink-0 text-forest-900 font-bold text-xs">
               i
             </div>
             <p className="leading-relaxed">

@@ -46,10 +46,10 @@ export const PatientMyReports: React.FC = () => {
     <div className="space-y-6 pb-12 max-w-6xl mx-auto">
       {/* 1. Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] font-serif tracking-tight">
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
           My reports
         </h1>
-        <p className="text-xs sm:text-sm text-[#5F736C] mt-0.5 font-sans">
+        <p className="text-xs sm:text-sm text-stone-600 mt-0.5 font-sans">
           {patientReports.length} report{patientReports.length === 1 ? '' : 's'} available
         </p>
       </div>
@@ -57,21 +57,21 @@ export const PatientMyReports: React.FC = () => {
       {/* 2. Latest Doctor's Note Hero Card */}
       {patientReports[0]?.doctorSummary && <div className="bg-white rounded-2xl border border-stone-200/80 p-6 shadow-2xs space-y-4">
         <div>
-          <h2 className="text-sm font-bold text-[#172B25] font-serif">Latest doctor's note</h2>
-          <p className="text-xs text-[#5F736C]">{patientReports[0].name} · {patientReports[0].labName}</p>
+          <h2 className="text-sm font-bold text-ink font-serif">Latest doctor's note</h2>
+          <p className="text-xs text-stone-600">{patientReports[0].name} · {patientReports[0].labName}</p>
         </div>
 
-        <div className="bg-[#FAFCFA] border border-[#CAD8CF] rounded-2xl p-4 space-y-3">
+        <div className="bg-stone-50 border border-stone-300 rounded-2xl p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-[#1E3F35] text-[#32A299] flex items-center justify-center shrink-0">
+            <div className="w-5 h-5 rounded-full bg-forest-900 text-teal-500 flex items-center justify-center shrink-0">
               <Check className="w-3 h-3 stroke-[3]" />
             </div>
-            <span className="text-xs font-bold text-[#2B5246]">
+            <span className="text-xs font-bold text-forest-800">
               Checked by {patientReports[0].doctorSummary.doctorName} · {patientReports[0].doctorSummary.approvedAt}
             </span>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#172B25] leading-relaxed">
+          <p className="text-xs sm:text-sm text-ink leading-relaxed">
             {patientReports[0].doctorSummary.text}
           </p>
         </div>
@@ -81,19 +81,19 @@ export const PatientMyReports: React.FC = () => {
             onClick={handleListenHindi}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl border transition-all ${
               isPlayingHindi
-                ? 'bg-[#E4EDE8] border-[#2B5246] text-[#2B5246]'
-                : 'bg-white border-stone-200 text-[#172B25] hover:bg-stone-50'
+                ? 'bg-forest-50 border-forest-800 text-forest-800'
+                : 'bg-white border-stone-200 text-ink hover:bg-stone-50'
             }`}
           >
-            <Volume2 className="w-4 h-4 text-[#1E3F35]" />
+            <Volume2 className="w-4 h-4 text-forest-900" />
             {isPlayingHindi ? 'Playing Hindi Audio...' : 'Listen in Hindi'}
           </button>
 
           <Link
             to={`/patient/reports/${patientReports[0].id}`}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] rounded-xl transition-all shadow-2xs"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-forest-900 hover:bg-forest-950 rounded-xl transition-all shadow-2xs"
           >
-            <ArrowUpRight className="w-4 h-4 text-[#32A299]" /> Open report
+            <ArrowUpRight className="w-4 h-4 text-teal-500" /> Open report
           </Link>
         </div>
       </div>}
@@ -101,8 +101,8 @@ export const PatientMyReports: React.FC = () => {
       {/* 3. Filter Pills and Sort Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-[#5F736C] flex items-center gap-1">
-            Sort by: <span className="font-bold text-[#172B25]">Newest</span>
+          <span className="text-xs font-medium text-stone-600 flex items-center gap-1">
+            Sort by: <span className="font-bold text-ink">Newest</span>
             <ChevronDown className="w-3.5 h-3.5 text-stone-400" />
           </span>
         </div>
@@ -120,8 +120,8 @@ export const PatientMyReports: React.FC = () => {
               onClick={() => setSelectedFilter(pill.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                 selectedFilter === pill.id
-                  ? 'bg-[#1E3F35] text-white shadow-2xs'
-                  : 'bg-white border border-stone-200 text-[#5F736C] hover:bg-stone-50'
+                  ? 'bg-forest-900 text-white shadow-2xs'
+                  : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50'
               }`}
             >
               {pill.label}
@@ -136,38 +136,38 @@ export const PatientMyReports: React.FC = () => {
           <Link
             key={report.id}
             to={`/patient/reports/${report.id}`}
-            className="p-4 hover:bg-[#FAFCFA] transition-colors flex items-center justify-between gap-4 group"
+            className="p-4 hover:bg-stone-50 transition-colors flex items-center justify-between gap-4 group"
           >
             <div className="flex items-center gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-forest-50 text-forest-900 flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-[#172B25] group-hover:text-[#1E3F35] transition-colors">
+                <h4 className="text-xs font-bold text-ink group-hover:text-forest-900 transition-colors">
                   {report.name}
                 </h4>
-                <p className="text-[11px] text-[#5F736C]">
+                <p className="text-xs text-stone-600">
                   Collected {formatDate(report.collectionDate)} · {report.labName}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+              <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
                 report.reviewed 
-                  ? 'bg-[#E4EDE8] text-[#2B5246]' 
-                  : 'bg-[#FEF3D6] text-[#8C6200]'
+                  ? 'bg-forest-50 text-forest-800' 
+                  : 'bg-amber-100 text-amber-700'
               }`}>
                 {report.reviewed ? 'Checked by doctor' : 'Pending review'}
               </span>
-              <ArrowUpRight className="w-4 h-4 text-stone-300 group-hover:text-[#1E3F35] transition-colors" />
+              <ArrowUpRight className="w-4 h-4 text-stone-300 group-hover:text-forest-900 transition-colors" />
             </div>
           </Link>
         ))}
       </div>
 
       {/* Footer Info */}
-      <div className="space-y-1 text-[11px] text-[#5F736C] px-1">
+      <div className="space-y-1 text-xs text-stone-600 px-1">
         <p>Showing {filteredReports.length} of {patientReports.length} reports</p>
         <p className="flex items-center gap-1.5">
           <Info className="w-3.5 h-3.5 shrink-0" />

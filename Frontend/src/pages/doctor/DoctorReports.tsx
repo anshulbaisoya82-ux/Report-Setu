@@ -92,7 +92,7 @@ export const DoctorReports: React.FC = () => {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">Reports</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Reports</h1>
           <p className="text-xs sm:text-sm text-stone-500 mt-1">
             {today} · {pendingCount} report{pendingCount === 1 ? '' : 's'} waiting for your review
           </p>
@@ -102,7 +102,7 @@ export const DoctorReports: React.FC = () => {
           <div className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-600 shadow-sm cursor-pointer hover:bg-stone-50 transition-colors">
             <Bell className="w-4 h-4" />
           </div>
-          <div className="w-10 h-10 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-semibold text-xs shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-forest-900 text-white flex items-center justify-center font-semibold text-xs shadow-sm">
             PM
           </div>
         </div>
@@ -112,7 +112,7 @@ export const DoctorReports: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         {/* Left Card: Reports overview (5 cols) */}
         <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 shadow-2xs border border-stone-200/60 flex flex-col justify-between">
-          <h3 className="font-bold text-base text-[#172B25] font-serif">Reports overview</h3>
+          <h3 className="font-bold text-base text-ink font-serif">Reports overview</h3>
 
           <div className="flex items-center gap-6 my-auto pt-4 pb-2">
             {/* SVG Donut Chart (85% reviewed) */}
@@ -140,24 +140,24 @@ export const DoctorReports: React.FC = () => {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-extrabold text-[#172B25] leading-none">{reviewedPercent}%</span>
-                <span className="text-[10px] text-stone-400 font-medium mt-1">reviewed</span>
+                <span className="text-2xl font-semibold text-ink leading-none">{reviewedPercent}%</span>
+                <span className="text-xs text-stone-400 font-medium mt-1">reviewed</span>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
                 <span className="text-xs text-stone-400 font-medium block">Total reports</span>
-                <p className="text-3xl font-extrabold text-[#172B25] font-serif leading-tight mt-0.5">{reports.length}</p>
+                <p className="text-3xl font-semibold text-ink font-serif leading-tight mt-0.5">{reports.length}</p>
               </div>
 
               <div className="space-y-1.5 text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#1E3F35]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-forest-900" />
                   <span className="text-stone-600 text-xs">Reviewed <strong>{reviewedCount}</strong></span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#A82B1E]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-700" />
                   <span className="text-stone-600 text-xs">Awaiting review <strong>{pendingCount}</strong></span>
                 </div>
               </div>
@@ -167,10 +167,10 @@ export const DoctorReports: React.FC = () => {
 
         {/* Right Card: Needs urgent review or All Acknowledged (7 cols) */}
         {unviewedCriticalReports.length > 0 ? (
-          <div className="lg:col-span-7 bg-[#FDF1EF] rounded-3xl p-6 sm:p-7 border border-[#FADCD7] flex flex-col justify-between space-y-3.5 animate-in fade-in duration-300">
+          <div className="lg:col-span-7 bg-red-50 rounded-3xl p-6 sm:p-7 border border-red-200 flex flex-col justify-between space-y-3.5 duration-300">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#A82B1E] text-white flex items-center justify-center shrink-0 shadow-2xs">
-                <AlertTriangle className="w-4 h-4 animate-pulse" />
+              <div className="w-9 h-9 rounded-xl bg-red-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <AlertTriangle className="w-4 h-4" />
               </div>
               <div>
                 <h3 className="font-bold text-sm sm:text-base text-[#9C2A1E] font-serif">Needs urgent review</h3>
@@ -182,35 +182,35 @@ export const DoctorReports: React.FC = () => {
               {unviewedCriticalReports.map((report, index) => (
                 <div key={report.id} className="bg-white rounded-2xl px-4 py-3 flex items-center justify-between gap-3 shadow-2xs border border-stone-100/80">
                   <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-[#FCECE9] text-[#A82B1E] font-bold text-xs flex items-center justify-center flex-shrink-0">{index + 1}</span>
+                    <span className="w-6 h-6 rounded-full bg-red-50 text-red-700 font-bold text-xs flex items-center justify-center flex-shrink-0">{index + 1}</span>
                     <div>
-                      <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">{report.name}</h4>
-                      <p className="text-[11px] text-stone-400">{report.patientName}{report.patientRsId ? ` · ${report.patientRsId}` : ''}</p>
+                      <h4 className="font-bold text-xs sm:text-sm text-ink">{report.name}</h4>
+                      <p className="text-xs text-stone-400">{report.patientName}{report.patientRsId ? ` · ${report.patientRsId}` : ''}</p>
                     </div>
                   </div>
-                  <button onClick={() => navigate(`/doctor/reports/${report.id}`)} className="bg-[#A82B1E] hover:bg-[#8F2317] text-white text-xs font-semibold px-4 py-1.5 rounded-full transition-all shadow-2xs active:scale-95">Review now</button>
+                  <button onClick={() => navigate(`/doctor/reports/${report.id}`)} className="bg-red-700 hover:bg-[#8F2317] text-white text-xs font-semibold px-4 py-1.5 rounded-full transition-all shadow-2xs ">Review now</button>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <div className="lg:col-span-7 bg-[#EBF5F0] rounded-3xl p-6 sm:p-7 border border-[#CDE5D8] flex flex-col justify-between space-y-3.5 animate-in fade-in duration-300">
+          <div className="lg:col-span-7 bg-[#EBF5F0] rounded-3xl p-6 sm:p-7 border border-[#CDE5D8] flex flex-col justify-between space-y-3.5 duration-300">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#2E9E6B] text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
                 <CheckCircle2 className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-bold text-sm sm:text-base text-[#1E3F35] font-serif">All critical alerts acknowledged</h3>
-                <p className="text-xs text-[#2B5246]">No unviewed critical reports. All alerts have been reviewed or are in progress.</p>
+                <h3 className="font-bold text-sm sm:text-base text-forest-900 font-serif">All critical alerts acknowledged</h3>
+                <p className="text-xs text-forest-800">No unviewed critical reports. All alerts have been reviewed or are in progress.</p>
               </div>
             </div>
 
             <div className="bg-white/90 rounded-2xl p-4 border border-[#D5EADF] text-xs text-stone-600 flex items-center justify-between">
               <div>
-                <p className="font-semibold text-[#172B25]">Urgent Alert Status: Clear</p>
-                <p className="text-[11px] text-stone-500 mt-0.5">{pendingCount} report{pendingCount === 1 ? '' : 's'} in standard review queue</p>
+                <p className="font-semibold text-ink">Urgent Alert Status: Clear</p>
+                <p className="text-xs text-stone-500 mt-0.5">{pendingCount} report{pendingCount === 1 ? '' : 's'} in standard review queue</p>
               </div>
-              <span className="text-xs font-bold text-[#2E9E6B] bg-[#E4EDE8] px-3 py-1 rounded-full flex items-center gap-1">
+              <span className="text-xs font-bold text-emerald-500 bg-forest-50 px-3 py-1 rounded-full flex items-center gap-1">
                 <Check className="w-3.5 h-3.5" />
                 <span>Acknowledged</span>
               </span>
@@ -228,13 +228,13 @@ export const DoctorReports: React.FC = () => {
             onClick={() => setActiveTab('pending')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'pending'
-                ? 'bg-[#1E3F35] text-white shadow-sm'
+                ? 'bg-forest-900 text-white shadow-sm'
                 : 'bg-white text-stone-600 hover:text-stone-900 border border-stone-200/80 hover:bg-stone-50'
             }`}
           >
             <span>Awaiting review</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                 activeTab === 'pending' ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-700'
               }`}
             >
@@ -247,13 +247,13 @@ export const DoctorReports: React.FC = () => {
             onClick={() => setActiveTab('reviewed')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'reviewed'
-                ? 'bg-[#1E3F35] text-white shadow-sm'
+                ? 'bg-forest-900 text-white shadow-sm'
                 : 'bg-white text-stone-600 hover:text-stone-900 border border-stone-200/80 hover:bg-stone-50'
             }`}
           >
             <span>Reviewed & approved</span>
             <span
-              className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+              className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                 activeTab === 'reviewed' ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-700'
               }`}
             >
@@ -275,7 +275,7 @@ export const DoctorReports: React.FC = () => {
           </button>
 
           {sortDropdownOpen && (
-            <div className="absolute right-0 top-11 z-20 bg-white border border-stone-200 rounded-xl shadow-lg p-1.5 text-xs w-44 space-y-1">
+            <div className="absolute right-0 top-11 z-20 bg-white border border-stone-200 rounded-xl shadow-sm p-1.5 text-xs w-44 space-y-1">
               {(['Criticality', 'Date', 'Patient'] as const).map((opt) => (
                 <button
                   key={opt}
@@ -285,7 +285,7 @@ export const DoctorReports: React.FC = () => {
                     setSortDropdownOpen(false);
                   }}
                   className={`w-full text-left px-3 py-1.5 rounded-lg transition-colors ${
-                    sortBy === opt ? 'bg-[#1E3F35] text-white font-semibold' : 'text-stone-700 hover:bg-stone-100'
+                    sortBy === opt ? 'bg-forest-900 text-white font-semibold' : 'text-stone-700 hover:bg-stone-100'
                   }`}
                 >
                   Sort by: {opt}
@@ -308,7 +308,7 @@ export const DoctorReports: React.FC = () => {
       {sortedReports.length === 0 && (
         <div className="bg-white rounded-3xl p-10 text-center border border-stone-200/60 shadow-2xs space-y-3">
           <div className="w-12 h-12 rounded-2xl bg-stone-100 text-stone-500 flex items-center justify-center mx-auto">
-            {activeTab === 'pending' ? <CheckCircle2 className="w-6 h-6 text-[#2E9E6B]" /> : <FileText className="w-6 h-6" />}
+            {activeTab === 'pending' ? <CheckCircle2 className="w-6 h-6 text-emerald-500" /> : <FileText className="w-6 h-6" />}
           </div>
           <h3 className="font-bold text-stone-800 text-base">
             {activeTab === 'pending'
@@ -340,30 +340,30 @@ export const DoctorReports: React.FC = () => {
                 <div
                   className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
                     isCritical
-                      ? 'bg-[#FCECE9] text-[#A82B1E]'
+                      ? 'bg-red-50 text-red-700'
                       : isUnbalanced
-                      ? 'bg-[#FEF5DF] text-[#8C6200]'
-                      : 'bg-[#E4EDE8] text-[#1E3F35]'
+                      ? 'bg-[#FEF5DF] text-amber-700'
+                      : 'bg-forest-50 text-forest-900'
                   }`}
                 >
                   <FileText className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-sm text-[#172B25] group-hover:text-[#1E3F35] transition-colors">
+                    <h4 className="font-bold text-sm text-ink group-hover:text-forest-900 transition-colors">
                       {report.name}
                     </h4>
                     {report.reviewed ? (
-                      <span className="text-[10px] font-bold text-[#2E9E6B] bg-[#E4EDE8] px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="text-xs font-bold text-emerald-500 bg-forest-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <Check className="w-3 h-3" />
                         <span>Approved & sent</span>
                       </span>
                     ) : report.doctorViewed ? (
-                      <span className="text-[10px] font-semibold text-[#1E3F35] bg-[#E4EDE8]/80 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-semibold text-forest-900 bg-forest-50/80 px-2 py-0.5 rounded-full">
                         In review
                       </span>
                     ) : isCritical ? (
-                      <span className="text-[10px] font-bold text-[#B53629] bg-[#FDF2F0] px-2 py-0.5 rounded-full animate-pulse">
+                      <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
                         New alert
                       </span>
                     ) : null}
@@ -374,7 +374,7 @@ export const DoctorReports: React.FC = () => {
 
               {/* Patient Name & Avatar */}
               <div className="col-span-12 sm:col-span-4 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#DCE8E2] text-[#1E3F35] font-bold text-xs flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#DCE8E2] text-forest-900 font-bold text-xs flex items-center justify-center shrink-0">
                   {report.patientAvatar}
                 </div>
                 <div>
@@ -392,10 +392,10 @@ export const DoctorReports: React.FC = () => {
                 <span
                   className={`text-xs font-semibold px-3 py-1 rounded-full inline-block ${
                     isCritical
-                      ? 'bg-[#FCECE9] text-[#A82B1E]'
+                      ? 'bg-red-50 text-red-700'
                       : isUnbalanced
-                      ? 'bg-[#FEF5DF] text-[#8C6200]'
-                      : 'bg-[#E4EDE8] text-[#2B5246]'
+                      ? 'bg-[#FEF5DF] text-amber-700'
+                      : 'bg-forest-50 text-forest-800'
                   }`}
                 >
                   {report.status}
@@ -413,8 +413,8 @@ export const DoctorReports: React.FC = () => {
                     report.reviewed
                       ? 'border border-stone-200 text-stone-700 hover:bg-stone-50'
                       : isCritical && !report.doctorViewed
-                      ? 'bg-[#A82B1E] text-white hover:bg-[#8F2317]'
-                      : 'bg-[#1E3F35] text-white hover:bg-[#163028]'
+                      ? 'bg-red-700 text-white hover:bg-[#8F2317]'
+                      : 'bg-forest-900 text-white hover:bg-[#163028]'
                   }`}
                 >
                   <Eye className="w-3.5 h-3.5" />

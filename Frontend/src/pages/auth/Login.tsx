@@ -126,9 +126,9 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#ECF2ED]">
+    <div className="min-h-screen flex bg-canvas">
       {/* Left Branding Panel */}
-      <div className="hidden lg:flex lg:w-5/12 bg-[#1E3F35] text-white p-12 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-5/12 bg-forest-900 text-white p-12 flex-col justify-between relative overflow-hidden">
         {/* Background decorative curved wave */}
         <div className="absolute -top-32 -right-32 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -137,7 +137,7 @@ export const Login: React.FC = () => {
           <Logo size="lg" />
 
           <div className="mt-24 space-y-6 max-w-md">
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-white">
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
               Lab reports,
               <br />
               understood in seconds.
@@ -198,12 +198,12 @@ export const Login: React.FC = () => {
       <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
         {/* Top Header / Switch Mode */}
         <div className="flex items-center justify-between lg:justify-end gap-4 text-xs sm:text-sm">
-          <div className="lg:hidden rounded-xl bg-[#1E3F35] px-3 py-2">
+          <div className="lg:hidden rounded-xl bg-forest-900 px-3 py-2">
             <Logo size="sm" />
           </div>
           <div>
           <span className="text-stone-500 mr-2">Need an account?</span>
-          <Link to={activeTab === 'patient' ? '/signup?role=patient' : '/signup'} className="font-semibold text-[#B53629] hover:underline">
+          <Link to={activeTab === 'patient' ? '/signup?role=patient' : '/signup'} className="font-semibold text-red-600 hover:underline">
             Register as {activeTab === 'patient' ? 'Patient' : 'Doctor'}
           </Link>
           </div>
@@ -221,7 +221,7 @@ export const Login: React.FC = () => {
               }}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeTab === 'doctor'
-                  ? 'bg-white text-[#1E3F35] shadow-sm'
+                  ? 'bg-white text-forest-900 shadow-sm'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
@@ -236,7 +236,7 @@ export const Login: React.FC = () => {
               }}
               className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeTab === 'patient'
-                  ? 'bg-[#1E3F35] text-white shadow-sm'
+                  ? 'bg-forest-900 text-white shadow-sm'
                   : 'text-stone-500 hover:text-stone-800'
               }`}
             >
@@ -262,7 +262,7 @@ export const Login: React.FC = () => {
             /* Doctor Login Form */
             <div>
               <div className="mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
                   Doctor log in
                 </h2>
                 <p className="text-sm text-stone-500 mt-2">
@@ -283,7 +283,7 @@ export const Login: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       placeholder="priya.mehta@reportsetu.in"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                     />
                   </div>
                 </div>
@@ -300,7 +300,7 @@ export const Login: React.FC = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       placeholder="••••••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                     />
                     <button
                       type="button"
@@ -318,7 +318,7 @@ export const Login: React.FC = () => {
                       type="checkbox"
                       checked={keepLoggedIn}
                       onChange={(e) => setKeepLoggedIn(e.target.checked)}
-                      className="rounded text-[#1E3F35] focus:ring-[#1E3F35]"
+                      className="rounded text-forest-900 focus:ring-forest-900"
                     />
                     <span>Remember this device</span>
                   </label>
@@ -327,7 +327,7 @@ export const Login: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-[#1E3F35] hover:bg-[#16322A] text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-70"
+                  className="w-full bg-forest-900 hover:bg-forest-950 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-70"
                 >
                   {isLoading ? (
                     <>
@@ -347,7 +347,7 @@ export const Login: React.FC = () => {
             /* Patient Login Form (Mobile OTP) */
             <div>
               <div className="mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
                   Patient log in
                 </h2>
                 <p className="text-sm text-stone-500 mt-2">
@@ -375,11 +375,11 @@ export const Login: React.FC = () => {
                           pattern="[0-9]{10}"
                           maxLength={10}
                           placeholder="98765 43210"
-                          className="w-full pl-20 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
+                          className="w-full pl-20 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink"
                         />
                       </div>
                     </div>
-                    <p className="text-[11px] text-stone-400 mt-1.5">
+                    <p className="text-xs text-stone-400 mt-1.5">
                       Enter your mobile number to receive an instant verification code.
                     </p>
                   </div>
@@ -387,7 +387,7 @@ export const Login: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#1E3F35] hover:bg-[#16322A] text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-70"
+                    className="w-full bg-forest-900 hover:bg-forest-950 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-70"
                   >
                     {isLoading ? (
                       <>
@@ -440,7 +440,7 @@ export const Login: React.FC = () => {
                         required
                         maxLength={6}
                         placeholder="123456"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25] tracking-widest font-mono text-center font-bold"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900 text-sm text-ink tracking-widest font-mono text-center font-bold"
                       />
                     </div>
                   </div>
@@ -448,7 +448,7 @@ export const Login: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#1E3F35] hover:bg-[#16322A] text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-70"
+                    className="w-full bg-forest-900 hover:bg-forest-950 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all disabled:opacity-70"
                   >
                     {isLoading ? (
                       <>
@@ -469,9 +469,9 @@ export const Login: React.FC = () => {
         </div>
 
         {isDemoMode && (
-          <div className="w-full max-w-md mx-auto -mt-2 mb-6 rounded-2xl border border-dashed border-[#A4BEB0] bg-white/70 p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#2B5246]">Demo mode · synthetic data</p>
-            <p className="mt-1 text-xs text-[#5F736C]">No backend needed. Every person and value here is fictional.</p>
+          <div className="w-full max-w-md mx-auto -mt-2 mb-6 rounded-2xl border border-dashed border-stone-400 bg-white/70 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-forest-800">Demo mode · synthetic data</p>
+            <p className="mt-1 text-xs text-stone-600">No backend needed. Every person and value here is fictional.</p>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {(['doctor', 'patient', 'admin'] as const).map((who) => (
                 <button
@@ -479,10 +479,10 @@ export const Login: React.FC = () => {
                   type="button"
                   disabled={isLoading}
                   onClick={() => demoLogin(who)}
-                  className="rounded-xl border border-[#CAD8CF] bg-white px-2 py-2 text-xs font-semibold capitalize text-[#1E3F35] hover:border-[#1E3F35] hover:bg-[#F5F8F6] disabled:opacity-60"
+                  className="rounded-xl border border-stone-300 bg-white px-2 py-2 text-xs font-semibold capitalize text-forest-900 hover:border-forest-900 hover:bg-stone-50 disabled:opacity-60"
                 >
                   {who === 'doctor' ? 'Dr. Priya Mehta' : who === 'patient' ? 'Rohan Verma' : 'Admin'}
-                  <span className="block text-[10px] font-normal text-[#5F736C]">{who}</span>
+                  <span className="block text-xs font-normal text-stone-600">{who}</span>
                 </button>
               ))}
             </div>

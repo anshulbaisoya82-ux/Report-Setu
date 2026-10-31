@@ -22,7 +22,7 @@ export const PatientMedicines: React.FC = () => {
       {/* Header & Streak Banner */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-forest-950 font-serif tracking-tight">My Medication Schedule</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">My Medication Schedule</h1>
           <p className="text-xs text-slate-500 mt-1">
             {prescriptions.length > 0
               ? `Active regimen prescribed by ${prescriptions[0].doctorName}`
@@ -99,7 +99,7 @@ export const PatientMedicines: React.FC = () => {
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                        isTaken ? 'bg-[#1E3F35] text-accent-teal' : 'border-2 border-slate-300'
+                        isTaken ? 'bg-forest-900 text-accent-teal' : 'border-2 border-slate-300'
                       }`}>
                         {isTaken && <Check className="w-4 h-4 stroke-[3]" />}
                       </div>
@@ -107,13 +107,13 @@ export const PatientMedicines: React.FC = () => {
                         <h4 className={`text-xs font-bold ${isTaken ? 'line-through text-slate-500' : 'text-slate-900'}`}>
                           {med.name} {med.dose}
                         </h4>
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-xs text-slate-500">
                           {med.instructions || med.timing} · <span className="font-semibold text-forest-800">{med.scheduledTime}</span>
                         </p>
                       </div>
                     </div>
 
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase ${
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase ${
                       isTaken ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                     }`}>
                       {isTaken ? (med.takenAt || 'Taken') : 'Take Now'}
@@ -192,7 +192,7 @@ export const PatientMedicines: React.FC = () => {
       )}
 
       {/* Drug Safety Protocol Notice */}
-      <div className="bg-[#FFF4E5] border border-[#FFD9A8] rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
           <div>
@@ -205,7 +205,7 @@ export const PatientMedicines: React.FC = () => {
 
         <Link
           to="/patient/ask-doctor"
-          className="shrink-0 px-4 py-2 text-xs font-bold text-white bg-[#1E3F35] rounded-xl hover:bg-forest-800 transition-colors shadow-2xs whitespace-nowrap"
+          className="shrink-0 px-4 py-2 text-xs font-bold text-white bg-forest-900 rounded-xl hover:bg-forest-800 transition-colors shadow-2xs whitespace-nowrap"
         >
           Ask Doctor about Medicines
         </Link>
@@ -222,7 +222,7 @@ export const PatientMedicines: React.FC = () => {
           </div>
           <div>
             <h4 className="text-xs font-bold text-slate-900">Current prescription · {rx.name}</h4>
-            <p className="text-[11px] text-slate-500">Prescribed by {rx.doctorName}{rx.startDate ? ` on ${formatDate(rx.startDate)}` : ''}</p>
+            <p className="text-xs text-slate-500">Prescribed by {rx.doctorName}{rx.startDate ? ` on ${formatDate(rx.startDate)}` : ''}</p>
           </div>
         </div>
 

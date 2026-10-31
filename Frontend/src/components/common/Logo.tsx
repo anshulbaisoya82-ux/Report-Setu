@@ -9,7 +9,7 @@ interface LogoProps {
 export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', theme = 'light' }) => {
   const iconSize = size === 'sm' ? 'w-7 h-7' : size === 'lg' ? 'w-10 h-10' : 'w-8 h-8';
   const textSize = size === 'sm' ? 'text-base' : size === 'lg' ? 'text-2xl' : 'text-xl';
-  const textColor = theme === 'dark' ? 'text-[#1E3F35]' : 'text-white';
+  const textColor = theme === 'dark' ? 'text-forest-900' : 'text-white';
 
   return (
     <div className={`flex items-center gap-2.5 font-bold tracking-tight select-none ${className}`}>

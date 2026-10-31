@@ -134,7 +134,7 @@ export const DoctorProfile: React.FC = () => {
     <div className="space-y-6 pb-16 max-w-5xl mx-auto">
       {/* Toast Alert */}
       {toastMsg && (
-        <div className="fixed top-6 right-6 z-50 bg-[#1E3F35] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 border border-forest-600/40 animate-in fade-in duration-200">
+        <div className="fixed top-6 right-6 z-50 bg-forest-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 border border-forest-600/40 duration-200">
           <CheckCircle className="w-4 h-4 text-accent-teal" />
           <span className="text-xs font-semibold">{toastMsg}</span>
         </div>
@@ -143,9 +143,9 @@ export const DoctorProfile: React.FC = () => {
       {/* Hero Overview Banner Card */}
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         {/* Banner with dark forest healthcare gradient */}
-        <div className="h-28 bg-gradient-to-r from-[#1E3F35] via-[#244E42] to-[#172B25] relative px-6 sm:px-8 flex items-end">
+        <div className="h-28 relative px-6 sm:px-8 flex items-end">
           <div className="absolute top-4 right-6 flex items-center gap-2">
-            <span className="bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-xs">
+            <span className="bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 text-xs font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-accent-teal" /> Verified Clinician
             </span>
           </div>
@@ -160,10 +160,10 @@ export const DoctorProfile: React.FC = () => {
               </div>
               <div className="mb-1">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-bold text-forest-950 font-serif leading-tight">
+                  <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
                     Dr. {formData.name?.replace(/^(Dr\.|Doctor)\s+/i, '') || 'Rishabh'}
                   </h1>
-                  <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full">
                     <CheckCircle className="w-3 h-3 text-emerald-700" /> NMC Verified
                   </span>
                 </div>
@@ -180,29 +180,29 @@ export const DoctorProfile: React.FC = () => {
 
           {/* Clinical Activity Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100">
-            <div className="bg-[#F8FAF9] p-3 rounded-2xl border border-slate-200/60">
-              <div className="flex items-center gap-2 text-slate-500 text-[11px] font-semibold mb-1">
+            <div className="bg-stone-50 p-3 rounded-2xl border border-slate-200/60">
+              <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-1">
                 <Users className="w-3.5 h-3.5 text-forest-700" /> Connected Patients
               </div>
               <div className="text-lg font-bold text-forest-950 font-serif">{stats.activePatientsCount} active</div>
             </div>
 
-            <div className="bg-[#F8FAF9] p-3 rounded-2xl border border-slate-200/60">
-              <div className="flex items-center gap-2 text-slate-500 text-[11px] font-semibold mb-1">
+            <div className="bg-stone-50 p-3 rounded-2xl border border-slate-200/60">
+              <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-1">
                 <Calendar className="w-3.5 h-3.5 text-blue-700" /> Total Appointments
               </div>
               <div className="text-lg font-bold text-forest-950 font-serif">{stats.appointmentsCount} scheduled</div>
             </div>
 
-            <div className="bg-[#F8FAF9] p-3 rounded-2xl border border-slate-200/60">
-              <div className="flex items-center gap-2 text-slate-500 text-[11px] font-semibold mb-1">
+            <div className="bg-stone-50 p-3 rounded-2xl border border-slate-200/60">
+              <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-1">
                 <FileText className="w-3.5 h-3.5 text-emerald-700" /> Reports Reviewed
               </div>
               <div className="text-lg font-bold text-forest-950 font-serif">{stats.reportsReviewedCount} verified</div>
             </div>
 
-            <div className="bg-[#F8FAF9] p-3 rounded-2xl border border-slate-200/60">
-              <div className="flex items-center gap-2 text-slate-500 text-[11px] font-semibold mb-1">
+            <div className="bg-stone-50 p-3 rounded-2xl border border-slate-200/60">
+              <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold mb-1">
                 <MessageSquare className="w-3.5 h-3.5 text-amber-700" /> Pending Inquiries
               </div>
               <div className="text-lg font-bold text-forest-950 font-serif">{stats.pendingQuestionsCount} in triage</div>
@@ -221,7 +221,7 @@ export const DoctorProfile: React.FC = () => {
                 <Award className="w-4 h-4 text-forest-800" />
                 <h3 className="text-sm font-bold text-slate-900 font-serif">Practitioner Professional Identity</h3>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">Displayed to linked patients and e-prescriptions</span>
+              <span className="text-xs text-slate-400 font-medium">Displayed to linked patients and e-prescriptions</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -330,7 +330,7 @@ export const DoctorProfile: React.FC = () => {
                 <Building className="w-4 h-4 text-forest-800" />
                 <h3 className="text-sm font-bold text-slate-900 font-serif">Clinic & Practice</h3>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">In-person visits</span>
+              <span className="text-xs text-slate-400 font-medium">In-person visits</span>
             </div>
 
             <div className="space-y-3.5">
@@ -396,7 +396,7 @@ export const DoctorProfile: React.FC = () => {
             className={`w-full py-4 rounded-2xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm transition-all ${
               saving
                 ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                : 'bg-forest-900 text-accent-teal hover:bg-forest-800 active:scale-98 cursor-pointer'
+                : 'bg-forest-900 text-accent-teal hover:bg-forest-800 cursor-pointer'
             }`}
           >
             {saving ? (

@@ -90,7 +90,7 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
     ? 'bg-red-50 text-red-700 border-red-200'
     : isAbnormal
     ? 'bg-amber-50 text-amber-800 border-amber-200'
-    : 'bg-[#EAF5EF] text-[#1E3F35] border-[#CAD8CF]';
+    : 'bg-[#EAF5EF] text-forest-900 border-stone-300';
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-stone-50/70 border border-stone-200/80 rounded-2xl">
@@ -98,10 +98,10 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
       <div className="bg-white p-3.5 rounded-xl border border-stone-200/60 shadow-2xs space-y-2">
         <div className="flex items-center justify-between text-xs text-stone-500 font-medium">
           <span className="flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5 text-[#219E91]" />
+            <Activity className="w-3.5 h-3.5 text-teal-500" />
             <span>Latest Reading</span>
           </span>
-          <span className="flex items-center gap-1 text-[11px] text-stone-400">
+          <span className="flex items-center gap-1 text-xs text-stone-400">
             <Calendar className="w-3 h-3" />
             <span>{currentPoint.date}</span>
           </span>
@@ -110,7 +110,7 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
         <div className="flex items-baseline justify-between pt-0.5">
           <div className="flex items-baseline gap-1.5">
             <span
-              className="text-2xl md:text-3xl font-extrabold font-serif tracking-tight"
+              className="text-2xl md:text-3xl font-semibold font-serif tracking-tight"
               style={{ color: statusColor }}
             >
               {currentPoint.displayValue}
@@ -122,7 +122,7 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
             {isCritical ? (
               <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
             ) : isNormal ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#219E91]" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-teal-500" />
             ) : (
               <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
             )}
@@ -130,7 +130,7 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
           </span>
         </div>
 
-        <div className="text-[11px] text-stone-400 pt-1 border-t border-stone-100 flex items-center justify-between">
+        <div className="text-xs text-stone-400 pt-1 border-t border-stone-100 flex items-center justify-between">
           <span>Target Interval:</span>
           <span className="font-semibold text-stone-700">
             {refLow.toLocaleString('en-IN')} – {refHigh.toLocaleString('en-IN')} {unit}
@@ -142,7 +142,7 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
       <div className="bg-white p-3.5 rounded-xl border border-stone-200/60 shadow-2xs space-y-2">
         <div className="flex items-center justify-between text-xs text-stone-500 font-medium">
           <span>Consecutive Shift</span>
-          <span className="text-[11px] text-stone-400">
+          <span className="text-xs text-stone-400">
             {priorPoint ? `vs ${priorPoint.date}` : 'Baseline Report'}
           </span>
         </div>
@@ -164,7 +164,7 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
                 }`}
               >
                 {trendDirection === 'rising' ? (
-                  <TrendingUp className="w-3.5 h-3.5 text-[#219E91]" />
+                  <TrendingUp className="w-3.5 h-3.5 text-teal-500" />
                 ) : trendDirection === 'falling' ? (
                   <TrendingDown className="w-3.5 h-3.5 text-stone-600" />
                 ) : (
@@ -174,14 +174,14 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
               </span>
             </div>
 
-            <p className="text-[11px] text-stone-500 leading-snug">
+            <p className="text-xs text-stone-500 leading-snug">
               Prior recorded level was {priorPoint.displayValue} {unit} ({priorPoint.status}).
             </p>
           </div>
         ) : (
           <div className="pt-2 text-stone-500 text-xs">
             <p className="font-medium text-stone-700">Initial Baseline Record</p>
-            <p className="text-[11px] text-stone-400 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Subsequent laboratory reports will compute automated velocity & delta tracking.
             </p>
           </div>
@@ -192,10 +192,10 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
       <div className="bg-white p-3.5 rounded-xl border border-stone-200/60 shadow-2xs space-y-2">
         <div className="flex items-center justify-between text-xs text-stone-500 font-medium">
           <span className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#219E91]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-teal-500" />
             <span>Clinical Observation</span>
           </span>
-          <span className="text-[10px] text-stone-400 uppercase tracking-wider font-semibold">
+          <span className="text-xs text-stone-400 uppercase tracking-wider font-semibold">
             {definition.category}
           </span>
         </div>
@@ -204,7 +204,7 @@ export const TrendSummary: React.FC<TrendSummaryProps> = ({
           {trajectoryComment}
         </p>
 
-        <p className="text-[11px] text-stone-400 leading-snug pt-1 border-t border-stone-100">
+        <p className="text-xs text-stone-400 leading-snug pt-1 border-t border-stone-100">
           {definition.clinicalMeaning}
         </p>
       </div>

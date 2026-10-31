@@ -20,7 +20,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-stone-600 pt-3 border-t border-stone-100 font-sans">
       {/* Legend items */}
-      <div className="flex flex-wrap items-center gap-4 text-[11px]">
+      <div className="flex flex-wrap items-center gap-4 text-xs">
         {/* Measured Trend */}
         <div className="flex items-center gap-1.5">
           <span
@@ -62,14 +62,14 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
 
         {/* Critical Range */}
         {hasCriticalPoints && (
-          <div className="flex items-center gap-1.5 text-[#B53629]">
+          <div className="flex items-center gap-1.5 text-red-600">
             <AlertTriangle className="w-3.5 h-3.5 inline-block text-[#DC5555]" />
             <span className="font-semibold text-[#DC5555]">Critical Value</span>
           </div>
         )}
       </div>
 
-      <div className="text-[10px] text-stone-400">
+      <div className="text-xs text-stone-400">
         Clinical Reference: Standard Laboratory Biological Intervals
       </div>
     </div>

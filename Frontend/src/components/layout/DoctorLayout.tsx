@@ -4,7 +4,7 @@ import { AppShell, NavItem } from './AppShell';
 import { useStore } from '../../store/useStore';
 
 export const DoctorLayout: React.FC = () => {
-  const { questionThreads, fetchQuestionThreads } = useStore();
+  const { questionThreads, fetchQuestionThreads, doctorInfo } = useStore();
 
   useEffect(() => {
     void fetchQuestionThreads();
@@ -20,8 +20,10 @@ export const DoctorLayout: React.FC = () => {
     { name: 'Reports', path: '/doctor/reports', icon: FileText, primary: true },
     { name: 'Appointments', path: '/doctor/appointments', icon: Calendar, primary: true },
     { name: 'Patient questions', path: '/doctor/questions', icon: MessageSquare, badge: unread, primary: true },
-    { name: 'My profile', path: '/doctor/profile', icon: User },
+    { name: 'Profile', path: '/doctor/profile', icon: User },
   ];
 
-  return <AppShell items={items} settingsPath="/doctor/settings" privacyNote="Patient reports are visible only to you and your clinic." />;
+  return <AppShell items={items} settingsPath="/doctor/settings" privacyNote="Patient reports are visible only to you and your clinic."
+      account={doctorInfo.name ? { name: doctorInfo.name, detail: doctorInfo.specialty } : undefined}
+    />;
 };

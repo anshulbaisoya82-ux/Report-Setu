@@ -65,7 +65,7 @@ const ClinicalDataDot = (props: any) => {
     : CLINICAL_CHART_THEME.pointNormal;
 
   return (
-    <g className="cursor-pointer transition-transform duration-150">
+    <g className="cursor-pointer transition-transform">
       {/* Outer halo for the most recent reading */}
       {isCurrent && (
         <circle
@@ -168,7 +168,7 @@ export const MedicalTrendChart: React.FC<MedicalTrendChartProps> = ({
             <h3 className="font-serif font-bold text-lg md:text-xl text-stone-900 tracking-tight">
               {title || `${definition.name} Trend`}
             </h3>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 font-medium">
+            <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-stone-100 text-stone-600 font-medium">
               {unit}
             </span>
           </div>

@@ -3,10 +3,12 @@ import { useLocation } from 'react-router-dom';
 import { Home, FileText, UploadCloud, Pill, Calendar, MessageSquare, UserCheck, User } from 'lucide-react';
 import { AppShell, NavItem } from './AppShell';
 import { connectionsApi } from '../../api';
+import { useStore } from '../../store/useStore';
 
 export const PatientLayout: React.FC = () => {
   const { pathname } = useLocation();
   const [pendingCount, setPendingCount] = useState(0);
+  const currentUser = useStore((s) => s.currentUser);
 
   useEffect(() => {
     connectionsApi
@@ -24,7 +26,7 @@ export const PatientLayout: React.FC = () => {
     { name: 'Appointments', path: '/patient/appointments', icon: Calendar },
     { name: 'Ask doctor', path: '/patient/ask-doctor', icon: MessageSquare, primary: true },
     { name: 'My doctors', path: '/patient/doctors', icon: UserCheck, badge: pendingCount || undefined },
-    { name: 'My profile', path: '/patient/profile', icon: User },
+    { name: 'Profile', path: '/patient/profile', icon: User },
   ];
 
   return (
@@ -32,6 +34,7 @@ export const PatientLayout: React.FC = () => {
       items={items}
       settingsPath="/patient/settings"
       privacyNote="Your reports are visible only to you and the doctors you connect."
+      account={currentUser?.name ? { name: currentUser.name, detail: currentUser.rsId } : undefined}
       fullBleed={(p) => p.startsWith('/patient/ask-doctor')}
     />
   );

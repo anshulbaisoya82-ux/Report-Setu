@@ -160,11 +160,11 @@ export const PatientAppointments: React.FC = () => {
     <div className="space-y-6 pb-12 max-w-4xl mx-auto">
       {/* Toast Alert */}
       {bookingSuccessToast && (
-        <div className="fixed top-6 right-6 z-50 bg-[#1E3F35] text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-[#2E9E6B]/50 animate-in fade-in slide-in-from-top-4">
+        <div className="fixed top-6 right-6 z-50 bg-forest-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-emerald-500/50 slide-in-from-top-4">
           <CheckCircle className="w-5 h-5 text-accent-teal shrink-0" />
           <div>
             <p className="font-semibold text-xs leading-snug">{bookingSuccessToast}</p>
-            <p className="text-[11px] text-stone-300">Your doctor will be notified via live websocket.</p>
+            <p className="text-xs text-stone-300">Your doctor will be notified via live websocket.</p>
           </div>
         </div>
       )}
@@ -173,9 +173,9 @@ export const PatientAppointments: React.FC = () => {
       <div className="bg-white p-5 rounded-3xl border border-stone-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-forest-950 font-serif tracking-tight">Appointments & Consultations</h1>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E4EDE8] text-[#1E3F35] flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2E9E6B] animate-pulse" />
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Appointments & Consultations</h1>
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-forest-50 text-forest-900 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Real-time Sync
             </span>
           </div>
@@ -186,7 +186,7 @@ export const PatientAppointments: React.FC = () => {
 
         <button
           onClick={handleOpenBookingModal}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] rounded-xl transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-forest-900 hover:bg-forest-950 rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4 text-accent-teal" /> Book New Appointment
         </button>
@@ -194,9 +194,9 @@ export const PatientAppointments: React.FC = () => {
 
       {/* 1. UPCOMING CONFIRMED APPOINTMENT CARD (HERO) */}
       {nextConfirmed ? (
-        <div className="bg-[#1E3F35] bg-gradient-to-r from-[#1E3F35] to-[#264E42] rounded-3xl p-6 text-white shadow-md space-y-4">
+        <div className="bg-forest-900 rounded-3xl p-6 text-white shadow-md space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-            <span className="text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-accent-teal/20 text-accent-teal border border-accent-teal/30 flex items-center gap-1.5">
+            <span className="text-xs font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-accent-teal/20 text-accent-teal border border-accent-teal/30 flex items-center gap-1.5">
               <CheckCircle2 className="w-3 h-3" /> Confirmed Upcoming Visit
             </span>
             <span className="text-xs text-stone-300 font-medium">{nextConfirmed.date}</span>
@@ -257,7 +257,7 @@ export const PatientAppointments: React.FC = () => {
           <button
             type="button"
             onClick={handleOpenBookingModal}
-            className="mt-2 px-4 py-2 text-xs font-bold text-[#1E3F35] bg-[#E4EDE8] hover:bg-[#d5e4da] rounded-xl transition-colors cursor-pointer inline-flex items-center gap-1"
+            className="mt-2 px-4 py-2 text-xs font-bold text-forest-900 bg-forest-50 hover:bg-[#d5e4da] rounded-xl transition-colors cursor-pointer inline-flex items-center gap-1"
           >
             <Plus className="w-3.5 h-3.5" /> Book Consultation
           </button>
@@ -269,12 +269,12 @@ export const PatientAppointments: React.FC = () => {
         <div className="bg-amber-50/60 border border-amber-200/80 rounded-3xl p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+              <div className="w-2 h-2 rounded-full bg-amber-500" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900">
                 Awaiting Doctor Confirmation ({pendingVisits.length})
               </h3>
             </div>
-            <span className="text-[11px] text-amber-800 font-medium">Real-time status updates active</span>
+            <span className="text-xs text-amber-800 font-medium">Real-time status updates active</span>
           </div>
 
           <div className="space-y-2.5">
@@ -286,7 +286,7 @@ export const PatientAppointments: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-stone-900">{apt.reason}</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
                       Pending Approval
                     </span>
                   </div>
@@ -294,7 +294,7 @@ export const PatientAppointments: React.FC = () => {
                     With <strong>{apt.doctorName || 'Doctor'}</strong> · {apt.date} at {apt.time} ({apt.type})
                   </p>
                   {apt.requestedAt && (
-                    <span className="text-[10px] text-stone-400 block mt-0.5">{apt.requestedAt}</span>
+                    <span className="text-xs text-stone-400 block mt-0.5">{apt.requestedAt}</span>
                   )}
                 </div>
 
@@ -360,7 +360,7 @@ export const PatientAppointments: React.FC = () => {
                   <div className="flex items-start gap-3.5">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                       isConfirmed
-                        ? 'bg-[#E4EDE8] text-[#1E3F35]'
+                        ? 'bg-forest-50 text-forest-900'
                         : isPending
                         ? 'bg-amber-100 text-amber-800'
                         : isCompleted
@@ -379,9 +379,9 @@ export const PatientAppointments: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-xs font-bold text-stone-900">{apt.reason}</h4>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                           isConfirmed
-                            ? 'bg-[#E4EDE8] text-[#1E3F35]'
+                            ? 'bg-forest-50 text-forest-900'
                             : isPending
                             ? 'bg-amber-100 text-amber-800'
                             : isCompleted
@@ -395,7 +395,7 @@ export const PatientAppointments: React.FC = () => {
                         {apt.doctorName} · {apt.date} at {apt.time} ({apt.type})
                       </p>
                       {apt.notes && (
-                        <p className="text-[11px] text-stone-400 mt-1 italic">
+                        <p className="text-xs text-stone-400 mt-1 italic">
                           "{apt.notes}"
                         </p>
                       )}
@@ -435,8 +435,8 @@ export const PatientAppointments: React.FC = () => {
 
       {/* BOOKING MODAL */}
       {showBookingModal && (
-        <div className="fixed inset-0 z-50 bg-stone-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 space-y-5 animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-stone-950/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-stone-200 space-y-5">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div>
                 <h3 className="text-base font-bold text-stone-900 font-serif">Book Clinical Consultation</h3>
@@ -461,7 +461,7 @@ export const PatientAppointments: React.FC = () => {
                   <button
                     type="button"
                     onClick={fetchConnections}
-                    className="text-[11px] font-semibold text-[#1E3F35] hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-semibold text-forest-900 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <RefreshCw className="w-3 h-3" />
                     <span>Refresh</span>
@@ -473,7 +473,7 @@ export const PatientAppointments: React.FC = () => {
                     <select
                       value={selectedDoctorId}
                       onChange={(e) => setSelectedDoctorId(e.target.value)}
-                      className="w-full text-xs p-3 rounded-xl border border-stone-300 bg-white font-semibold text-stone-800 focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35]"
+                      className="w-full text-xs p-3 rounded-xl border border-stone-300 bg-white font-semibold text-stone-800 focus:ring-2 focus:ring-forest-900/20 focus:border-forest-900"
                     >
                       {connectedDoctors.map((conn) => {
                         const docId = conn.doctorId || conn.id || conn.doctor?.id;
@@ -491,20 +491,20 @@ export const PatientAppointments: React.FC = () => {
                     {selectedDoc && (
                       <div className="p-3 bg-emerald-50/80 border border-emerald-200/80 rounded-xl flex items-center justify-between text-xs text-emerald-950">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-[#1E3F35] text-white flex items-center justify-center font-bold text-xs">
+                          <div className="w-8 h-8 rounded-lg bg-forest-900 text-white flex items-center justify-center font-bold text-xs">
                             {(selectedDoc.name || selectedDoc.doctorName || 'Dr').slice(0, 2).toUpperCase()}
                           </div>
                           <div>
                             <div className="font-bold text-stone-900">
                               {selectedDoc.name || selectedDoc.doctorName || 'Doctor'}
                             </div>
-                            <div className="text-[11px] text-emerald-800 font-medium">
+                            <div className="text-xs text-emerald-800 font-medium">
                               {selectedDoc.specialty || selectedDoc.doctor?.specialty || 'General Practitioner'}
                               {(selectedDoc.clinic?.name || selectedDoc.doctor?.clinic?.name) ? ` · ${selectedDoc.clinic?.name || selectedDoc.doctor?.clinic?.name}` : ''}
                             </div>
                           </div>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900 border border-emerald-300">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900 border border-emerald-300">
                           Connected
                         </span>
                       </div>
@@ -516,12 +516,12 @@ export const PatientAppointments: React.FC = () => {
                       <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
                       <span>No Connected Doctor Found</span>
                     </div>
-                    <p className="text-amber-800 text-[11px] leading-relaxed">
+                    <p className="text-amber-800 text-xs leading-relaxed">
                       You must be connected with a doctor to book clinical appointments. Share your RS ID or connect with your doctor on the Doctors page.
                     </p>
                     <a
                       href="/patient/doctors"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] px-3.5 py-1.5 rounded-xl shadow-xs transition-all w-fit"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-forest-900 hover:bg-forest-950 px-3.5 py-1.5 rounded-xl shadow-xs transition-all w-fit"
                     >
                       <span>Go to Doctors Page</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -541,13 +541,13 @@ export const PatientAppointments: React.FC = () => {
                     onClick={() => setConsultType('In-person')}
                     className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                       consultType === 'In-person'
-                        ? 'bg-[#1E3F35] text-white border-[#1E3F35] shadow-xs'
+                        ? 'bg-forest-900 text-white border-forest-900 shadow-xs'
                         : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
                     }`}
                   >
                     <MapPin className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-bold block">In-person</span>
-                    <span className="text-[10px] opacity-80 block">Clinic visit</span>
+                    <span className="text-xs opacity-80 block">Clinic visit</span>
                   </button>
 
                   <button
@@ -555,13 +555,13 @@ export const PatientAppointments: React.FC = () => {
                     onClick={() => setConsultType('Video call')}
                     className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                       consultType === 'Video call'
-                        ? 'bg-[#1E3F35] text-white border-[#1E3F35] shadow-xs'
+                        ? 'bg-forest-900 text-white border-forest-900 shadow-xs'
                         : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
                     }`}
                   >
                     <Video className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-bold block">Video Call</span>
-                    <span className="text-[10px] opacity-80 block">Telehealth</span>
+                    <span className="text-xs opacity-80 block">Telehealth</span>
                   </button>
 
                   <button
@@ -569,13 +569,13 @@ export const PatientAppointments: React.FC = () => {
                     onClick={() => setConsultType('Phone call')}
                     className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                       consultType === 'Phone call'
-                        ? 'bg-[#1E3F35] text-white border-[#1E3F35] shadow-xs'
+                        ? 'bg-forest-900 text-white border-forest-900 shadow-xs'
                         : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
                     }`}
                   >
                     <Phone className="w-4 h-4 mx-auto mb-1" />
                     <span className="text-xs font-bold block">Phone Call</span>
-                    <span className="text-[10px] opacity-80 block">Direct dial</span>
+                    <span className="text-xs opacity-80 block">Direct dial</span>
                   </button>
                 </div>
               </div>
@@ -624,7 +624,7 @@ export const PatientAppointments: React.FC = () => {
                   value={visitReason}
                   onChange={(e) => setVisitReason(e.target.value)}
                   placeholder="e.g. Follow up on platelet count, discuss recent blood test, medication query..."
-                  className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
+                  className="w-full text-xs p-3 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-forest-900/20"
                   required
                 />
               </div>
@@ -640,7 +640,7 @@ export const PatientAppointments: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting || connectedDoctors.length === 0}
-                  className="px-5 py-2.5 text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] rounded-xl shadow-xs transition-all active:scale-95 disabled:bg-stone-300 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2.5 text-xs font-bold text-white bg-forest-900 hover:bg-forest-950 rounded-xl shadow-xs transition-all disabled:bg-stone-300 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
                 >
                   {isSubmitting ? (
                     <>
@@ -659,8 +659,8 @@ export const PatientAppointments: React.FC = () => {
 
       {/* RESCHEDULE MODAL */}
       {showRescheduleModal && (
-        <div className="fixed inset-0 z-50 bg-stone-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-200 space-y-4 animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-stone-950/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-stone-200 space-y-4">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div>
                 <h3 className="text-base font-bold text-stone-900 font-serif">Reschedule Appointment</h3>
@@ -719,7 +719,7 @@ export const PatientAppointments: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] rounded-xl shadow-xs transition-all cursor-pointer"
+                  className="px-5 py-2.5 font-bold text-white bg-forest-900 hover:bg-forest-950 rounded-xl shadow-xs transition-all cursor-pointer"
                 >
                   Confirm Reschedule
                 </button>

@@ -66,7 +66,7 @@ export const ParameterSelector: React.FC<ParameterSelectorProps> = ({
             onClick={() => onSelectKey(bio.key)}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               isActive
-                ? 'bg-[#1E3F35] text-white shadow-sm ring-2 ring-[#1E3F35]/20'
+                ? 'bg-forest-900 text-white shadow-sm ring-2 ring-forest-900/20'
                 : 'bg-stone-100 hover:bg-stone-200 text-stone-600'
             }`}
           >
@@ -75,7 +75,7 @@ export const ParameterSelector: React.FC<ParameterSelectorProps> = ({
             {/* Value preview tag */}
             {latestValue && (
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono font-medium ${
+                className={`text-xs px-1.5 py-0.2 rounded-full font-mono font-medium ${
                   isActive
                     ? isCritical
                       ? 'bg-red-500 text-white'

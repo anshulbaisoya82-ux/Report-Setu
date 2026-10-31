@@ -274,7 +274,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
         </p>
         <button
           onClick={() => navigate('/doctor/patients')}
-          className="text-xs text-[#1E3F35] font-bold underline cursor-pointer"
+          className="text-xs text-forest-900 font-bold underline cursor-pointer"
         >
           Return to Patients List
         </button>
@@ -299,12 +299,12 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
       <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-stone-200/70">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex items-start sm:items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1E3F35] to-[#2B5246] text-white font-extrabold text-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className="w-16 h-16 rounded-2xl text-white font-semibold text-xl flex items-center justify-center flex-shrink-0 shadow-sm">
               {patient.avatar || initials}
             </div>
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-[#172B25] tracking-tight">
+                <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
                   {patient.name || 'Unnamed Patient'}
                 </h1>
                 <span className="text-xs font-mono font-semibold text-stone-600 bg-stone-100 px-2.5 py-1 rounded-md">
@@ -313,8 +313,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <span
                   className={`text-xs font-bold px-3 py-1 rounded-full ${
                     patient.status === 'Critical'
-                      ? 'bg-[#FDF2F0] text-[#B53629] border border-[#F6C4C0]'
-                      : 'bg-[#FEF3D6] text-[#8C6200]'
+                      ? 'bg-red-50 text-red-600 border border-red-200'
+                      : 'bg-amber-100 text-amber-700'
                   }`}
                 >
                   {patient.status || 'Active'}
@@ -348,7 +348,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 </div>
                 <div>
                   <span className="text-stone-400">Known conditions: </span>
-                  <strong className="text-[#2A554A] bg-[#EBF4F0] px-2 py-0.5 rounded-full font-semibold">
+                  <strong className="text-forest-800 bg-forest-50 px-2 py-0.5 rounded-full font-semibold">
                     {patient.conditions && patient.conditions.length > 0
                       ? patient.conditions.join(', ')
                       : 'None recorded'}
@@ -367,7 +367,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               onClick={() => setActiveTab('Medicines')}
               className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all cursor-pointer ${
                 activeTab === 'Medicines'
-                  ? 'bg-[#1E3F35] text-white shadow-sm'
+                  ? 'bg-forest-900 text-white shadow-sm'
                   : 'bg-stone-100 hover:bg-stone-200 text-stone-800'
               }`}
             >
@@ -378,16 +378,16 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               onClick={() => setActiveTab('Appointments')}
               className={`flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all cursor-pointer ${
                 activeTab === 'Appointments'
-                  ? 'bg-[#1E3F35] text-white shadow-sm'
+                  ? 'bg-forest-900 text-white shadow-sm'
                   : 'bg-stone-100 hover:bg-stone-200 text-stone-800'
               }`}
             >
-              <Calendar className="w-4 h-4 text-[#1E3F35]" />
+              <Calendar className="w-4 h-4 text-forest-900" />
               <span>Appointments ({chronologicalAppointments.length})</span>
             </button>
             <button
               onClick={() => setShowAppointmentModal(true)}
-              className="flex items-center gap-1.5 bg-[#1E3F35] hover:bg-[#16322A] text-white px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all shadow-sm cursor-pointer"
+              className="flex items-center gap-1.5 bg-forest-900 hover:bg-forest-950 text-white px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all shadow-sm cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>New Appointment</span>
@@ -403,7 +403,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === tab
-                  ? 'bg-[#1E3F35] text-white shadow-sm'
+                  ? 'bg-forest-900 text-white shadow-sm'
                   : 'text-stone-500 hover:bg-stone-100 hover:text-stone-800'
               }`}
             >
@@ -425,8 +425,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             {/* Header with Sort and Filter */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-5">
               <div>
-                <h3 className="text-lg font-bold text-[#172B25] flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-[#1E3F35]" />
+                <h3 className="text-lg font-bold text-ink flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-forest-900" />
                   <span>Patient Diagnostic Lab Reports ({chronologicalReports.length})</span>
                 </h3>
                 <p className="text-xs text-stone-500 mt-0.5">
@@ -440,7 +440,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   <button
                     onClick={() => setReportSortOrder('newest')}
                     className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      reportSortOrder === 'newest' ? 'bg-white text-[#172B25] shadow-xs' : 'hover:text-stone-900'
+                      reportSortOrder === 'newest' ? 'bg-white text-ink shadow-xs' : 'hover:text-stone-900'
                     }`}
                   >
                     Newest First
@@ -448,7 +448,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   <button
                     onClick={() => setReportSortOrder('oldest')}
                     className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      reportSortOrder === 'oldest' ? 'bg-white text-[#172B25] shadow-xs' : 'hover:text-stone-900'
+                      reportSortOrder === 'oldest' ? 'bg-white text-ink shadow-xs' : 'hover:text-stone-900'
                     }`}
                   >
                     Oldest First
@@ -459,7 +459,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <select
                   value={reportFilter}
                   onChange={(e) => setReportFilter(e.target.value as any)}
-                  className="px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 cursor-pointer"
+                  className="px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-forest-900/20 cursor-pointer"
                 >
                   <option value="all">All Severity ({chronologicalReports.length})</option>
                   <option value="critical">Critical Only</option>
@@ -477,7 +477,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   <UploadCloud className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-bold text-sm text-[#172B25]">No Laboratory Reports Match Selected Filter</h4>
+                  <h4 className="font-bold text-sm text-ink">No Laboratory Reports Match Selected Filter</h4>
                   <p className="text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
                     {chronologicalReports.length === 0
                       ? 'This patient has not yet uploaded any blood tests or diagnostic reports. Once submitted, OCR-extracted parameters, reference ranges, and AI clinical summaries will appear here.'
@@ -488,7 +488,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   <div className="pt-2">
                     <button
                       onClick={() => setShowAppointmentModal(true)}
-                      className="px-4 py-2 bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                      className="px-4 py-2 bg-forest-900 hover:bg-forest-950 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                     >
                       <Calendar className="w-3.5 h-3.5" />
                       <span>Order Labs via Consultation</span>
@@ -514,10 +514,10 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                           <div
                             className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 font-bold text-xs ${
                               r.status === 'Critical'
-                                ? 'bg-[#FDF2F0] text-[#B53629] border border-[#F6C4C0]'
+                                ? 'bg-red-50 text-red-600 border border-red-200'
                                 : r.status === 'Unbalanced'
-                                ? 'bg-[#FEF3D6] text-[#8C6200] border border-[#FAD689]'
-                                : 'bg-[#E4EDE8] text-[#2B5246] border border-[#CAD8CF]'
+                                ? 'bg-amber-100 text-amber-700 border border-[#FAD689]'
+                                : 'bg-forest-50 text-forest-800 border border-stone-300'
                             }`}
                           >
                             <FileText className="w-5 h-5" />
@@ -525,28 +525,28 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
                           <div>
                             <div className="flex items-center gap-2.5 flex-wrap">
-                              <h4 className="font-extrabold text-sm sm:text-base text-[#172B25] font-serif">
+                              <h4 className="font-semibold text-sm sm:text-base text-ink font-serif">
                                 {r.name || 'Laboratory Test Report'}
                               </h4>
                               <span
-                                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
+                                className={`text-xs font-bold px-2.5 py-0.5 rounded-full uppercase ${
                                   r.status === 'Critical'
-                                    ? 'bg-[#FDF2F0] text-[#B53629]'
+                                    ? 'bg-red-50 text-red-600'
                                     : r.status === 'Unbalanced'
-                                    ? 'bg-[#FEF3D6] text-[#8C6200]'
-                                    : 'bg-[#E4EDE8] text-[#2B5246]'
+                                    ? 'bg-amber-100 text-amber-700'
+                                    : 'bg-forest-50 text-forest-800'
                                 }`}
                               >
                                 {r.status}
                               </span>
 
                               {r.reviewed || r.reviewStatus === 'approved' ? (
-                                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1 border border-emerald-200">
+                                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1 border border-emerald-200">
                                   <Check className="w-3 h-3 stroke-[3]" />
                                   <span>Approved & Sent</span>
                                 </span>
                               ) : (
-                                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1 border border-amber-200">
+                                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1 border border-amber-200">
                                   <Clock className="w-3 h-3" />
                                   <span>Pending Doctor Review</span>
                                 </span>
@@ -573,7 +573,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
                           <button
                             onClick={() => navigate(`/doctor/reports/${r.id}`)}
-                            className="px-3.5 py-1.5 bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1"
+                            className="px-3.5 py-1.5 bg-forest-900 hover:bg-forest-950 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1"
                           >
                             <span>Open Viewer</span>
                             <ExternalLink className="w-3.5 h-3.5" />
@@ -584,15 +584,15 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                       {/* Abnormal Biomarker Highlight Chips */}
                       {abnormalParams.length > 0 && (
                         <div className="bg-[#FFF8F7] border border-[#F8D7D3] rounded-xl p-3 text-xs space-y-1.5">
-                          <span className="font-bold text-[#B53629] text-[11px] uppercase tracking-wider flex items-center gap-1">
-                            <AlertCircle className="w-3.5 h-3.5 text-[#B53629]" />
+                          <span className="font-bold text-red-600 text-xs uppercase tracking-wider flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5 text-red-600" />
                             <span>Flagged Out-of-Range Parameters ({abnormalParams.length})</span>
                           </span>
                           <div className="flex items-center gap-2 flex-wrap pt-1">
                             {abnormalParams.map((p, pIdx) => (
                               <span
                                 key={pIdx}
-                                className="px-2.5 py-1 bg-white border border-[#F6C4C0] rounded-lg text-xs font-semibold text-[#8B2318] shadow-2xs"
+                                className="px-2.5 py-1 bg-white border border-red-200 rounded-lg text-xs font-semibold text-[#8B2318] shadow-2xs"
                               >
                                 {p.name}: <strong>{p.value} {p.unit}</strong> ({p.status})
                               </span>
@@ -603,11 +603,11 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
                       {/* Expandable Parameter Table */}
                       {isExpanded && r.parameters && r.parameters.length > 0 && (
-                        <div className="border-t border-stone-100 pt-4 animate-in fade-in duration-150">
+                        <div className="border-t border-stone-100 pt-4">
                           <h5 className="font-bold text-xs text-stone-700 mb-2">All Extracted Biomarkers</h5>
                           <div className="overflow-x-auto rounded-xl border border-stone-200">
                             <table className="w-full text-left text-xs">
-                              <thead className="bg-stone-50 border-b border-stone-200 text-stone-500 font-semibold text-[11px]">
+                              <thead className="bg-stone-50 border-b border-stone-200 text-stone-500 font-semibold text-xs">
                                 <tr>
                                   <th className="py-2.5 px-3">Parameter</th>
                                   <th className="py-2.5 px-3">Result</th>
@@ -622,12 +622,12 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                                     <td className="py-2.5 px-3 font-bold text-stone-900">
                                       {p.value} {p.unit}
                                     </td>
-                                    <td className="py-2.5 px-3 text-stone-500 font-mono text-[11px]">
+                                    <td className="py-2.5 px-3 text-stone-500 font-mono text-xs">
                                       {p.referenceRange} {p.unit}
                                     </td>
                                     <td className="py-2.5 px-3">
                                       <span
-                                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                        className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                                           p.status === 'Critical'
                                             ? 'bg-rose-100 text-rose-800'
                                             : p.status === 'High' || p.status === 'Low'
@@ -674,8 +674,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             {/* Header with Schedule Button */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-5">
               <div>
-                <h3 className="text-lg font-bold text-[#172B25] flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-[#1E3F35]" />
+                <h3 className="text-lg font-bold text-ink flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-forest-900" />
                   <span>Appointments with {patient.name} ({chronologicalAppointments.length})</span>
                 </h3>
                 <p className="text-xs text-stone-500 mt-0.5">
@@ -686,7 +686,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowAppointmentModal(true)}
-                  className="px-4 py-2.5 bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2.5 bg-forest-900 hover:bg-forest-950 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Set New Appointment</span>
@@ -702,7 +702,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   onClick={() => setAppointmentFilter(filterKey)}
                   className={`px-3.5 py-1.5 rounded-xl capitalize transition-all cursor-pointer ${
                     appointmentFilter === filterKey
-                      ? 'bg-[#1E3F35] text-white shadow-xs'
+                      ? 'bg-forest-900 text-white shadow-xs'
                       : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
                   }`}
                 >
@@ -724,7 +724,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   <Calendar className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-bold text-sm text-[#172B25]">No Appointments Found</h4>
+                  <h4 className="font-bold text-sm text-ink">No Appointments Found</h4>
                   <p className="text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
                     {chronologicalAppointments.length === 0
                       ? `There are no consultations scheduled with ${patient.name} yet. Schedule a checkup or follow-up evaluation.`
@@ -734,7 +734,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <div className="pt-2">
                   <button
                     onClick={() => setShowAppointmentModal(true)}
-                    className="px-4 py-2 bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                    className="px-4 py-2 bg-forest-900 hover:bg-forest-950 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Schedule First Appointment</span>
@@ -772,12 +772,12 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
                           <div className="space-y-1">
                             <div className="flex items-center gap-2.5 flex-wrap">
-                              <h4 className="font-bold text-sm sm:text-base text-[#172B25] font-serif">
-                                {apt.date} · <span className="text-[#1E3F35] font-sans">{apt.time}</span>
+                              <h4 className="font-bold text-sm sm:text-base text-ink font-serif">
+                                {apt.date} · <span className="text-forest-900 font-sans">{apt.time}</span>
                               </h4>
 
                               <span
-                                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase ${
+                                className={`text-xs font-bold px-2.5 py-0.5 rounded-full uppercase ${
                                   isConfirmed
                                     ? 'bg-emerald-100 text-emerald-800'
                                     : isPending
@@ -812,7 +812,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                               </p>
                             )}
 
-                            <div className="text-[11px] text-stone-400 pt-0.5">
+                            <div className="text-xs text-stone-400 pt-0.5">
                               <span>Attending Doctor: <strong>{apt.doctorName || currentUser?.name || 'Dr. Physician'}</strong></span>
                             </div>
                           </div>
@@ -842,7 +842,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                             <>
                               <button
                                 onClick={() => handleCompleteAppointment(apt.id)}
-                                className="px-3.5 py-1.5 bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1"
+                                className="px-3.5 py-1.5 bg-forest-900 hover:bg-forest-950 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-1"
                               >
                                 <Check className="w-3.5 h-3.5" />
                                 <span>Mark Completed</span>
@@ -886,7 +886,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
           <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-5">
               <div>
-                <h3 className="text-lg font-bold text-[#172B25] flex items-center gap-2">
+                <h3 className="text-lg font-bold text-ink flex items-center gap-2">
                   <Pill className="w-5 h-5 text-emerald-700" />
                   <span>Prescriptions & Medication Reminders ({patientPrescriptions.length})</span>
                 </h3>
@@ -897,7 +897,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
               <button
                 onClick={() => setShowPrescribeModal(true)}
-                className="px-4 py-2.5 bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2 self-start sm:self-auto"
+                className="px-4 py-2.5 bg-forest-900 hover:bg-forest-950 text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2 self-start sm:self-auto"
               >
                 <Plus className="w-4 h-4" />
                 <span>Prescribe Medicine</span>
@@ -911,7 +911,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   <Pill className="w-6 h-6" />
                 </div>
                 <div className="space-y-1">
-                  <h4 className="font-bold text-sm text-[#172B25]">No Active Prescriptions Issued</h4>
+                  <h4 className="font-bold text-sm text-ink">No Active Prescriptions Issued</h4>
                   <p className="text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
                     Set up medications with daily dose schedules (morning, noon, night), meal instructions, and duration.
                     Reminders will automatically sync to {patient.name}'s mobile dashboard.
@@ -920,7 +920,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <div className="pt-2">
                   <button
                     onClick={() => setShowPrescribeModal(true)}
-                    className="px-4 py-2 bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+                    className="px-4 py-2 bg-forest-900 hover:bg-forest-950 text-white text-xs font-bold rounded-xl transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Prescribe Medication Now</span>
@@ -936,7 +936,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <h4 className="font-extrabold text-sm sm:text-base text-[#172B25] font-serif">{rx.name}</h4>
+                        <h4 className="font-semibold text-sm sm:text-base text-ink font-serif">{rx.name}</h4>
                         <p className="text-xs text-stone-600 mt-0.5">
                           <strong>Instructions:</strong> {rx.instructions}
                         </p>
@@ -992,13 +992,13 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                       className="p-3.5 rounded-xl border border-stone-200 bg-stone-50/60 flex items-center justify-between gap-2"
                     >
                       <div className="space-y-0.5">
-                        <h5 className="font-bold text-xs text-[#172B25]">
+                        <h5 className="font-bold text-xs text-ink">
                           {item.name} {item.dose}
                         </h5>
-                        <p className="text-[11px] text-stone-500">{item.timing || item.scheduledTime}</p>
+                        <p className="text-xs text-stone-500">{item.timing || item.scheduledTime}</p>
                       </div>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                           item.state === 'taken'
                             ? 'bg-emerald-100 text-emerald-800'
                             : 'bg-amber-100 text-amber-800'
@@ -1020,7 +1020,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
       {/* ==================================================================== */}
       {activeTab === 'Notes' && (
         <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 space-y-4">
-          <h3 className="text-lg font-bold text-[#172B25]">Clinician Notes & Care Observations</h3>
+          <h3 className="text-lg font-bold text-ink">Clinician Notes & Care Observations</h3>
           <p className="text-xs text-stone-500">Private clinical records encrypted and visible only to attending clinicians.</p>
           <div className="p-8 text-center text-xs text-stone-500 bg-stone-50 rounded-2xl border border-stone-200/70 space-y-2">
             <FileText className="w-8 h-8 text-stone-300 mx-auto" />
@@ -1043,12 +1043,12 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             >
               <div>
                 <p className="text-xs font-semibold text-stone-500">Diagnostic Reports</p>
-                <h4 className="text-2xl font-extrabold text-[#172B25] mt-0.5">{chronologicalReports.length}</h4>
-                <p className="text-[11px] text-stone-400 mt-1">
+                <h4 className="text-2xl font-semibold text-ink mt-0.5">{chronologicalReports.length}</h4>
+                <p className="text-xs text-stone-400 mt-1">
                   {latestReport ? `Latest: ${formatDate(latestReport.collectionDate || latestReport.reportedDate)}` : 'No reports yet'}
                 </p>
               </div>
-              <div className="w-11 h-11 rounded-xl bg-stone-100 text-[#1E3F35] flex items-center justify-center">
+              <div className="w-11 h-11 rounded-xl bg-stone-100 text-forest-900 flex items-center justify-center">
                 <FileText className="w-5 h-5" />
               </div>
             </div>
@@ -1059,12 +1059,12 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             >
               <div>
                 <p className="text-xs font-semibold text-stone-500">Appointments</p>
-                <h4 className="text-2xl font-extrabold text-[#172B25] mt-0.5">{chronologicalAppointments.length}</h4>
-                <p className="text-[11px] text-stone-400 mt-1">
+                <h4 className="text-2xl font-semibold text-ink mt-0.5">{chronologicalAppointments.length}</h4>
+                <p className="text-xs text-stone-400 mt-1">
                   {chronologicalAppointments[0] ? `Next: ${chronologicalAppointments[0].date} ${chronologicalAppointments[0].time}` : 'None scheduled'}
                 </p>
               </div>
-              <div className="w-11 h-11 rounded-xl bg-stone-100 text-[#1E3F35] flex items-center justify-center">
+              <div className="w-11 h-11 rounded-xl bg-stone-100 text-forest-900 flex items-center justify-center">
                 <Calendar className="w-5 h-5" />
               </div>
             </div>
@@ -1075,8 +1075,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             >
               <div>
                 <p className="text-xs font-semibold text-stone-500">Active Prescriptions</p>
-                <h4 className="text-2xl font-extrabold text-[#172B25] mt-0.5">{patientPrescriptions.length}</h4>
-                <p className="text-[11px] text-stone-400 mt-1">
+                <h4 className="text-2xl font-semibold text-ink mt-0.5">{patientPrescriptions.length}</h4>
+                <p className="text-xs text-stone-400 mt-1">
                   {patientPrescriptions.length > 0 ? `${patientPrescriptions[0].name}` : 'No active prescriptions'}
                 </p>
               </div>
@@ -1093,14 +1093,14 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 space-y-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-[#172B25]">Latest Lab Report: {latestReport.name}</h3>
+                    <h3 className="text-lg font-bold text-ink">Latest Lab Report: {latestReport.name}</h3>
                     <p className="text-xs text-stone-500">
                       Reported {formatDate(latestReport.reportedDate)} · {latestReport.labName}
                     </p>
                   </div>
                   <button
                     onClick={() => navigate(`/doctor/reports/${latestReport.id}`)}
-                    className="text-xs font-semibold bg-[#32A299] hover:bg-[#288E86] text-white px-3 py-1.5 rounded-lg shadow-sm cursor-pointer"
+                    className="text-xs font-semibold bg-teal-500 hover:bg-teal-600 text-white px-3 py-1.5 rounded-lg shadow-sm cursor-pointer"
                   >
                     Compose patient reply
                   </button>
@@ -1109,7 +1109,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-stone-200 text-stone-400 uppercase font-semibold text-[10px] tracking-wider">
+                      <tr className="border-b border-stone-200 text-stone-400 uppercase font-semibold text-xs tracking-wider">
                         <th className="pb-3">Parameter</th>
                         <th className="pb-3">Value</th>
                         <th className="pb-3">Unit</th>
@@ -1126,21 +1126,21 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                             key={param.id || param.name}
                             onClick={() => setSelectedParamId(param.id || param.name)}
                             className={`cursor-pointer transition-colors ${
-                              isSelected ? 'bg-[#EBF4F0] font-bold' : 'hover:bg-stone-50'
+                              isSelected ? 'bg-forest-50 font-bold' : 'hover:bg-stone-50'
                             }`}
                           >
                             <td className="py-3 px-2 font-medium text-stone-900">{param.name}</td>
-                            <td className="py-3 px-2 font-bold text-[#172B25]">{param.value}</td>
+                            <td className="py-3 px-2 font-bold text-ink">{param.value}</td>
                             <td className="py-3 px-2 text-stone-500">{param.unit}</td>
-                            <td className="py-3 px-2 text-stone-500 font-mono text-[11px]">{param.referenceRange}</td>
+                            <td className="py-3 px-2 text-stone-500 font-mono text-xs">{param.referenceRange}</td>
                             <td className="py-3 px-2">
                               <span
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                                   param.status === 'Critical'
-                                    ? 'bg-[#FDF2F0] text-[#B53629]'
+                                    ? 'bg-red-50 text-red-600'
                                     : param.status === 'High' || param.status === 'Low'
-                                    ? 'bg-[#FEF3D6] text-[#8C6200]'
-                                    : 'bg-[#E4EDE8] text-[#2B5246]'
+                                    ? 'bg-amber-100 text-amber-700'
+                                    : 'bg-forest-50 text-forest-800'
                                 }`}
                               >
                                 {param.status}
@@ -1150,9 +1150,9 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                               <span
                                 className={
                                   param.change?.includes('↓')
-                                    ? 'text-[#B53629]'
+                                    ? 'text-red-600'
                                     : param.change?.includes('↑')
-                                    ? 'text-[#2E9E6B]'
+                                    ? 'text-emerald-500'
                                     : 'text-stone-400'
                                 }
                               >
@@ -1170,17 +1170,17 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               {/* Selected Parameter AI Context (4 cols) */}
               <div className="lg:col-span-4 bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-base text-[#172B25]">{selectedParam.name}</h4>
-                  <span className="text-[11px] font-semibold bg-[#E0F7F5] text-[#0C736A] border border-[#80D7CE] px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-2xs">
-                    <Sparkles className="w-3 h-3 text-[#0A887D]" />
+                  <h4 className="font-bold text-base text-ink">{selectedParam.name}</h4>
+                  <span className="text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-300 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-2xs">
+                    <Sparkles className="w-3 h-3 text-teal-600" />
                     <span>AI analysis</span>
                   </span>
                 </div>
 
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-[#172B25]">{selectedParam.value}</span>
+                  <span className="text-3xl font-semibold text-ink">{selectedParam.value}</span>
                   <span className="text-xs text-stone-500 font-medium">{selectedParam.unit}</span>
-                  <span className="text-[11px] font-bold text-[#B53629] bg-[#FDF2F0] px-2 py-0.5 rounded-full ml-auto">
+                  <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full ml-auto">
                     {selectedParam.status}
                   </span>
                 </div>
@@ -1206,7 +1206,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   </div>
                 </div>
 
-                <div className="bg-stone-50 border border-stone-200/70 rounded-2xl p-3 text-[11px] text-stone-500 flex items-start gap-2">
+                <div className="bg-stone-50 border border-stone-200/70 rounded-2xl p-3 text-xs text-stone-500 flex items-start gap-2">
                   <Info className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
                   <span>AI-generated reference. Confirm against laboratory report.</span>
                 </div>
@@ -1217,7 +1217,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               <div className="w-12 h-12 rounded-2xl bg-stone-100 text-stone-500 mx-auto flex items-center justify-center">
                 <UploadCloud className="w-6 h-6" />
               </div>
-              <h4 className="font-bold text-sm text-[#172B25]">No Laboratory Reports Uploaded Yet</h4>
+              <h4 className="font-bold text-sm text-ink">No Laboratory Reports Uploaded Yet</h4>
               <p className="text-xs text-stone-500 max-w-md mx-auto leading-relaxed">
                 Once {patient.name} submits diagnostic test results, complete parameter breakdowns and historical trends will be summarized here.
               </p>
@@ -1247,12 +1247,12 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
       {/* MODAL: SCHEDULE NEW APPOINTMENT WITH PATIENT                         */}
       {/* ==================================================================== */}
       {showAppointmentModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-stone-200 max-h-[90vh] overflow-y-auto space-y-5 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-stone-200 max-h-[90vh] overflow-y-auto space-y-5">
             <div className="flex items-center justify-between border-b border-stone-100 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-[#172B25] flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-[#1E3F35]" />
+                <h3 className="text-lg font-bold text-ink flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-forest-900" />
                   <span>Schedule Appointment</span>
                 </h3>
                 <p className="text-xs text-stone-500">
@@ -1291,7 +1291,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setAppointmentDate(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 text-xs font-semibold"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 text-xs font-semibold"
                 />
                 {/* Date Quick Shortcuts */}
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
@@ -1309,7 +1309,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                         d.setDate(d.getDate() + shortcut.days);
                         setAppointmentDate(d.toISOString().split('T')[0]);
                       }}
-                      className="text-[10px] px-2 py-0.5 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium cursor-pointer"
+                      className="text-xs px-2 py-0.5 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium cursor-pointer"
                     >
                       {shortcut.label}
                     </button>
@@ -1339,7 +1339,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                         onClick={() => setAppointmentTime(slot)}
                         className={`py-2 px-1 text-center rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
                           active
-                            ? 'bg-[#1E3F35] text-white border-[#1E3F35] shadow-xs'
+                            ? 'bg-forest-900 text-white border-forest-900 shadow-xs'
                             : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'
                         }`}
                       >
@@ -1353,7 +1353,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   value={appointmentTime}
                   onChange={(e) => setAppointmentTime(e.target.value)}
                   placeholder="Or enter custom time (e.g. 10:45 AM)"
-                  className="w-full mt-2 px-3 py-2 rounded-xl border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
+                  className="w-full mt-2 px-3 py-2 rounded-xl border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-forest-900/20"
                 />
               </div>
 
@@ -1375,13 +1375,13 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                         onClick={() => setAppointmentType(opt.type as any)}
                         className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                           active
-                            ? 'bg-[#1E3F35] text-white border-[#1E3F35] shadow-xs'
+                            ? 'bg-forest-900 text-white border-forest-900 shadow-xs'
                             : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'
                         }`}
                       >
                         <Icon className="w-4 h-4 mx-auto mb-1" />
                         <p className="font-bold text-xs">{opt.type}</p>
-                        <p className={`text-[10px] ${active ? 'text-emerald-200' : 'text-stone-400'}`}>
+                        <p className={`text-xs ${active ? 'text-emerald-200' : 'text-stone-400'}`}>
                           {opt.desc}
                         </p>
                       </button>
@@ -1399,7 +1399,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   onChange={(e) => setAppointmentReason(e.target.value)}
                   placeholder="e.g. Follow-up on CBC platelet count & review medications"
                   required
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 text-xs focus:outline-none focus:ring-2 focus:ring-forest-900/20"
                 />
                 {/* Preset Chips */}
                 <div className="flex items-center gap-1.5 flex-wrap pt-1">
@@ -1413,7 +1413,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                       type="button"
                       key={preset}
                       onClick={() => setAppointmentReason(preset)}
-                      className="text-[10px] px-2 py-0.5 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium cursor-pointer"
+                      className="text-xs px-2 py-0.5 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium cursor-pointer"
                     >
                       {preset}
                     </button>
@@ -1429,7 +1429,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   value={appointmentNotes}
                   onChange={(e) => setAppointmentNotes(e.target.value)}
                   placeholder="e.g. Please bring recent prescriptions. Fasting required for repeat blood sample."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-forest-900/20 text-xs"
                 />
               </div>
 
@@ -1444,7 +1444,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <button
                   type="submit"
                   disabled={isSubmittingAppointment}
-                  className="px-5 py-2.5 rounded-xl bg-[#1E3F35] hover:bg-[#16322A] text-white font-bold shadow-sm transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-xl bg-forest-900 hover:bg-forest-950 text-white font-bold shadow-sm transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50"
                 >
                   <Calendar className="w-4 h-4" />
                   <span>{isSubmittingAppointment ? 'Scheduling...' : 'Confirm Appointment'}</span>

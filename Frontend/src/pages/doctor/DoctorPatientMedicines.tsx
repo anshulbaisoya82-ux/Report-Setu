@@ -64,7 +64,7 @@ export const DoctorPatientMedicines: React.FC = () => {
         <p className="text-xs text-stone-500">Please select a patient from the patient directory to view or prescribe medication.</p>
         <button
           onClick={() => navigate('/doctor/patients')}
-          className="text-xs text-[#1E3F35] font-bold underline cursor-pointer"
+          className="text-xs text-forest-900 font-bold underline cursor-pointer"
         >
           Return to Patients List
         </button>
@@ -86,7 +86,7 @@ export const DoctorPatientMedicines: React.FC = () => {
       </button>
 
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
           Medicines & Medication Adherence
         </h1>
         <p className="text-xs sm:text-sm text-stone-500 mt-1">
@@ -104,7 +104,7 @@ export const DoctorPatientMedicines: React.FC = () => {
                 Current Active Prescription
               </span>
               {activePrescription && (
-                <span className="text-xs font-bold bg-[#E4EDE8] text-[#2B5246] px-3 py-1 rounded-full">
+                <span className="text-xs font-bold bg-forest-50 text-forest-800 px-3 py-1 rounded-full">
                   {activePrescription.remainingDays} days left
                 </span>
               )}
@@ -125,13 +125,13 @@ export const DoctorPatientMedicines: React.FC = () => {
                 </div>
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-[#172B25]">{activePrescription.name}</h3>
+                    <h3 className="text-xl font-bold text-ink">{activePrescription.name}</h3>
                     <span className="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">
                       Active
                     </span>
                   </div>
                   <p className="text-xs text-stone-600">{activePrescription.instructions}</p>
-                  <p className="text-[11px] text-stone-400 flex items-center gap-1.5">
+                  <p className="text-xs text-stone-400 flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
                     <span>
                       {activePrescription.startDate} – {activePrescription.endDate} ·{' '}
@@ -152,7 +152,7 @@ export const DoctorPatientMedicines: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-[#172B25]">Today's Scheduled Intakes</h3>
+                <h3 className="text-lg font-bold text-ink">Today's Scheduled Intakes</h3>
                 <p className="text-xs text-stone-500">
                   Real-time reminder triggers visible on {patient.name}'s dashboard
                 </p>
@@ -174,13 +174,13 @@ export const DoctorPatientMedicines: React.FC = () => {
                     className="p-3.5 rounded-2xl border border-stone-200/80 bg-white shadow-2xs flex items-center justify-between gap-3"
                   >
                     <div>
-                      <h4 className="font-bold text-xs text-[#172B25]">
+                      <h4 className="font-bold text-xs text-ink">
                         {item.name} {item.dose}
                       </h4>
-                      <p className="text-[11px] text-stone-500">{item.timing || item.scheduledTime}</p>
+                      <p className="text-xs text-stone-500">{item.timing || item.scheduledTime}</p>
                     </div>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                         item.state === 'taken'
                           ? 'bg-emerald-100 text-emerald-800'
                           : 'bg-amber-100 text-amber-800'
@@ -196,7 +196,7 @@ export const DoctorPatientMedicines: React.FC = () => {
 
           {/* Earlier Prescriptions Card */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 space-y-4">
-            <h3 className="text-lg font-bold text-[#172B25]">Completed / Earlier Prescriptions</h3>
+            <h3 className="text-lg font-bold text-ink">Completed / Earlier Prescriptions</h3>
             {endedPrescriptions.length === 0 ? (
               <div className="p-6 text-center text-xs text-stone-400 bg-stone-50 rounded-2xl border border-stone-100">
                 No past expired prescriptions for this patient.
@@ -209,11 +209,11 @@ export const DoctorPatientMedicines: React.FC = () => {
                     className="p-4 rounded-2xl border border-stone-100 bg-stone-50/50 flex items-center justify-between gap-4 text-xs"
                   >
                     <div>
-                      <span className="text-[11px] text-stone-400 font-medium">{rx.startDate}</span>
-                      <h4 className="font-bold text-sm text-[#172B25] mt-0.5">{rx.name}</h4>
+                      <span className="text-xs text-stone-400 font-medium">{rx.startDate}</span>
+                      <h4 className="font-bold text-sm text-ink mt-0.5">{rx.name}</h4>
                       <p className="text-stone-500 text-xs mt-0.5">{rx.instructions}</p>
                     </div>
-                    <span className="text-[11px] font-bold bg-[#FEF3D6] text-[#8C6200] px-2.5 py-1 rounded-full">
+                    <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">
                       Ended
                     </span>
                   </div>
@@ -226,11 +226,11 @@ export const DoctorPatientMedicines: React.FC = () => {
         {/* Right Section: Add New Prescription (4 cols) */}
         <div className="lg:col-span-4 bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 space-y-5">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#32A299]/10 text-[#32A299] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-500 flex items-center justify-center">
               <Plus className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-base text-[#172B25]">New Prescription</h3>
+              <h3 className="font-bold text-base text-ink">New Prescription</h3>
               <p className="text-xs text-stone-500">Prescribe medication for {patient.name}</p>
             </div>
           </div>

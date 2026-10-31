@@ -95,7 +95,7 @@ export const DoctorPatientQuestions: React.FC = () => {
     <div className="space-y-6 pb-12">
       {/* Toast Notification */}
       {toastInfo && (
-        <div className="fixed top-6 right-6 z-50 bg-[#1E3F35] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-forest-700 animate-in fade-in slide-in-from-top-4">
+        <div className="fixed top-6 right-6 z-50 bg-forest-900 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-forest-700 slide-in-from-top-4">
           <CheckCircle className="w-5 h-5 text-accent-teal shrink-0" />
           <div>
             <p className="font-semibold text-sm">{toastInfo.message}</p>
@@ -107,7 +107,7 @@ export const DoctorPatientQuestions: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
-          <h1 className="text-2xl font-bold text-forest-950 font-serif tracking-tight">Patient Inquiries & Triage</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Patient Inquiries & Triage</h1>
           <p className="text-xs text-slate-500 mt-1">
             Incoming queries regarding reports, prescriptions, and symptoms from your connected patients
           </p>
@@ -197,7 +197,7 @@ export const DoctorPatientQuestions: React.FC = () => {
                     <span className="font-semibold text-xs text-slate-900 font-serif">
                       {thread.patientName}
                     </span>
-                    <span className="text-[10px] text-slate-400 flex items-center gap-1 shrink-0">
+                    <span className="text-xs text-slate-400 flex items-center gap-1 shrink-0">
                       <Clock className="w-3 h-3" /> {thread.lastMessageTime}
                     </span>
                   </div>
@@ -212,27 +212,27 @@ export const DoctorPatientQuestions: React.FC = () => {
 
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {thread.category === 'Medicine' && (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-200 flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200 flex items-center gap-1">
                         <AlertTriangle className="w-2.5 h-2.5" /> Rx / Medicine
                       </span>
                     )}
 
                     {thread.isAiPaused ? (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[10px] font-semibold border border-amber-300 flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-xs font-semibold border border-amber-300 flex items-center gap-1">
                         <PauseCircle className="w-2.5 h-2.5 text-amber-700" /> AI Paused
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-medium border border-emerald-200 flex items-center gap-1">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-200 flex items-center gap-1">
                         <Sparkles className="w-2.5 h-2.5 text-emerald-600" /> AI Active
                       </span>
                     )}
 
                     {thread.unreadCount > 0 ? (
-                      <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-bold border border-red-200">
+                      <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-bold border border-red-200">
                         Needs Reply ({thread.unreadCount})
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-medium border border-slate-200 flex items-center gap-0.5">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200 flex items-center gap-0.5">
                         <Check className="w-2.5 h-2.5" /> Handled
                       </span>
                     )}
@@ -256,13 +256,13 @@ export const DoctorPatientQuestions: React.FC = () => {
               {/* Patient Banner with AI Takeover Toggle Button */}
               <div className="p-4 border-b border-slate-100 bg-slate-50/70 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#1E3F35] text-white font-bold flex items-center justify-center text-sm shadow-xs">
+                  <div className="w-10 h-10 rounded-full bg-forest-900 text-white font-bold flex items-center justify-center text-sm shadow-xs">
                     {selectedThread.patientAvatar || selectedThread.patientName.charAt(0)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-bold text-slate-900 font-serif">{selectedThread.patientName}</h3>
-                      <span className="text-[10px] px-2 py-0.2 bg-slate-200 text-slate-700 font-mono rounded">
+                      <span className="text-xs px-2 py-0.2 bg-slate-200 text-slate-700 font-mono rounded">
                         {selectedThread.patientRsId}
                       </span>
                     </div>
@@ -327,7 +327,7 @@ export const DoctorPatientQuestions: React.FC = () => {
                   if (isSystem) {
                     return (
                       <div key={msg.id} className="flex justify-center my-2">
-                        <div className="bg-slate-200/80 text-slate-700 text-[11px] font-medium px-3.5 py-1 rounded-full border border-slate-300 flex items-center gap-1.5 shadow-2xs">
+                        <div className="bg-slate-200/80 text-slate-700 text-xs font-medium px-3.5 py-1 rounded-full border border-slate-300 flex items-center gap-1.5 shadow-2xs">
                           <Clock className="w-3 h-3 text-slate-500" />
                           <span>{msg.text}</span>
                         </div>
@@ -341,25 +341,25 @@ export const DoctorPatientQuestions: React.FC = () => {
                       className={`flex flex-col ${isDoctor ? 'items-end' : 'items-start'}`}
                     >
                       <div className="flex items-center gap-1.5 mb-1 px-1">
-                        <span className="text-[10px] font-bold text-slate-600">
+                        <span className="text-xs font-bold text-slate-600">
                           {isDoctor ? (
                             <span className="text-forest-900 flex items-center gap-1">
                               <Stethoscope className="w-3 h-3 text-forest-700" /> {currentDoctorName}
                             </span>
                           ) : isAssistant ? (
-                            <span className="text-[#0C736A] flex items-center gap-1">
-                              <Sparkles className="w-3 h-3 text-[#0A887D]" /> Setu AI Assistant
+                            <span className="text-teal-700 flex items-center gap-1">
+                              <Sparkles className="w-3 h-3 text-teal-600" /> Setu AI Assistant
                             </span>
                           ) : (
                             selectedThread.patientName
                           )}
                         </span>
-                        <span className="text-[10px] text-slate-400">{msg.timestamp}</span>
+                        <span className="text-xs text-slate-400">{msg.timestamp}</span>
                       </div>
 
                       <div className={`max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed ${
                         isDoctor 
-                          ? 'bg-[#1E3F35] text-white rounded-tr-none shadow-xs' 
+                          ? 'bg-forest-900 text-white rounded-tr-none shadow-xs' 
                           : isAssistant
                           ? 'bg-emerald-50 text-emerald-950 border border-emerald-200 rounded-tl-none'
                           : 'bg-white text-slate-800 border border-slate-200 rounded-tl-none shadow-2xs'
@@ -372,27 +372,27 @@ export const DoctorPatientQuestions: React.FC = () => {
 
                 {/* AI Assistant Suggestion Box */}
                 {selectedThread.suggestedReply && selectedThread.unreadCount > 0 && (
-                  <div className="mt-4 bg-[#F2FAF9] border border-[#C6ECE7] rounded-2xl p-4 space-y-3 shadow-2xs">
+                  <div className="mt-4 bg-teal-50 border border-teal-200 rounded-2xl p-4 space-y-3 shadow-2xs">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-[#E0F7F5] text-[#0C736A] border border-[#80D7CE] flex items-center justify-center shrink-0">
-                          <Sparkles className="w-3.5 h-3.5 text-[#0A887D]" />
+                        <div className="w-6 h-6 rounded-lg bg-teal-50 text-teal-700 border border-teal-300 flex items-center justify-center shrink-0">
+                          <Sparkles className="w-3.5 h-3.5 text-teal-600" />
                         </div>
                         <span className="text-xs font-bold text-forest-950 font-serif">Setu AI Suggested Reply</span>
-                        <span className="text-[10px] bg-[#E0F7F5] text-[#0C736A] border border-[#80D7CE] px-2 py-0.5 rounded-full font-medium">
+                        <span className="text-xs bg-teal-50 text-teal-700 border border-teal-300 px-2 py-0.5 rounded-full font-medium">
                           Clinical Context Verified
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={handleApplyAISuggestion}
-                        className="text-xs font-bold text-[#0C736A] hover:text-forest-950 flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-[#80D7CE] shadow-2xs transition-colors"
+                        className="text-xs font-bold text-teal-700 hover:text-forest-950 flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-teal-300 shadow-2xs transition-colors"
                       >
                         Insert into composer
                       </button>
                     </div>
 
-                    <p className="text-xs text-slate-700 leading-relaxed font-sans bg-white/90 p-3 rounded-xl border border-[#C6ECE7]/60">
+                    <p className="text-xs text-slate-700 leading-relaxed font-sans bg-white/90 p-3 rounded-xl border border-teal-200/60">
                       "{selectedThread.suggestedReply}"
                     </p>
                   </div>
@@ -403,25 +403,25 @@ export const DoctorPatientQuestions: React.FC = () => {
               <form onSubmit={handleSendReply} className="p-4 border-t border-slate-100 bg-white space-y-3">
                 {/* Quick Templates */}
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Quick Insert:</span>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quick Insert:</span>
                   <button 
                     type="button" 
                     onClick={() => insertQuickTemplate("Yes, you can safely continue this regimen as prescribed.")}
-                    className="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-medium transition-colors"
+                    className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-medium transition-colors"
                   >
                     + Continue regimen
                   </button>
                   <button 
                     type="button" 
                     onClick={() => insertQuickTemplate("Please visit the clinic for an in-person follow-up evaluation.")}
-                    className="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-medium transition-colors"
+                    className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-medium transition-colors"
                   >
                     + Schedule clinic visit
                   </button>
                   <button 
                     type="button" 
                     onClick={() => insertQuickTemplate("Kindly repeat the laboratory test in 4 days and share the report.")}
-                    className="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-medium transition-colors"
+                    className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-medium transition-colors"
                   >
                     + Repeat lab test
                   </button>
@@ -440,7 +440,7 @@ export const DoctorPatientQuestions: React.FC = () => {
                     disabled={!replyText.trim()}
                     className={`absolute right-3 bottom-3 p-2 rounded-xl transition-all ${
                       replyText.trim() 
-                        ? 'bg-[#1E3F35] text-accent-teal hover:bg-forest-800 shadow-xs cursor-pointer' 
+                        ? 'bg-forest-900 text-accent-teal hover:bg-forest-800 shadow-xs cursor-pointer' 
                         : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                     }`}
                   >

@@ -45,10 +45,10 @@ export const PatientOnboarding: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#ECF2ED] p-6">
+    <div className="min-h-screen flex items-center justify-center bg-canvas p-6">
       <form onSubmit={submit} className="w-full max-w-xl rounded-3xl bg-white p-8 shadow-card border border-stone-200/60 space-y-5">
         <div>
-          <h1 className="text-2xl font-bold text-[#172B25]">Complete your patient profile</h1>
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Complete your patient profile</h1>
           <p className="mt-1 text-sm text-stone-500">Tell us a few details so your health record is accurate.</p>
         </div>
         {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
@@ -76,7 +76,7 @@ export const PatientOnboarding: React.FC = () => {
         <label className="block text-sm font-medium text-stone-700">Existing conditions <span className="font-normal text-stone-400">(optional)</span>
           <input value={form.conditions} onChange={(e) => setForm({ ...form, conditions: e.target.value })} className="mt-1.5 w-full rounded-xl border border-stone-200 px-4 py-3" placeholder="Separate multiple conditions with commas" />
         </label>
-        <button disabled={saving} className="w-full rounded-xl bg-[#1E3F35] py-3 font-semibold text-white disabled:opacity-60">{saving ? 'Saving profile...' : 'Continue to patient portal'}</button>
+        <button disabled={saving} className="w-full rounded-xl bg-forest-900 py-3 font-semibold text-white disabled:opacity-60">{saving ? 'Saving profile...' : 'Continue to patient portal'}</button>
       </form>
     </div>
   );

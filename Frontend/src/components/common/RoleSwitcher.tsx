@@ -23,7 +23,7 @@ export const RoleSwitcher: React.FC = () => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-[#1E3F35] text-white px-3 py-2 rounded-full shadow-2xl border border-teal-500/30 text-xs font-medium backdrop-blur-md">
+    <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-forest-900 text-white px-3 py-2 rounded-full shadow-2xl border border-teal-500/30 text-xs font-medium">
       <span className="flex items-center gap-1.5 opacity-80">
         <ArrowRightLeft className="w-3.5 h-3.5 text-teal-400" />
         <span>Portal:</span>
@@ -33,7 +33,7 @@ export const RoleSwitcher: React.FC = () => {
         onClick={() => handleSwitch('doctor')}
         className={`flex items-center gap-1 px-2.5 py-1 rounded-full transition-all ${
           currentRole === 'doctor' && location.pathname.startsWith('/doctor')
-            ? 'bg-white text-[#1E3F35] font-semibold shadow-sm'
+            ? 'bg-white text-forest-900 font-semibold shadow-sm'
             : 'text-white/80 hover:text-white hover:bg-white/10'
         }`}
       >

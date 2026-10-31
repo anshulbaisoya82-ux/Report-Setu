@@ -233,8 +233,8 @@ export const PatientDoctors: React.FC = () => {
       <div className="max-w-3xl mx-auto space-y-6 pb-12">
         {/* Toast */}
         {toastMsg && (
-          <div className="fixed top-6 right-6 z-50 bg-[#1E3F35] text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-[#2E9E6B]/30 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-[#52B788]" />
+          <div className="fixed top-6 right-6 z-50 bg-forest-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-emerald-500/30">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             <span className="text-xs font-semibold">{toastMsg}</span>
           </div>
         )}
@@ -253,7 +253,7 @@ export const PatientDoctors: React.FC = () => {
 
         {/* Success Connected State */}
         {isSuccessConnected ? (
-          <div className="bg-white rounded-3xl p-8 border border-emerald-200 shadow-card text-center space-y-6 animate-in zoom-in-95">
+          <div className="bg-white rounded-3xl p-8 border border-emerald-200 shadow-card text-center space-y-6">
             <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-10 h-10" />
             </div>
@@ -277,7 +277,7 @@ export const PatientDoctors: React.FC = () => {
                   setActiveTab('connected');
                   loadData();
                 }}
-                className="px-6 py-3 bg-[#1E3F35] hover:bg-[#16322A] text-white font-semibold text-sm rounded-xl shadow-sm transition-all"
+                className="px-6 py-3 bg-forest-900 hover:bg-forest-950 text-white font-semibold text-sm rounded-xl shadow-sm transition-all"
               >
                 View Connected Doctors
               </button>
@@ -293,14 +293,14 @@ export const PatientDoctors: React.FC = () => {
           /* Active Code Display Card */
           <div className="bg-white rounded-3xl border border-stone-200/80 shadow-card overflow-hidden">
             {/* Header banner */}
-            <div className="bg-[#1E3F35] p-6 text-white space-y-2 relative overflow-hidden">
+            <div className="bg-forest-900 p-6 text-white space-y-2 relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-[#2E9E6B]/20 text-[#52B788] border border-[#2E9E6B]/30 flex items-center gap-1.5">
+                <span className="px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
                   <KeyRound className="w-3.5 h-3.5" />
                   TEMPORARY VERIFICATION CODE
                 </span>
                 <span className="text-xs text-white/70 flex items-center gap-1 font-mono">
-                  <ShieldCheck className="w-4 h-4 text-[#52B788]" />
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   DPDP Protected
                 </span>
               </div>
@@ -317,7 +317,7 @@ export const PatientDoctors: React.FC = () => {
             <div className="p-8 text-center space-y-6">
               {/* Doctor target pill */}
               <div className="inline-flex items-center gap-2 bg-stone-100 px-4 py-1.5 rounded-full text-xs font-semibold text-stone-700">
-                <Stethoscope className="w-3.5 h-3.5 text-[#1E3F35]" />
+                <Stethoscope className="w-3.5 h-3.5 text-forest-900" />
                 <span>Target Doctor: {targetDoctorName || 'Doctor'}</span>
               </div>
 
@@ -331,7 +331,7 @@ export const PatientDoctors: React.FC = () => {
                   {generatedCode.split('').map((digit, idx) => (
                     <div
                       key={idx}
-                      className="w-12 h-14 sm:w-14 sm:h-16 rounded-2xl bg-stone-50 border-2 border-[#1E3F35]/30 flex items-center justify-center text-2xl sm:text-3xl font-extrabold font-mono text-[#1E3F35] shadow-xs"
+                      className="w-12 h-14 sm:w-14 sm:h-16 rounded-2xl bg-stone-50 border-2 border-forest-900/30 flex items-center justify-center text-2xl sm:text-3xl font-semibold font-mono text-forest-900 shadow-xs"
                     >
                       {digit}
                     </div>
@@ -362,12 +362,12 @@ export const PatientDoctors: React.FC = () => {
               <div className="max-w-md mx-auto bg-stone-50 p-5 rounded-2xl border border-stone-200/80 space-y-3">
                 <div className="flex items-center justify-between text-xs font-semibold">
                   <span className="flex items-center gap-1.5 text-stone-600">
-                    <Clock className={`w-4 h-4 ${isExpiringSoon ? 'text-rose-500 animate-pulse' : 'text-[#1E3F35]'}`} />
+                    <Clock className={`w-4 h-4 ${isExpiringSoon ? 'text-rose-500' : 'text-forest-900'}`} />
                     <span>Time Remaining</span>
                   </span>
                   <span
                     className={`font-mono font-bold text-sm ${
-                      isExpiringSoon ? 'text-rose-600' : 'text-[#1E3F35]'
+                      isExpiringSoon ? 'text-rose-600' : 'text-forest-900'
                     }`}
                   >
                     {Math.floor(secondsRemaining / 60)}:
@@ -379,7 +379,7 @@ export const PatientDoctors: React.FC = () => {
                 <div className="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-1000 ${
-                      isExpiringSoon ? 'bg-rose-500' : 'bg-[#1E3F35]'
+                      isExpiringSoon ? 'bg-rose-500' : 'bg-forest-900'
                     }`}
                     style={{ width: `${timerPercent}%` }}
                   />
@@ -396,7 +396,7 @@ export const PatientDoctors: React.FC = () => {
                     </button>
                   </div>
                 ) : (
-                  <p className="text-[11px] text-stone-500 leading-normal">
+                  <p className="text-xs text-stone-500 leading-normal">
                     This temporary code automatically self-destructs after 2 minutes for your security.
                   </p>
                 )}
@@ -405,7 +405,7 @@ export const PatientDoctors: React.FC = () => {
               {/* Live status waiting badge */}
               {secondsRemaining > 0 && (
                 <div className="flex items-center justify-center gap-2 text-xs font-medium text-stone-500 pt-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                   <span>Waiting for doctor to enter verification code...</span>
                 </div>
               )}
@@ -423,8 +423,8 @@ export const PatientDoctors: React.FC = () => {
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       {/* Toast */}
       {toastMsg && (
-        <div className="fixed top-6 right-6 z-50 bg-[#1E3F35] text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-[#2E9E6B]/30 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 text-[#52B788]" />
+        <div className="fixed top-6 right-6 z-50 bg-forest-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 border border-emerald-500/30">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span className="text-xs font-semibold">{toastMsg}</span>
         </div>
       )}
@@ -433,11 +433,11 @@ export const PatientDoctors: React.FC = () => {
       <div className="bg-white p-6 rounded-3xl border border-stone-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
               Doctor Consent & Access
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-[#172B25] tracking-tight mt-1">
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
             My Doctors & Clinical Access
           </h1>
           <p className="text-xs text-stone-500 mt-1">
@@ -447,8 +447,8 @@ export const PatientDoctors: React.FC = () => {
 
         {/* Patient RS-ID Badge */}
         <div className="bg-stone-50 border border-stone-200 px-4 py-2.5 rounded-2xl text-right self-start sm:self-center">
-          <span className="text-[10px] uppercase font-bold text-stone-400 block tracking-wider">Your ReportSetu ID</span>
-          <span className="font-mono font-extrabold text-base text-[#1E3F35]">
+          <span className="text-xs uppercase font-bold text-stone-400 block tracking-wider">Your ReportSetu ID</span>
+          <span className="font-mono font-semibold text-base text-forest-900">
             {currentPatient?.rsId || 'RS-10475'}
           </span>
         </div>
@@ -460,13 +460,13 @@ export const PatientDoctors: React.FC = () => {
           onClick={() => setActiveTab('requests')}
           className={`pb-3 px-4 text-xs sm:text-sm font-semibold transition-all relative flex items-center gap-2 ${
             activeTab === 'requests'
-              ? 'text-[#1E3F35] border-b-2 border-[#1E3F35]'
+              ? 'text-forest-900 border-b-2 border-forest-900'
               : 'text-stone-500 hover:text-stone-800'
           }`}
         >
           <span>Incoming Requests</span>
           {pendingRequests.length > 0 && (
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#B53629] text-white">
+            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-600 text-white">
               {pendingRequests.length}
             </span>
           )}
@@ -476,12 +476,12 @@ export const PatientDoctors: React.FC = () => {
           onClick={() => setActiveTab('connected')}
           className={`pb-3 px-4 text-xs sm:text-sm font-semibold transition-all relative flex items-center gap-2 ${
             activeTab === 'connected'
-              ? 'text-[#1E3F35] border-b-2 border-[#1E3F35]'
+              ? 'text-forest-900 border-b-2 border-forest-900'
               : 'text-stone-500 hover:text-stone-800'
           }`}
         >
           <span>Connected Doctors</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700">
+          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-stone-100 text-stone-700">
             {connectedDoctors.length}
           </span>
         </button>
@@ -490,7 +490,7 @@ export const PatientDoctors: React.FC = () => {
           onClick={() => setActiveTab('quick_code')}
           className={`pb-3 px-4 text-xs sm:text-sm font-semibold transition-all relative flex items-center gap-1.5 ${
             activeTab === 'quick_code'
-              ? 'text-[#1E3F35] border-b-2 border-[#1E3F35]'
+              ? 'text-forest-900 border-b-2 border-forest-900'
               : 'text-stone-500 hover:text-stone-800'
           }`}
         >
@@ -503,10 +503,10 @@ export const PatientDoctors: React.FC = () => {
       {activeTab === 'requests' && (
         <div className="space-y-4">
           {/* Informational banner */}
-          <div className="bg-[#EBF4F0] border border-[#C6DBD0] rounded-2xl p-4 text-xs text-[#2A554A] flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-[#1E3F35] flex-shrink-0 mt-0.5" />
+          <div className="bg-forest-50 border border-stone-300 rounded-2xl p-4 text-xs text-forest-800 flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-forest-900 flex-shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <p className="font-bold text-[#1E3F35]">How doctor connection works:</p>
+              <p className="font-bold text-forest-900">How doctor connection works:</p>
               <p className="leading-relaxed">
                 When a doctor requests access, you review their profile. When you tap <strong>Approve</strong>, a <strong>2-minute temporary code</strong> is generated. You share this code with the doctor to complete the connection.
               </p>
@@ -530,11 +530,11 @@ export const PatientDoctors: React.FC = () => {
               {pendingRequests.map((req) => (
                 <div
                   key={req.connectionId}
-                  className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs hover:border-[#1E3F35]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs hover:border-forest-900/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-bold text-xs">
+                      <div className="w-10 h-10 rounded-full bg-forest-900 text-white flex items-center justify-center font-bold text-xs">
                         DR
                       </div>
                       <div>
@@ -542,7 +542,7 @@ export const PatientDoctors: React.FC = () => {
                           <h4 className="font-bold text-stone-900 text-sm sm:text-base">
                             {req.doctorName}
                           </h4>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
                             <ShieldCheck className="w-3 h-3" />
                             Verified Doctor
                           </span>
@@ -553,7 +553,7 @@ export const PatientDoctors: React.FC = () => {
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-stone-400 pl-12">
+                    <p className="text-xs text-stone-400 pl-12">
                       Requested: {new Date(req.requestedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · Wants access to review lab reports
                     </p>
                   </div>
@@ -571,12 +571,12 @@ export const PatientDoctors: React.FC = () => {
                     <button
                       onClick={() => handleApprove(req)}
                       disabled={actionLoading === req.connectionId}
-                      className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] shadow-sm flex items-center gap-2 transition-all active:scale-95"
+                      className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-forest-900 hover:bg-forest-950 shadow-sm flex items-center gap-2 transition-all "
                     >
                       {actionLoading === req.connectionId ? (
                         <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                       ) : (
-                        <KeyRound className="w-3.5 h-3.5 text-[#52B788]" />
+                        <KeyRound className="w-3.5 h-3.5 text-emerald-400" />
                       )}
                       <span>Approve & Get Code</span>
                     </button>
@@ -605,7 +605,7 @@ export const PatientDoctors: React.FC = () => {
               <div className="p-8 text-center bg-stone-50 rounded-2xl border border-stone-200 space-y-2">
                 <ShieldCheck className="w-8 h-8 text-stone-400 mx-auto" />
                 <p className="text-xs font-semibold text-stone-600">No connected doctors</p>
-                <p className="text-[11px] text-stone-400">Your lab records are private to you.</p>
+                <p className="text-xs text-stone-400">Your lab records are private to you.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -615,13 +615,13 @@ export const PatientDoctors: React.FC = () => {
                     className="p-4 rounded-2xl border border-stone-200 bg-stone-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-bold text-xs">
+                      <div className="w-10 h-10 rounded-full bg-forest-900 text-white flex items-center justify-center font-bold text-xs">
                         DR
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <h4 className="text-xs font-bold text-stone-900">{doc.name}</h4>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
                             Active Consent
                           </span>
                         </div>
@@ -652,7 +652,7 @@ export const PatientDoctors: React.FC = () => {
         <div className="space-y-4">
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-xs space-y-6">
             <div className="space-y-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
                 In-Person Walk-in
               </span>
               <h3 className="text-lg font-bold text-stone-900">Generate In-Clinic Quick Code</h3>
@@ -661,16 +661,16 @@ export const PatientDoctors: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-[#1E3F35] text-white p-6 rounded-2xl space-y-4">
+            <div className="bg-forest-900 text-white p-6 rounded-2xl space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-white/70">Single-use clinic pairing</span>
-                <span className="text-xs font-mono text-[#52B788]">Valid 2 minutes</span>
+                <span className="text-xs font-mono text-emerald-400">Valid 2 minutes</span>
               </div>
 
               <button
                 onClick={handleGenerateQuickCode}
                 disabled={actionLoading === 'quick'}
-                className="w-full py-3 bg-[#52B788] hover:bg-[#40966F] text-[#172B25] font-bold text-xs sm:text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
+                className="w-full py-3 bg-emerald-400 hover:bg-[#40966F] text-ink font-bold text-xs sm:text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2"
               >
                 {actionLoading === 'quick' ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
