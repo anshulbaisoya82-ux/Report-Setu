@@ -6,6 +6,8 @@ import {
   ChevronRight, Activity, Bell, Plus, Info, Clock
 } from 'lucide-react';
 import { MedicalTrendChart } from '../../components/charts';
+import { notify } from '../../components/ui/Toast';
+import { formatDate } from '../../utils/format';
 
 export const PatientHome: React.FC = () => {
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ export const PatientHome: React.FC = () => {
   const handleToggleNight = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (nightMed) {
-      toggleMedicineSchedule(nightMed.id, isNightTaken ? 'due' : 'taken');
+      toggleMedicineSchedule(nightMed.id, isNightTaken ? 'due' : 'taken').catch((e: any) => notify(e?.message || 'Could not save. Please try again.', 'error'));
     }
   };
 
@@ -64,7 +66,7 @@ export const PatientHome: React.FC = () => {
         <div className="flex items-center gap-3">
           {/* Bell Icon button */}
           <button 
-            onClick={() => alert("No unread alerts")}
+            onClick={() => notify('No new alerts', 'info')}
             className="w-10 h-10 rounded-full bg-white border border-stone-200 shadow-2xs flex items-center justify-center text-[#172B25] hover:bg-stone-50 transition-colors relative"
             title="Notifications"
           >
@@ -151,7 +153,7 @@ export const PatientHome: React.FC = () => {
 
           <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
             <button
-              onClick={() => toggleMedicineSchedule(nextDueMed.id, 'taken')}
+              onClick={() => toggleMedicineSchedule(nextDueMed.id, 'taken').catch((e: any) => notify(e?.message || 'Could not save. Please try again.', 'error'))}
               className="px-4 py-2 text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
             >
               <Check className="w-4 h-4" />
@@ -295,7 +297,7 @@ export const PatientHome: React.FC = () => {
                 <div className="w-8 h-8 rounded-full bg-[#FCE8E2] text-[#D86E53] flex items-center justify-center shrink-0"><Pill className="w-4 h-4" /></div>
                 <div><h4 className="text-xs font-bold text-[#172B25]">{medicine.name} {medicine.dose}</h4><p className="text-[11px] text-[#5F736C]">{medicine.timing || medicine.scheduledTime || 'Schedule not provided'}</p></div>
               </div>
-              <button type="button" onClick={() => toggleMedicineSchedule(medicine.id, medicine.state === 'taken' ? 'due' : 'taken')} className="text-[11px] font-semibold text-[#2B5246] bg-[#E4EDE8] px-3 py-1 rounded-full">
+              <button type="button" onClick={() => toggleMedicineSchedule(medicine.id, medicine.state === 'taken' ? 'due' : 'taken').catch((e: any) => notify(e?.message || 'Could not save. Please try again.', 'error'))} className="text-[11px] font-semibold text-[#2B5246] bg-[#E4EDE8] px-3 py-1 rounded-full">
                 {medicine.state === 'taken' ? 'Taken' : 'Mark taken'}
               </button>
             </div>
@@ -344,7 +346,7 @@ export const PatientHome: React.FC = () => {
                     <div>
                       <h4 className="text-xs font-bold text-[#172B25]">{rep.name}</h4>
                       <p className="text-[11px] text-[#5F736C]">
-                        {rep.labName} · {rep.collectionDate || rep.reportedDate}
+                        {rep.labName} · {formatDate(rep.collectionDate || rep.reportedDate)}
                       </p>
                     </div>
                   </div>

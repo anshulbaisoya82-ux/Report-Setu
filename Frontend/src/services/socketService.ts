@@ -17,6 +17,8 @@ const getSocketUrl = (): string => {
  */
 export const initSocketClient = (): Socket | null => {
   const token = getAccessToken();
+  // No realtime server in demo mode.
+  if (import.meta.env.VITE_DEMO_MODE === 'true') return null;
   if (!token) {
     // Cannot authenticate socket without token
     return null;

@@ -126,3 +126,6 @@ scratch/
 logs/
 *.sqlite
 *.sqlite3
+
+# Frontend demo build
+Frontend/dist-demo/

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
+import { initials } from '../../utils/format';
+import { isDemoMode } from '../../demo/flags';
 import {
   Bell,
   Plus,
@@ -32,10 +34,57 @@ export const DoctorHome: React.FC = () => {
   );
   const pendingReports = reports.filter((r) => !r.reviewed && r.reviewStatus !== 'approved');
   const today = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  const todayAppointments = appointments.filter((appointment) => appointment.status !== 'Cancelled');
+  // Appointment dates arrive as display strings ("Sat, 31 Oct") or ISO dates; compare day + month with today.
+  const now = new Date();
+  const isToday = (raw?: string) => {
+    if (!raw) return false;
+    const m = raw.match(/(\d{1,2})\s+([A-Za-z]{3})/);
+    if (m) return +m[1] === now.getDate() && m[2].toLowerCase() === now.toLocaleString('en-GB', { month: 'short' }).toLowerCase();
+    const d = new Date(raw);
+    return !Number.isNaN(d.getTime()) && d.toDateString() === now.toDateString();
+  };
+  const todayAppointments = appointments.filter((appointment) => appointment.status !== 'Cancelled' && isToday(appointment.date));
   const completedAppointments = todayAppointments.filter((appointment) => appointment.status === 'Completed').length;
   const nextAppointment = todayAppointments.find((appointment) => appointment.status === 'Confirmed' || appointment.status === 'Pending');
-  const doctorInitials = doctorInfo.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+  const doctorInitials = initials(doctorInfo.name);
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  // Follow-ups come from real data: upcoming visits plus repeat tests the doctor set when approving a report.
+  const dayMonth = (raw?: string) => {
+    const m = (raw || '').match(/(\d{1,2})\s+([A-Za-z]{3})/);
+    if (m) return { day: m[1].padStart(2, '0'), month: m[2] };
+    const d = raw ? new Date(raw) : null;
+    return d && !Number.isNaN(d.getTime())
+      ? { day: String(d.getDate()).padStart(2, '0'), month: d.toLocaleString('en-GB', { month: 'short' }) }
+      : { day: '--', month: '' };
+  };
+  const followUps = [
+    ...appointments
+      .filter((a) => a.status === 'Confirmed' || a.status === 'Pending')
+      .map((a) => ({
+        key: `apt-${a.id}`,
+        kind: 'visit' as const,
+        ...dayMonth(a.date),
+        title: `${a.patientName} · ${a.reason}`,
+        meta: `${a.time} · ${a.type} · ${a.patientRsId}`,
+        badge: a.status === 'Pending' ? 'Requested' : 'Confirmed',
+        tone: a.status === 'Pending' ? 'bg-amberalert-100 text-amberalert-700' : 'bg-badgegreen-100 text-badgegreen-700',
+        href: '/doctor/appointments',
+      })),
+    ...reports
+      .filter((r) => r.doctorSummary?.nextTestDate)
+      .map((r) => ({
+        key: `test-${r.id}`,
+        kind: 'test' as const,
+        ...dayMonth(r.doctorSummary!.nextTestDate),
+        title: `${r.patientName} · Repeat ${r.category} test`,
+        meta: 'Any lab · patient uploads when done',
+        badge: 'Test due',
+        tone: 'bg-stone-100 text-stone-700',
+        href: `/doctor/patients/${r.patientId}`,
+      })),
+  ].slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -43,14 +92,14 @@ export const DoctorHome: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
-            Good morning, {doctorInfo.name}
+            {greeting}{doctorInfo.name ? `, ${doctorInfo.name}` : ''}
           </h1>
           <div className="flex items-center gap-2 mt-1 text-xs text-stone-500 font-medium">
             <span>{today}</span>
             <span>·</span>
             <span className="flex items-center gap-1.5 text-[#2B5246]">
               <span className="w-2 h-2 rounded-full bg-[#2E9E6B] inline-block animate-pulse" />
-              Live data
+              {isDemoMode ? 'Demo data' : 'Live data'}
             </span>
           </div>
         </div>
@@ -366,79 +415,35 @@ export const DoctorHome: React.FC = () => {
               </button>
             </div>
 
-            <div className="space-y-3">
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-[#2A554A] uppercase">Oct</span>
-                    <span className="text-sm">23</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Rohan Verma · CBC report discussion
-                    </h4>
-                    <p className="text-[11px] text-stone-500">12:15 PM · In-person · RS-10475</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-[#FEF3D6] text-[#8C6200] px-2.5 py-1 rounded-full">
-                  Requested
-                </span>
+            {followUps.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-500">
+                No upcoming visits or repeat tests.
               </div>
-
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-[#2A554A] uppercase">Oct</span>
-                    <span className="text-sm">26</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Meera Iyer · HbA1c therapy escalation
-                    </h4>
-                    <p className="text-[11px] text-stone-500">11:00 AM · Video call · RS-10482</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-[#E4EDE8] text-[#2B5246] px-2.5 py-1 rounded-full">
-                  Confirmed
-                </span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-[#2A554A] uppercase">Oct</span>
-                    <span className="text-sm">27</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Arjun Nair · Routine blood pressure review
-                    </h4>
-                    <p className="text-[11px] text-stone-500">04:30 PM · In-person · RS-10448</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-[#E4EDE8] text-[#2B5246] px-2.5 py-1 rounded-full">
-                  Confirmed
-                </span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-stone-100 text-stone-600 flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-stone-500 uppercase">Nov</span>
-                    <span className="text-sm">06</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Rohan Verma · Repeat CBC lab test due
-                    </h4>
-                    <p className="text-[11px] text-stone-500">Any accredited lab · Automated follow-up</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-stone-100 text-stone-600 px-2.5 py-1 rounded-full">
-                  Test Due
-                </span>
-              </div>
-            </div>
+            ) : (
+              <ul className="space-y-3">
+                {followUps.map((f) => (
+                  <li key={f.key}>
+                    <button
+                      type="button"
+                      onClick={() => navigate(f.href)}
+                      className="w-full p-3.5 rounded-2xl border border-stone-200 hover:border-stone-300 hover:bg-stone-50 flex items-center justify-between gap-3 text-left"
+                    >
+                      <span className="flex items-center gap-3.5 min-w-0">
+                        <span className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center font-bold flex-shrink-0 ${f.kind === 'test' ? 'bg-stone-100 text-stone-700' : 'bg-badgegreen-100 text-forest-900'}`}>
+                          <span className="text-[10px] uppercase leading-none">{f.month}</span>
+                          <span className="text-sm leading-tight">{f.day}</span>
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block font-semibold text-sm text-ink truncate">{f.title}</span>
+                          <span className="block text-xs text-stone-500 truncate">{f.meta}</span>
+                        </span>
+                      </span>
+                      <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0 ${f.tone}`}>{f.badge}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>

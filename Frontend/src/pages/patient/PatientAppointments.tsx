@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Appointment } from '../../types';
 import { connectionsApi } from '../../api';
+import { notify } from '../../components/ui/Toast';
 
 export const PatientAppointments: React.FC = () => {
   const { currentUser, appointments, requestAppointment, updateAppointmentStatus, fetchAppointments } = useStore();
@@ -87,7 +88,7 @@ export const PatientAppointments: React.FC = () => {
     if (!visitReason.trim()) return;
 
     if (!selectedDoc) {
-      alert('You have no connected healthcare provider. Please connect with your doctor first on the Doctors page.');
+      notify('You have no connected doctor yet. Connect with your doctor first on the My doctors page.', 'warning');
       return;
     }
 
@@ -117,7 +118,7 @@ export const PatientAppointments: React.FC = () => {
       setBookingSuccessToast(`Appointment requested with ${docName}! Real-time status updates enabled.`);
       setTimeout(() => setBookingSuccessToast(null), 4500);
     } catch (err: any) {
-      alert(`Booking notice: ${err?.message || 'Failed to submit appointment request'}`);
+      notify(err?.message || 'Failed to send appointment request', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -130,7 +131,7 @@ export const PatientAppointments: React.FC = () => {
       setBookingSuccessToast('Appointment cancelled successfully.');
       setTimeout(() => setBookingSuccessToast(null), 3000);
     } catch (err: any) {
-      alert(err.message || 'Failed to cancel appointment');
+      notify(err.message || 'Failed to cancel appointment', 'error');
     }
   };
 
@@ -149,7 +150,7 @@ export const PatientAppointments: React.FC = () => {
       setBookingSuccessToast(`Reschedule request sent for ${rescheduleDate} at ${rescheduleTime}.`);
       setTimeout(() => setBookingSuccessToast(null), 4000);
     } catch (err: any) {
-      alert(err.message || 'Failed to reschedule appointment');
+      notify(err.message || 'Failed to reschedule appointment', 'error');
     } finally {
       setIsSubmitting(false);
     }

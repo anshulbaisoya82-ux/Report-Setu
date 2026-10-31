@@ -1,3 +1,4 @@
+import { Logo } from '../../components/common/Logo';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { adminApi, authApi, setAccessToken, setStoredUser, setStoredRole } from '../../api';
@@ -198,39 +199,22 @@ export const AdminPortal: React.FC = () => {
   return (
     <div className="min-h-screen bg-stone-50 text-stone-900 font-sans pb-24">
       {/* Top Admin Header */}
-      <header className="bg-[#172B25] text-white border-b border-[#25463B] sticky top-0 z-40 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-stone-900 font-bold shadow-lg shadow-amber-500/20">
-              <ShieldCheck className="w-6 h-6 text-stone-950" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold tracking-tight text-white">ReportSetu Admin</span>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider">
-                  Council Triage
-                </span>
-              </div>
-              <p className="text-xs text-stone-400">Medical Practitioner Verification & Regulatory Oversight</p>
+      <header className="bg-forest-900 text-white sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <Logo size="md" />
+            <span className="hidden sm:inline-block h-6 w-px bg-white/20" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white">Admin · Doctor verification</p>
+              <p className="hidden sm:block text-xs text-white/60 truncate">Check registration details before a doctor can connect with patients</p>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              to="/doctor"
-              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition-all flex items-center gap-1.5 border border-white/10"
-            >
-              <Stethoscope className="w-3.5 h-3.5 text-teal-300" />
-              <span>Doctor Portal</span>
-            </Link>
-            <Link
-              to="/patient"
-              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition-all flex items-center gap-1.5 border border-white/10"
-            >
-              <Users className="w-3.5 h-3.5 text-blue-300" />
-              <span>Patient Portal</span>
-            </Link>
-          </div>
+          <Link
+            to="/login"
+            className="shrink-0 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white border border-white/10"
+          >
+            Exit admin
+          </Link>
         </div>
       </header>
 

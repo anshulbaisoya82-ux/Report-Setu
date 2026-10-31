@@ -5,6 +5,8 @@ import {
   Check, Download, 
   ShieldAlert, FileText
 } from 'lucide-react';
+import { notify } from '../../components/ui/Toast';
+import { formatDate } from '../../utils/format';
 
 export const PatientMedicines: React.FC = () => {
   const { medicineSchedule, prescriptions, toggleMedicineSchedule, fetchMedicineSchedule, fetchPrescriptions } = useStore();
@@ -90,7 +92,7 @@ export const PatientMedicines: React.FC = () => {
                 return (
                   <div 
                     key={med.id}
-                    onClick={() => toggleMedicineSchedule(med.id, isTaken ? 'due' : 'taken')}
+                    onClick={() => toggleMedicineSchedule(med.id, isTaken ? 'due' : 'taken').catch((e: any) => notify(e?.message || 'Could not save. Please try again.', 'error'))}
                     className={`p-4 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all ${
                       isTaken ? 'bg-slate-50/70 border-slate-200' : 'bg-white border-forest-300 shadow-xs'
                     }`}
@@ -209,25 +211,30 @@ export const PatientMedicines: React.FC = () => {
         </Link>
       </div>
 
-      {/* Official Prescription Download Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex items-center justify-between">
+      {/* Prescription card (from the active prescription) */}
+      {prescriptions.find((rx) => rx.status === 'Active') && (() => {
+        const rx = prescriptions.find((x) => x.status === 'Active')!;
+        return (
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-forest-100 text-forest-900 flex items-center justify-center shrink-0">
             <FileText className="w-5 h-5 text-forest-800" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-slate-900 font-serif">Official Stamped Prescription (Rx-8921)</h4>
-            <p className="text-[11px] text-slate-500">Signed by Dr. Priya Mehta on 15 Oct 2026 · Apollo Clinic</p>
+            <h4 className="text-xs font-bold text-slate-900">Current prescription · {rx.name}</h4>
+            <p className="text-[11px] text-slate-500">Prescribed by {rx.doctorName}{rx.startDate ? ` on ${formatDate(rx.startDate)}` : ''}</p>
           </div>
         </div>
 
         <button
-          onClick={() => alert("Downloading stamped PDF prescription: Rx_RohanVerma_2026.pdf")}
+          onClick={() => notify('Prescription PDF download is not available yet.', 'info')}
           className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors shadow-2xs"
         >
           <Download className="w-4 h-4 text-slate-500" /> Download PDF
         </button>
       </div>
+        );
+      })()}
     </div>
   );
 };

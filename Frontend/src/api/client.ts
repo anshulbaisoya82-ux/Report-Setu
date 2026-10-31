@@ -1,9 +1,14 @@
 /**
- * ReportSetu Centralized Real API Client
- * Connects frontend directly to Express/MongoDB backend at http://localhost:5000/api/v1
+ * ReportSetu centralized API client.
+ * Talks to the Express + Prisma (PostgreSQL) backend, by default at http://localhost:5000/api/v1.
+ * In demo mode (VITE_DEMO_MODE=true) requests go to a same-origin virtual path that
+ * src/demo/demoServer.ts answers with synthetic data.
  */
 
 const getApiBase = () => {
+  if (import.meta.env.VITE_DEMO_MODE === 'true' && typeof window !== 'undefined') {
+    return `${window.location.origin}/__demo_api/v1`;
+  }
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
@@ -11,7 +16,7 @@ const getApiBase = () => {
   return `http://${host}:5000/api/v1`;
 };
 
-const API_BASE = getApiBase();
+export const API_BASE = getApiBase();
 
 // Token Management Helpers
 export const getAccessToken = (): string | null => {

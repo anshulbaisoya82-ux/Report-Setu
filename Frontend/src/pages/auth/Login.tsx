@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { authApi } from '../../api/client';
+import { isDemoMode } from '../../demo/flags';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -57,6 +58,32 @@ export const Login: React.FC = () => {
       navigate('/doctor');
     } catch (err: any) {
       setErrorMessage(err.message || 'Doctor login failed. Check email and password.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Demo mode only: one-click sign-in that runs the same auth calls as the forms.
+  const demoLogin = async (who: 'doctor' | 'patient' | 'admin') => {
+    setErrorMessage(null);
+    setIsLoading(true);
+    try {
+      if (who === 'doctor') {
+        const res = await authApi.loginDoctor('priya.mehta@demo.reportsetu.in', 'demo');
+        setRole('doctor');
+        setCurrentUser(res.doctor || res.user);
+        navigate('/doctor');
+      } else if (who === 'patient') {
+        await authApi.sendPatientOtp('9000010475');
+        const res = await authApi.verifyPatientOtp('9000010475', '123456');
+        setRole('patient');
+        setCurrentUser(res.patient || res.user);
+        navigate('/patient');
+      } else {
+        navigate('/admin');
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Demo sign-in failed.');
     } finally {
       setIsLoading(false);
     }
@@ -163,18 +190,23 @@ export const Login: React.FC = () => {
         {/* Security badge */}
         <div className="relative z-10 pt-8 border-t border-white/10 flex items-center gap-3 text-xs text-white/60">
           <ShieldCheck className="w-4 h-4 text-teal-400" />
-          <span>ABDM Compliant · 256-bit AES Clinical Encryption</span>
+          <span>Private by design · Decision-support tool, not a diagnosis</span>
         </div>
       </div>
 
       {/* Right Login Form */}
       <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 overflow-y-auto">
         {/* Top Header / Switch Mode */}
-        <div className="flex items-center justify-end text-xs sm:text-sm">
+        <div className="flex items-center justify-between lg:justify-end gap-4 text-xs sm:text-sm">
+          <div className="lg:hidden rounded-xl bg-[#1E3F35] px-3 py-2">
+            <Logo size="sm" />
+          </div>
+          <div>
           <span className="text-stone-500 mr-2">Need an account?</span>
           <Link to={activeTab === 'patient' ? '/signup?role=patient' : '/signup'} className="font-semibold text-[#B53629] hover:underline">
             Register as {activeTab === 'patient' ? 'Patient' : 'Doctor'}
           </Link>
+          </div>
         </div>
 
         {/* Center Card */}
@@ -435,6 +467,27 @@ export const Login: React.FC = () => {
             </div>
           )}
         </div>
+
+        {isDemoMode && (
+          <div className="w-full max-w-md mx-auto -mt-2 mb-6 rounded-2xl border border-dashed border-[#A4BEB0] bg-white/70 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#2B5246]">Demo mode · synthetic data</p>
+            <p className="mt-1 text-xs text-[#5F736C]">No backend needed. Every person and value here is fictional.</p>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {(['doctor', 'patient', 'admin'] as const).map((who) => (
+                <button
+                  key={who}
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => demoLogin(who)}
+                  className="rounded-xl border border-[#CAD8CF] bg-white px-2 py-2 text-xs font-semibold capitalize text-[#1E3F35] hover:border-[#1E3F35] hover:bg-[#F5F8F6] disabled:opacity-60"
+                >
+                  {who === 'doctor' ? 'Dr. Priya Mehta' : who === 'patient' ? 'Rohan Verma' : 'Admin'}
+                  <span className="block text-[10px] font-normal text-[#5F736C]">{who}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Footer Note */}
         <div className="text-center text-xs text-stone-400 flex items-center justify-center gap-1.5 pb-2">

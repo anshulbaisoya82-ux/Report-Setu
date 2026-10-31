@@ -196,12 +196,36 @@ export function evaluateClinicalStatus(
 }
 
 /**
+ * Names that contain a biomarker's alias but are a *different* test.
+ * Without these, "HbA1c" or "Mean Corpuscular Hemoglobin" would be plotted as Hemoglobin,
+ * "LDL Cholesterol" as Total Cholesterol, and "Estimated Average Glucose" as fasting glucose.
+ */
+const EXCLUSIONS: Record<string, RegExp> = {
+  hemoglobin: /a1c|glyc|corpuscular|\bmchc?\b/,
+  cholesterol: /\b(ldl|hdl|vldl|non[\s-]?hdl)\b|ratio/,
+  glucose: /average|\beag\b|post[\s-]?prandial|\bpp\b|random/,
+  rbc: /distribution|\brdw\b/,
+  platelets: /\bmpv\b|mean platelet|distribution|\bpdw\b/,
+  wbc: /differential|%/,
+};
+
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** Whole-word alias match with exclusions — never a loose substring match. */
+export function matchesBiomarker(paramName: string, def: BiomarkerDefinition): boolean {
+  const name = (paramName || '').trim().toLowerCase();
+  if (!name) return false;
+  if (EXCLUSIONS[def.key]?.test(name)) return false;
+  return def.aliases.some((alias) => new RegExp(`(^|[^a-z0-9])${escapeRe(alias)}([^a-z0-9]|$)`).test(name));
+}
+
+/**
  * Normalizes parameter names to find a matching BiomarkerDefinition.
  */
 export function findBiomarkerDefinition(paramName: string): BiomarkerDefinition {
   const normalized = paramName.trim().toLowerCase();
   for (const def of BIOMARKER_CATALOG) {
-    if (def.aliases.some((alias) => normalized.includes(alias) || alias.includes(normalized))) {
+    if (matchesBiomarker(normalized, def)) {
       return def;
     }
   }
@@ -290,10 +314,7 @@ export function extractBiomarkerTrend(
     if (!report.parameters || !Array.isArray(report.parameters)) continue;
 
     // Find parameter matching the definition aliases
-    const matchedParam = report.parameters.find((p: LabParameter) => {
-      const pName = (p.name || '').toLowerCase().trim();
-      return definition.aliases.some((alias) => pName.includes(alias) || alias.includes(pName));
-    });
+    const matchedParam = report.parameters.find((p: LabParameter) => matchesBiomarker(p.name || '', definition));
 
     if (!matchedParam) continue;
 

@@ -45,8 +45,9 @@ export const DoctorProfile: React.FC = () => {
       try {
         setLoading(true);
         const res = await doctorProfileApi.get();
-        if (res && res.data && isMounted) {
-          const d = res.data;
+        // apiFetch already unwraps the { data } envelope; accept either shape.
+        const d = (res as any)?.data ?? res;
+        if (d && d.name !== undefined && isMounted) {
           const clinic = d.clinic || {};
           setFormData({
             name: d.name || '',

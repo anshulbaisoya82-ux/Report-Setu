@@ -1,46 +1,56 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { isDemoMode } from './demo/flags';
+import { PageLoader } from './components/ui/PageLoader';
+import { DemoBadge } from './components/common/DemoBadge';
+import { ToastViewport } from './components/ui/Toast';
+
+// The hosted demo is served as static files, so it uses hash URLs; real deployments keep clean URLs.
+const Router = isDemoMode ? HashRouter : BrowserRouter;
 
 // Layouts
 import { DoctorLayout } from './components/layout/DoctorLayout';
 import { PatientLayout } from './components/layout/PatientLayout';
 
 // Auth Pages
-import { Login } from './pages/auth/Login';
-import { SignUp } from './pages/auth/SignUp';
+const Login = lazy(() => import('./pages/auth/Login').then((m) => ({ default: m.Login })));
+const SignUp = lazy(() => import('./pages/auth/SignUp').then((m) => ({ default: m.SignUp })));
 
 // Doctor Pages
-import { DoctorHome } from './pages/doctor/DoctorHome';
-import { DoctorPatients } from './pages/doctor/DoctorPatients';
-import { DoctorAddPatient } from './pages/doctor/DoctorAddPatient';
-import { DoctorPatientDetail } from './pages/doctor/DoctorPatientDetail';
-import { DoctorPatientMedicines } from './pages/doctor/DoctorPatientMedicines';
-import { DoctorAppointments } from './pages/doctor/DoctorAppointments';
-import { DoctorReports } from './pages/doctor/DoctorReports';
-import { DoctorReportDetail } from './pages/doctor/DoctorReportDetail';
-import { DoctorPatientQuestions } from './pages/doctor/DoctorPatientQuestions';
-import { DoctorProfile } from './pages/doctor/DoctorProfile';
+const DoctorHome = lazy(() => import('./pages/doctor/DoctorHome').then((m) => ({ default: m.DoctorHome })));
+const DoctorPatients = lazy(() => import('./pages/doctor/DoctorPatients').then((m) => ({ default: m.DoctorPatients })));
+const DoctorAddPatient = lazy(() => import('./pages/doctor/DoctorAddPatient').then((m) => ({ default: m.DoctorAddPatient })));
+const DoctorPatientDetail = lazy(() => import('./pages/doctor/DoctorPatientDetail').then((m) => ({ default: m.DoctorPatientDetail })));
+const DoctorPatientMedicines = lazy(() => import('./pages/doctor/DoctorPatientMedicines').then((m) => ({ default: m.DoctorPatientMedicines })));
+const DoctorAppointments = lazy(() => import('./pages/doctor/DoctorAppointments').then((m) => ({ default: m.DoctorAppointments })));
+const DoctorReports = lazy(() => import('./pages/doctor/DoctorReports').then((m) => ({ default: m.DoctorReports })));
+const DoctorReportDetail = lazy(() => import('./pages/doctor/DoctorReportDetail').then((m) => ({ default: m.DoctorReportDetail })));
+const DoctorPatientQuestions = lazy(() => import('./pages/doctor/DoctorPatientQuestions').then((m) => ({ default: m.DoctorPatientQuestions })));
+const DoctorProfile = lazy(() => import('./pages/doctor/DoctorProfile').then((m) => ({ default: m.DoctorProfile })));
 
 // Patient Pages
-import { PatientHome } from './pages/patient/PatientHome';
-import { PatientUploadReport } from './pages/patient/PatientUploadReport';
-import { PatientMyReports } from './pages/patient/PatientMyReports';
-import { PatientReportDetail } from './pages/patient/PatientReportDetail';
-import { PatientMedicines } from './pages/patient/PatientMedicines';
-import { PatientAppointments } from './pages/patient/PatientAppointments';
-import { PatientAskDoctor } from './pages/patient/PatientAskDoctor';
-import { PatientDoctors } from './pages/patient/PatientDoctors';
-import { PatientSettings } from './pages/patient/PatientSettings';
-import { PatientProfile } from './pages/patient/PatientProfile';
-import { PatientOnboarding } from './pages/patient/PatientOnboarding';
+const PatientHome = lazy(() => import('./pages/patient/PatientHome').then((m) => ({ default: m.PatientHome })));
+const PatientUploadReport = lazy(() => import('./pages/patient/PatientUploadReport').then((m) => ({ default: m.PatientUploadReport })));
+const PatientMyReports = lazy(() => import('./pages/patient/PatientMyReports').then((m) => ({ default: m.PatientMyReports })));
+const PatientReportDetail = lazy(() => import('./pages/patient/PatientReportDetail').then((m) => ({ default: m.PatientReportDetail })));
+const PatientMedicines = lazy(() => import('./pages/patient/PatientMedicines').then((m) => ({ default: m.PatientMedicines })));
+const PatientAppointments = lazy(() => import('./pages/patient/PatientAppointments').then((m) => ({ default: m.PatientAppointments })));
+const PatientAskDoctor = lazy(() => import('./pages/patient/PatientAskDoctor').then((m) => ({ default: m.PatientAskDoctor })));
+const PatientDoctors = lazy(() => import('./pages/patient/PatientDoctors').then((m) => ({ default: m.PatientDoctors })));
+const PatientSettings = lazy(() => import('./pages/patient/PatientSettings').then((m) => ({ default: m.PatientSettings })));
+const PatientProfile = lazy(() => import('./pages/patient/PatientProfile').then((m) => ({ default: m.PatientProfile })));
+const PatientOnboarding = lazy(() => import('./pages/patient/PatientOnboarding').then((m) => ({ default: m.PatientOnboarding })));
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { AdminPortal } from './pages/admin/AdminPortal';
+const AdminPortal = lazy(() => import('./pages/admin/AdminPortal').then((m) => ({ default: m.AdminPortal })));
 import { RealtimeNotificationBanner } from './components/common/RealtimeNotificationBanner';
 
 export const App: React.FC = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <RealtimeNotificationBanner />
+      {isDemoMode && <DemoBadge />}
+      <ToastViewport />
+      <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
@@ -87,7 +97,8 @@ export const App: React.FC = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-    </BrowserRouter>
+      </Suspense>
+    </Router>
   );
 };
 

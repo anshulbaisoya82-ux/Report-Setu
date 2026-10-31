@@ -1,244 +1,249 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useStore } from '../../store/useStore';
-import { 
-  ArrowLeft, Download, Calendar
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import {
+  ArrowLeft, Calendar, CheckCircle2, Clock3, Eye, FileText, Info, MessageSquare, TriangleAlert, Volume2, X,
 } from 'lucide-react';
+import { useStore } from '../../store/useStore';
 import { MedicalTrendChart } from '../../components/charts';
+import { notify } from '../../components/ui/Toast';
+import { describeParameter, explainParameter, StatusLabel, StatusPill } from '../../components/ui/status';
+import { formatDate } from '../../utils/format';
+import { speakHindi, stopSpeaking } from '../../utils/speech';
+import type { LabParameter } from '../../types';
 
 export const PatientReportDetail: React.FC = () => {
   const { reportId } = useParams<{ reportId: string }>();
   const { reports, fetchReports } = useStore();
+  const [loaded, setLoaded] = useState(reports.length > 0);
+  const [selected, setSelected] = useState<LabParameter | null>(null);
+  const [speaking, setSpeaking] = useState(false);
 
-  React.useEffect(() => {
-    fetchReports();
-  }, []);
+  useEffect(() => {
+    fetchReports().finally(() => setLoaded(true));
+    return () => stopSpeaking();
+  }, [fetchReports]);
 
-  const report = reports.find(r => r.id === reportId || (r as any)._id === reportId) || reports[0];
+  // Never fall back to a different report: showing someone the wrong results is worse than "not found".
+  const report = reports.find((r) => r.id === reportId || (r as any)._id === reportId);
+  const params = report?.parameters ?? [];
+  const outside = useMemo(() => params.filter((p) => p.status !== 'Normal'), [params]);
 
-  const getPlainDescription = (name: string) => {
-    if (name.toLowerCase().includes('platelet')) {
-      return 'Platelets are blood cells that help stop bleeding. Review the measured value and reference range below with your doctor.';
-    }
-    if (name.toLowerCase().includes('hemoglobin') || name.toLowerCase().includes('hb')) {
-      return 'Hemoglobin carries oxygen throughout your body. Your doctor can interpret this value with your symptoms and other results.';
-    }
-    if (name.toLowerCase().includes('wbc') || name.toLowerCase().includes('leukocyte')) {
-      return 'White blood cells support your immune system. Your doctor can interpret this result alongside symptoms and other tests.';
-    }
-    if (name.toLowerCase().includes('neutrophil')) {
-      return 'Neutrophils are one type of white blood cell involved in immune response. Review this value with your doctor.';
-    }
-    if (name.toLowerCase().includes('lymphocyte')) {
-      return 'Lymphocytes are immune cells. Your doctor can explain what this result means in the context of your full report.';
-    }
-    return 'This laboratory measurement is within acceptable clinical limits.';
-  };
+  useEffect(() => {
+    if (!selected && params.length) setSelected(outside[0] ?? params[0]);
+  }, [params, outside, selected]);
 
   if (!report) {
     return (
-      <div className="p-12 text-center text-stone-500 space-y-4">
-        <p className="text-base font-semibold">Loading report details...</p>
-        <Link to="/patient/reports" className="text-xs text-[#1E3F35] font-semibold underline">
-          Return to My Reports
+      <div className="mx-auto max-w-xl rounded-3xl bg-white p-10 text-center shadow-card">
+        {loaded ? (
+          <>
+            <FileText className="mx-auto h-8 w-8 text-stone-400" />
+            <h1 className="mt-3 text-lg font-semibold text-ink">Report not found</h1>
+            <p className="mt-1 text-sm text-stone-500">It may have been removed, or the link is incorrect.</p>
+          </>
+        ) : (
+          <p className="text-sm text-stone-500" role="status">Loading report…</p>
+        )}
+        <Link to="/patient/reports" className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-forest-900 underline">
+          <ArrowLeft className="h-4 w-4" /> Back to My reports
         </Link>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-6 pb-12 max-w-4xl mx-auto">
-      {/* Back button & Header */}
-      <div>
-        <Link 
-          to="/patient/reports"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-forest-700 mb-3"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> Back to My Reports
-        </Link>
+  const summary = report.doctorSummary;
+  const checked = Boolean(report.reviewed && summary?.text);
+  const nextTest = summary?.nextTestDate;
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-forest-950 font-serif tracking-tight">{report.name}</h1>
-              <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                {report.category}
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Tested on <span className="font-semibold text-slate-700">{report.reportedDate}</span> at {report.labName}
+  const listen = () => {
+    if (speaking) {
+      stopSpeaking();
+      setSpeaking(false);
+      return;
+    }
+    if (!summary?.hindiText) return;
+    if (speakHindi(summary.hindiText, () => setSpeaking(false))) setSpeaking(true);
+    else notify('Your browser cannot read text aloud.', 'warning');
+  };
+
+  const sel = selected ? describeParameter(selected) : null;
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link to="/patient/reports" className="inline-flex items-center gap-2 text-sm font-semibold text-forest-900 hover:underline">
+          <ArrowLeft className="h-4 w-4" /> Back to My reports
+        </Link>
+        <Link to="/patient/ask-doctor" className="inline-flex items-center gap-2 rounded-xl bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-teal-600">
+          <MessageSquare className="h-4 w-4" /> Ask about this report
+        </Link>
+      </div>
+
+      {/* Header */}
+      <section className="flex flex-col gap-5 rounded-3xl bg-white p-5 shadow-card sm:p-6 md:flex-row md:items-center">
+        <div className="flex flex-1 items-start gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-terracotta-500/15 text-terracotta-600">
+            <FileText className="h-6 w-6" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{report.name}</h1>
+            <p className="mt-1 text-sm text-stone-500">
+              {report.labName} · Collected {formatDate(report.collectionDate)}
             </p>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => alert(`Downloading verified PDF for ${report.name}`)}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 shadow-2xs transition-colors"
-            >
-              <Download className="w-4 h-4 text-slate-500" /> Download PDF
-            </button>
-          </div>
         </div>
-      </div>
-
-      {/* Doctor's Note Card (Plain Language) */}
-      <div className="bg-[#F2FAF9] bg-gradient-to-r from-[#F2FAF9] to-[#E8F6F4] border border-[#C6ECE7] rounded-2xl p-5 shadow-xs space-y-3">
-        <div className="flex items-center justify-between border-b border-[#C6ECE7] pb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-forest-900 text-accent-teal font-bold flex items-center justify-center text-xs shadow-xs">
-              PM
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-forest-950 font-serif">Dr. Priya Mehta's Review</h3>
-              <p className="text-[11px] text-forest-800">Internal Medicine · Apollo Clinic</p>
-            </div>
-          </div>
-          <span className="text-[10px] bg-[#E0F7F5] text-[#0C736A] border border-[#80D7CE] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs">
-            Clinician Approved
-          </span>
-        </div>
-
-        <p className="text-xs text-forest-950 leading-relaxed font-sans bg-white/70 p-4 rounded-xl border border-forest-100/80">
-          "{report.doctorSummary?.text || 'Your doctor has not added a patient-facing summary yet.'}"
-        </p>
-
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs text-forest-800">
-          {report.doctorSummary?.nextTestDate && <span className="text-[11px]">Next follow-up test: <strong>{report.doctorSummary.nextTestDate}</strong></span>}
-          <Link
-            to="/patient/ask-doctor"
-            className="font-bold text-forest-900 underline flex items-center gap-1"
-          >
-            Reply or ask doctor a question <ArrowLeft className="w-3 h-3 rotate-180" />
-          </Link>
-        </div>
-      </div>
-
-      {/* What Your Values Mean (Patient Friendly Parameter Breakdown) */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-        <div>
-          <h2 className="text-base font-bold text-slate-900 font-serif">Understanding Your Lab Results</h2>
-          <p className="text-xs text-slate-500">Every parameter explained in simple terms</p>
-        </div>
-
-        <div className="space-y-4 pt-2">
-          {report.parameters.map(p => (
-            <div 
-              key={p.name} 
-              className={`p-4 rounded-xl border transition-all ${
-                p.status === 'Low' || p.status === 'High' || p.status === 'Critical'
-                  ? 'bg-red-50/40 border-red-200' 
-                  : 'bg-slate-50/50 border-slate-200'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900">{p.name}</h4>
-                  <span className="text-[11px] text-slate-500">Normal Range: {p.referenceRange} {p.unit}</span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <span className={`text-sm font-bold font-serif ${
-                      p.status === 'Low' || p.status === 'High' || p.status === 'Critical' ? 'text-red-700' : 'text-slate-900'
-                    }`}>
-                      {p.value}
-                    </span>{' '}
-                    <span className="text-xs text-slate-500">{p.unit}</span>
-                  </div>
-
-                  {p.status === 'Low' && (
-                    <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-bold border border-red-200">
-                      Low
-                    </span>
-                  )}
-                  {p.status === 'High' && (
-                    <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-200">
-                      High
-                    </span>
-                  )}
-                  {p.status === 'Critical' && (
-                    <span className="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold">
-                      Critical
-                    </span>
-                  )}
-                  {p.status === 'Normal' && (
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-medium border border-emerald-200">
-                      Normal
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Visual meter bar */}
-              <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mt-3 relative">
-                <div className="absolute inset-y-0 left-[25%] right-[25%] bg-emerald-200" title="Normal Range"></div>
-                {p.status === 'Low' && (
-                  <div className="absolute top-0 bottom-0 left-[18%] w-2 bg-red-600 rounded-full" />
-                )}
-                {p.status === 'Normal' && (
-                  <div className="absolute top-0 bottom-0 left-[50%] w-2 bg-emerald-600 rounded-full" />
-                )}
-                {p.status === 'High' && (
-                  <div className="absolute top-0 bottom-0 left-[85%] w-2 bg-amber-600 rounded-full" />
-                )}
-                {p.status === 'Critical' && (
-                  <div className="absolute top-0 bottom-0 left-[10%] w-2 bg-red-700 rounded-full" />
-                )}
-              </div>
-
-              {/* Friendly Explanation */}
-              <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-                {p.whatItMeans || getPlainDescription(p.name)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Longitudinal Parameter Trajectory Chart */}
-      <MedicalTrendChart
-        reports={reports}
-        initialKey="platelets"
-        title="Longitudinal Biomarker Trajectory"
-        subtitle="Tracking this parameter across all your verified reports with biological reference range"
-      />
-
-      {/* Repeat Test Reminder Box */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-forest-100 text-forest-900 flex items-center justify-center shrink-0">
-            <Calendar className="w-5 h-5 text-forest-800" />
+        <dl className="grid grid-cols-3 gap-4 border-t border-stone-200 pt-4 text-sm md:border-l md:border-t-0 md:pl-6 md:pt-0">
+          <div>
+            <dt className="text-xs text-stone-500">Status</dt>
+            <dd className="mt-1 flex items-center gap-1.5 font-semibold text-ink">
+              {checked ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <Clock3 className="h-4 w-4 text-amber-600" />}
+              {checked ? 'Checked by doctor' : 'Waiting for doctor'}
+            </dd>
           </div>
           <div>
-            <h3 className="text-xs font-bold text-slate-900 font-serif">Repeat Complete Blood Count on 26 Oct 2026</h3>
-            <p className="text-[11px] text-slate-500">Dr. Priya Mehta recommended verifying that platelet count reaches &gt; 1.5 Lakh.</p>
+            <dt className="text-xs text-stone-500">Outside normal range</dt>
+            <dd className="mt-1 flex items-center gap-1.5 font-semibold text-ink">
+              {outside.length > 0 && <TriangleAlert className="h-4 w-4 text-amber-600" />}
+              {outside.length} {outside.length === 1 ? 'value' : 'values'}
+            </dd>
           </div>
-        </div>
+          <div>
+            <dt className="text-xs text-stone-500">Next test</dt>
+            <dd className="mt-1 flex items-center gap-1.5 font-semibold text-ink">
+              <Calendar className="h-4 w-4 text-stone-500" />
+              {nextTest ? formatDate(nextTest) : '—'}
+            </dd>
+          </div>
+        </dl>
+      </section>
 
-        <button
-          onClick={() => alert("Reminder added to your phone calendar for 26 Oct 2026!")}
-          className="px-4 py-2 text-xs font-bold text-forest-900 bg-forest-50 border border-forest-200 rounded-xl hover:bg-forest-100 transition-colors"
-        >
-          Add to Calendar
-        </button>
+      {/* Doctor's summary */}
+      {checked ? (
+        <section className="rounded-3xl border border-sage-300 bg-sage-50 p-5 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-base font-semibold text-ink">Doctor's summary</h2>
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-forest-800">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Approved by {summary!.doctorName || report.reviewedBy}
+              {summary!.approvedAt ? ` · ${formatDate(summary!.approvedAt)}` : ''}
+            </p>
+          </div>
+          <p className="mt-3 max-w-4xl text-[15px] leading-relaxed text-ink">{summary!.text}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {summary!.hindiText && (
+              <button type="button" onClick={listen} aria-pressed={speaking} className="inline-flex items-center gap-2 rounded-xl border border-sage-300 bg-white px-4 py-2 text-sm font-semibold text-forest-900 hover:border-forest-900">
+                <Volume2 className="h-4 w-4" /> {speaking ? 'Stop' : 'Listen in Hindi'}
+              </button>
+            )}
+            <button type="button" onClick={() => notify('Viewing the original uploaded file is not available yet.', 'info')} className="inline-flex items-center gap-2 rounded-xl border border-sage-300 bg-white px-4 py-2 text-sm font-semibold text-forest-900 hover:border-forest-900">
+              <Eye className="h-4 w-4" /> View original report
+            </button>
+          </div>
+        </section>
+      ) : (
+        <section className="flex items-start gap-3 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+          <Clock3 className="mt-0.5 h-5 w-5 shrink-0" />
+          <div>
+            <p className="font-semibold">Your doctor hasn't checked this report yet</p>
+            <p className="mt-0.5 text-amber-800">A summary in simple words will appear here once they approve it. You can still see the values you confirmed below.</p>
+          </div>
+        </section>
+      )}
+
+      {/* Results + explanation */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <section className="rounded-3xl bg-white p-4 shadow-card sm:p-6">
+          <h2 className="text-base font-semibold text-ink">Your results</h2>
+          <p className="text-xs text-stone-500">Tap a value to see what it means</p>
+
+          {params.length === 0 ? (
+            <p className="mt-6 rounded-2xl bg-sage-50 p-6 text-center text-sm text-stone-500">No values recorded for this report.</p>
+          ) : (
+            <div className="mt-4 overflow-hidden rounded-2xl border border-stone-200">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-sage-50 text-xs text-stone-500">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Parameter</th>
+                    <th className="px-3 py-3 font-medium">Value</th>
+                    <th className="hidden px-3 py-3 font-medium sm:table-cell">Normal range</th>
+                    <th className="px-3 py-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-200">
+                  {params.map((p) => {
+                    const d = describeParameter(p);
+                    const active = selected?.id === p.id;
+                    return (
+                      <tr
+                        key={p.id}
+                        tabIndex={0}
+                        onClick={() => setSelected(p)}
+                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setSelected(p))}
+                        aria-selected={active}
+                        className={`cursor-pointer transition-colors ${active ? 'bg-sage-100' : 'hover:bg-sage-50'}`}
+                      >
+                        <td className={`px-4 py-3 ${active ? 'font-semibold' : ''} text-ink`}>{p.name}</td>
+                        <td className="whitespace-nowrap px-3 py-3">
+                          <span className="font-semibold text-ink">{p.value}</span>{' '}
+                          <span className="text-xs text-stone-500">{p.unit}</span>
+                        </td>
+                        <td className="hidden whitespace-nowrap px-3 py-3 text-stone-600 sm:table-cell">{p.referenceRange}</td>
+                        <td className="px-3 py-3"><StatusLabel {...d} /></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        {selected && sel && (
+          <aside className="h-fit rounded-3xl bg-sage-50 p-5 shadow-card lg:sticky lg:top-6" aria-live="polite">
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-lg font-semibold text-ink">{selected.name}</h2>
+              <button type="button" aria-label="Close explanation" onClick={() => setSelected(null)} className="rounded-lg p-1 text-stone-500 hover:bg-white">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="text-4xl font-bold tracking-tight text-ink">{selected.value}</span>
+              <span className="text-sm text-stone-500">{selected.unit}</span>
+              <StatusPill {...sel} />
+            </div>
+            <p className="mt-2 text-xs text-stone-500">Normal range: {selected.referenceRange} {selected.unit}</p>
+            <hr className="my-4 border-stone-200" />
+            <h3 className="text-sm font-semibold text-ink">What is this?</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-stone-700">
+              {explainParameter(selected.name)}{' '}
+              {sel.severity === 'normal'
+                ? 'Your value is within the usual range in this report.'
+                : `Your value is ${selected.status === 'Low' ? 'lower' : 'higher'} than the usual range in this report.`}
+            </p>
+            {checked && (
+              <div className="mt-4 rounded-2xl bg-white p-4">
+                <p className="text-xs font-semibold text-forest-800">What your doctor said</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink">“{summary!.text}”</p>
+              </div>
+            )}
+            <p className="mt-4 flex items-start gap-2 rounded-2xl bg-white/70 p-3 text-xs text-stone-500">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              This explanation helps you understand your report. It is not a diagnosis.
+            </p>
+          </aside>
+        )}
       </div>
 
-      {/* Ask Question Card */}
-      <div className="bg-[#1E3F35] bg-gradient-to-r from-[#1E3F35] to-[#264E42] rounded-2xl p-6 text-white shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-base font-bold font-serif">Have questions regarding this report?</h3>
-          <p className="text-xs text-forest-100/90 mt-1">
-            Ask Dr. Priya Mehta directly or get instant AI answers for general questions.
-          </p>
-        </div>
+      <MedicalTrendChart
+        reports={reports}
+        initialKey={/hba1c/i.test(report.category) ? 'hba1c' : 'hemoglobin'}
+        title="Trends over time"
+        subtitle="How this value has changed across your reports, with the normal range shaded"
+      />
 
-        <Link
-          to="/patient/ask-doctor"
-          className="px-5 py-2.5 bg-accent-teal hover:bg-[#298d85] text-forest-950 font-bold text-xs rounded-xl shadow-xs transition-all active:scale-95 shrink-0"
-        >
-          Ask Dr. Priya Mehta
-        </Link>
-      </div>
+      <p className="flex items-center gap-2 rounded-2xl bg-sage-50 px-4 py-3 text-xs text-stone-500">
+        <Info className="h-3.5 w-3.5 shrink-0" />
+        Values come from your lab report and were checked by you and your doctor. ReportSetu is a decision-support tool and does not diagnose.
+      </p>
     </div>
   );
 };

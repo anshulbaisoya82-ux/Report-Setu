@@ -8,11 +8,52 @@ import {
 import { LabParameter } from '../../types';
 import { reportsApi, doctorApi } from '../../api';
 import { MedicalTrendChart, findBiomarkerDefinition } from '../../components/charts';
+import { notify } from '../../components/ui/Toast';
+import { formatDate } from '../../utils/format';
+
+
+/**
+ * Starting text for the patient message. Deliberately factual: it names the values that are
+ * outside the lab's range and the follow-up date, and never adds medical or lifestyle advice —
+ * that is the doctor's to write.
+ */
+function buildDraft(tone: 'plain' | 'clinical' | 'urgent', report: any, firstName: string, nextTestDate?: string) {
+  const name = report?.name || 'report';
+  const params: any[] = report?.parameters || [];
+  const out = params.filter((p) => p.status && p.status !== 'Normal');
+  const when = nextTestDate ? formatDate(nextTestDate) : '';
+  const word = (p: any) => (p.status === 'Low' ? 'lower' : 'higher');
+  const plainList = out.map((p) => `${p.name.replace(/\s*\(.*?\)/, '')} is ${word(p)} than the usual range`).join('; ');
+  const detailList = out.map((p) => `${p.name} ${p.value} ${p.unit || ''} (range ${p.referenceRange})`.replace(/\s+/g, ' ')).join('; ');
+  const follow = when ? ` I'd like you to repeat this test on ${when}.` : '';
+  const followHi = when ? ` कृपया ${when} को यह जाँच दोबारा कराएँ।` : '';
+
+  if (tone === 'clinical') {
+    return {
+      en: out.length
+        ? `Hello ${firstName}, I have reviewed your ${name}. Values outside the lab's range: ${detailList}. All other values are within range.${follow} We will discuss this at your next visit.`
+        : `Hello ${firstName}, I have reviewed your ${name}. All values are within the lab's range.${follow}`,
+      hi: `नमस्ते ${firstName}, मैंने आपकी ${name} रिपोर्ट देखी है।${out.length ? ` कुछ मान सामान्य सीमा से बाहर हैं: ${detailList}।` : ' सभी मान सामान्य सीमा में हैं।'}${followHi}`,
+    };
+  }
+  if (tone === 'urgent') {
+    return {
+      en: `Hello ${firstName}, I have reviewed your ${name}.${out.length ? ` ${out.length === 1 ? 'One value needs' : 'Some values need'} attention soon: ${detailList}.` : ''} Please contact the clinic to book a visit.${follow}`,
+      hi: `नमस्ते ${firstName}, मैंने आपकी ${name} रिपोर्ट देखी है। कृपया जल्द मिलने का समय लेने के लिए क्लिनिक से संपर्क करें।${followHi}`,
+    };
+  }
+  return {
+    en: out.length
+      ? `Hello ${firstName}, I have reviewed your ${name}. Most of your results are in the normal range. ${plainList.charAt(0).toUpperCase() + plainList.slice(1)}.${follow} We will talk about it at your visit.`
+      : `Hello ${firstName}, I have reviewed your ${name}. All your results are in the normal range.${follow}`,
+    hi: `नमस्ते ${firstName}, मैंने आपकी ${name} रिपोर्ट देखी है।${out.length ? ' कुछ मान सामान्य सीमा से अलग हैं। हम आपकी अगली मुलाक़ात में इस बारे में बात करेंगे।' : ' आपके सभी मान सामान्य सीमा में हैं।'}${followHi}`,
+  };
+}
 
 export const DoctorReportDetail: React.FC = () => {
   const { reportId } = useParams<{ reportId: string }>();
   const navigate = useNavigate();
-  const { reports, patients, markReportReviewed, markReportDoctorViewed, fetchReports, fetchDoctorPatients } = useStore();
+  const { reports, patients, doctorInfo, markReportReviewed, markReportDoctorViewed, fetchReports, fetchDoctorPatients } = useStore();
 
   const [currentReport, setCurrentReport] = useState<any>(null);
   const [patientHistoryReports, setPatientHistoryReports] = useState<any[]>([]);
@@ -109,22 +150,12 @@ export const DoctorReportDetail: React.FC = () => {
     const repName = rep.name || 'Complete Blood Count (CBC)';
     const lab = rep.labName || 'Diagnostic Laboratory';
 
-    // Set initial draft text if doctorSummary exists, or default reassuring note
-    if (rep.doctorSummary?.text) {
-      setEnglishMessage(rep.doctorSummary.text);
-    } else {
-      setEnglishMessage(
-        `Hello ${patName.split(' ')[0]}, I have reviewed your ${repName} from ${lab}. Your vital blood cell counts are noted. Please maintain good hydration and rest. Scheduled follow-up repeat test is recommended on ${nextTestDate}.`
-      );
-    }
-
-    if (rep.doctorSummary?.hindiText) {
-      setHindiMessage(rep.doctorSummary.hindiText);
-    } else {
-      setHindiMessage(
-        `नमस्ते ${patName.split(' ')[0]}, मैंने आपकी ${repName} रिपोर्ट की समीक्षा की है। कृपया पर्याप्त पानी पिएं और आराम करें। अगली जाँच ${nextTestDate} को कराने की सलाह दी जाती है।`
-      );
-    }
+    // Start from the approved summary if there is one; otherwise a neutral, data-only draft.
+    const initial = buildDraft('plain', rep, patName.split(' ')[0], nextTestDate);
+    setEnglishMessage(rep.doctorSummary?.text || initial.en);
+    setHindiMessage(rep.doctorSummary?.hindiText || initial.hi);
+    void repName;
+    void lab;
   };
 
   const patient = patients.find(p => p.id === currentReport?.patientId) || {
@@ -139,34 +170,13 @@ export const DoctorReportDetail: React.FC = () => {
   // Tone changer
   const handleToneChange = (tone: 'plain' | 'clinical' | 'urgent') => {
     setMessageTone(tone);
-    const patFirst = patient.name.split(' ')[0] || 'Patient';
-    const repName = currentReport?.name || 'CBC report';
-
-    if (tone === 'plain') {
-      setEnglishMessage(
-        `Hello ${patFirst}, I have reviewed your ${repName}. Parameters are being monitored closely. Continue plenty of fluids and rest. Please repeat CBC on ${nextTestDate}.`
-      );
-      setHindiMessage(
-        `नमस्ते ${patFirst}, मैंने आपकी ${repName} रिपोर्ट देखी है। आपके रक्त मानकों पर नजर रखी जा रही है। भरपूर तरल पदार्थ और आराम लें। कृपया ${nextTestDate} को दोबारा जांच कराएं।`
-      );
-    } else if (tone === 'clinical') {
-      setEnglishMessage(
-        `Clinical Review: ${repName} evaluated. Cell line counts show dynamic changes requiring ongoing clinical observation. Supportive therapy advised. Follow-up CBC scheduled for ${nextTestDate}.`
-      );
-      setHindiMessage(
-        `चिकित्सीय समीक्षा: ${repName} की जांच की गई। रक्त कणिकाओं में बदलाव देखे गए हैं। आवश्यक दवाएं जारी रखें और ${nextTestDate} को पुनः सीबीसी कराएं।`
-      );
-    } else {
-      setEnglishMessage(
-        `Important alert for ${patFirst}: Certain readings in your ${repName} require close monitoring. Watch for spontaneous bleeding, bruising, or fever. Urgent repeat test scheduled for ${nextTestDate}.`
-      );
-      setHindiMessage(
-        `महत्वपूर्ण सूचना: आपकी ${repName} में कुछ पैरामीटर सामान्य सीमा से बाहर हैं। रक्तस्राव या तेज बुखार के लक्षणों पर ध्यान दें और ${nextTestDate} को तुरंत दोबारा जांच कराएं।`
-      );
-    }
+    if (!currentReport) return;
+    const d = buildDraft(tone, currentReport, patient.name.split(' ')[0] || 'there', nextTestDate);
+    setEnglishMessage(d.en);
+    setHindiMessage(d.hi);
   };
 
-  // Generate AI Draft using Gemini / ML Service
+  // Generate an AI draft (backend AI provider / ML service). The doctor always reviews before sending.
   const handleGenerateAiDraft = async () => {
     if (!currentReport) return;
     try {
@@ -223,23 +233,13 @@ export const DoctorReportDetail: React.FC = () => {
         urgent: 'Brief',
       };
 
-      await reportsApi.reviewReport(repId, {
+      await markReportReviewed(repId, {
         text: englishMessage,
-        summaryText: englishMessage,
         hindiText: hindiMessage,
         tone: toneMap[messageTone] || 'Plain language',
+        approvedAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        doctorName: doctorInfo.name || 'Your doctor',
         nextTestDate: includeReminder ? nextTestDate : undefined,
-        medicinesStatus: 'No change',
-        sentVia: ['App', 'SMS'],
-      });
-
-      markReportReviewed(repId, {
-        text: englishMessage,
-        hindiText: hindiMessage,
-        tone: 'Plain language',
-        approvedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        doctorName: 'Dr. Priya Mehta',
-        nextTestDate,
         medicinesStatus: 'No change',
         sentVia: ['App', 'SMS'],
       });
@@ -249,21 +249,8 @@ export const DoctorReportDetail: React.FC = () => {
       setTimeout(() => setShowApproveToast(false), 4000);
     } catch (err: any) {
       console.error('Error approving report:', err);
-      // Fallback local update
-      const repId = currentReport.id || currentReport._id;
-      markReportReviewed(repId, {
-        text: englishMessage,
-        hindiText: hindiMessage,
-        tone: 'Plain language',
-        approvedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        doctorName: 'Dr. Priya Mehta',
-        nextTestDate,
-        medicinesStatus: 'No change',
-        sentVia: ['App', 'SMS'],
-      });
-      setIsApproved(true);
-      setShowApproveToast(true);
-      setTimeout(() => setShowApproveToast(false), 4000);
+      // Do not pretend it was sent: the patient has not received anything.
+      notify(err?.message ? `Could not send to patient: ${err.message}` : 'Could not send to patient. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -290,7 +277,7 @@ export const DoctorReportDetail: React.FC = () => {
   }
 
   const aiOverview = currentReport.aiOverview || {
-    summary: `${currentReport.name} from ${currentReport.labName}. Contains ${currentReport.parameters?.length || 0} extracted parameters evaluated against standard biological reference intervals.`,
+    summary: `No AI overview has been generated for this report yet. ${currentReport.parameters?.length || 0} values were read from the ${currentReport.labName || 'lab'} report; values outside the lab's range are listed below. Use Re-analyze to request an overview.`,
     keyFindings: (currentReport.parameters || [])
       .filter((p: any) => p.status !== 'Normal')
       .map((p: any) => ({
@@ -300,10 +287,8 @@ export const DoctorReportDetail: React.FC = () => {
         tag: p.status,
         changeText: `${p.status} reading outside biological reference range`,
       })),
-    pointsToConsider: [
-      'Correlate abnormal readings with patient hydration and clinical symptoms.',
-      'Schedule a follow-up Complete Blood Count within 3-4 days.',
-    ],
+    // No AI overview from the backend yet: show only facts from the report, no invented guidance.
+    pointsToConsider: [],
   };
 
   const isCritical = currentReport.status === 'Critical';
@@ -316,7 +301,7 @@ export const DoctorReportDetail: React.FC = () => {
           <CheckCircle className="w-5 h-5 text-accent-teal" />
           <div>
             <p className="font-semibold text-sm">Report approved & message dispatched!</p>
-            <p className="text-xs text-forest-200">{patient.name} received notification via WhatsApp and Patient App.</p>
+            <p className="text-xs text-forest-200">{patient.name} received the summary in the Patient App and by SMS.</p>
           </div>
         </div>
       )}
@@ -339,13 +324,13 @@ export const DoctorReportDetail: React.FC = () => {
             </div>
 
             <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 text-xs text-slate-800 space-y-2">
-              <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">SMS / WhatsApp Draft (English)</span>
+              <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">SMS draft (English)</span>
               <p className="whitespace-pre-wrap leading-relaxed">{englishMessage}</p>
             </div>
 
             {hindiMessage && (
               <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4 text-xs text-slate-800 space-y-2">
-                <span className="text-[10px] uppercase font-bold text-amber-800 tracking-wider">WhatsApp Draft (हिंदी)</span>
+                <span className="text-[10px] uppercase font-bold text-amber-800 tracking-wider">SMS draft (हिंदी)</span>
                 <p className="whitespace-pre-wrap leading-relaxed font-sans">{hindiMessage}</p>
               </div>
             )}
@@ -399,7 +384,7 @@ export const DoctorReportDetail: React.FC = () => {
 
         <div className="flex items-center gap-2.5 flex-wrap">
           <button 
-            onClick={() => alert(`Original authentic lab report: ${currentReport.name}.pdf`)}
+            onClick={() => notify('Viewing the original uploaded file is not connected to the backend yet.', 'info')}
             className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-colors shadow-2xs"
           >
             <Download className="w-4 h-4 text-slate-500" /> Original Lab Document
@@ -462,7 +447,7 @@ export const DoctorReportDetail: React.FC = () => {
                   <span>{isRefreshingAiOverview ? 'Analyzing...' : 'Re-analyze'}</span>
                 </button>
                 <span className="text-[11px] text-[#147970] font-medium hidden sm:inline">
-                  · Verified against ICMR Reference Limits
+                  · Ranges from the lab report
                 </span>
               </div>
             </div>
@@ -619,7 +604,7 @@ export const DoctorReportDetail: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 font-serif">Patient Communication Composer</h3>
-                <p className="text-xs text-slate-500">Draft clinician advice to send to {patient.name} via WhatsApp & Patient App</p>
+                <p className="text-xs text-slate-500">Draft clinician advice to send to {patient.name} in the Patient App and by SMS</p>
               </div>
 
               {/* Action Buttons: Gemini Draft + Tone Switcher */}
@@ -629,10 +614,10 @@ export const DoctorReportDetail: React.FC = () => {
                   onClick={handleGenerateAiDraft}
                   disabled={isGeneratingAiDraft}
                   className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold transition-all"
-                  title="Generate bilingual AI clinical summary using Gemini/ML module"
+                  title="Generate a bilingual draft with the AI assistant. You review and edit before sending."
                 >
                   {isGeneratingAiDraft ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" /> : <Sparkles className="w-3.5 h-3.5 text-emerald-600" />}
-                  <span>{isGeneratingAiDraft ? 'Drafting...' : 'Gemini AI Draft'}</span>
+                  <span>{isGeneratingAiDraft ? 'Drafting...' : 'AI draft'}</span>
                 </button>
 
                 <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-medium">
@@ -704,7 +689,7 @@ export const DoctorReportDetail: React.FC = () => {
               </div>
 
               <span className="text-[11px] text-slate-400">
-                {messageLang === 'en' ? 'Dispatched as SMS & In-App' : 'Dispatched as WhatsApp (हिंदी)'}
+                {messageLang === 'en' ? 'Sent in the app and by SMS' : 'Sent in the app and by SMS (हिंदी)'}
               </span>
             </div>
 
@@ -772,7 +757,7 @@ export const DoctorReportDetail: React.FC = () => {
             <div className="flex items-center justify-between pt-2 border-t border-slate-100 flex-wrap gap-2">
               <button 
                 type="button" 
-                onClick={() => alert("Draft saved locally for this clinical session.")}
+                onClick={() => notify('Draft kept on this screen. Saving drafts to the server is not supported yet.', 'info')}
                 className="text-xs font-semibold text-slate-600 hover:text-slate-900"
               >
                 Save as draft
@@ -784,7 +769,7 @@ export const DoctorReportDetail: React.FC = () => {
                   onClick={() => setShowPreviewModal(true)}
                   className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors"
                 >
-                  <Eye className="w-3.5 h-3.5 text-slate-500" /> Preview SMS / WhatsApp
+                  <Eye className="w-3.5 h-3.5 text-slate-500" /> Preview as patient
                 </button>
                 <button 
                   type="button"

@@ -8,6 +8,9 @@ import {
 } from 'lucide-react';
 import { LabParameter, LabReport } from '../../types';
 import { analyzeReport, ReportAnalysisResult } from '../../api';
+import { formatDate } from '../../utils/format';
+import { notify } from '../../components/ui/Toast';
+import { isDemoMode } from '../../demo/flags';
 
 type StepNumber = 1 | 2 | 3 | 4;
 
@@ -80,10 +83,19 @@ export const PatientUploadReport: React.FC = () => {
     setReadingFinished(false);
     setValuesReadCount(0);
 
-    // Call API function
-    const result: ReportAnalysisResult = await analyzeReport(fileObj);
+    let result: ReportAnalysisResult;
+    try {
+      result = await analyzeReport(fileObj);
+    } catch (err: any) {
+      setIsAnalyzing(false);
+      setCurrentStep(1);
+      setUploadedFile(null);
+      notify(err?.message || "We couldn't read this file. Please try again.", 'error');
+      return;
+    }
 
     setIsAnalyzing(false);
+    if (result.reportId) setUploadedReportId(result.reportId);
 
     if (!result.recognized) {
       setIsRecognized(false);
@@ -97,7 +109,7 @@ export const PatientUploadReport: React.FC = () => {
     }
     setDetectedReportType(result.reportType);
     setDetectedCategory(result.category);
-    setDetectedLab(`${result.labName} · Collected ${result.collectionDate}`);
+    setDetectedLab(`${result.labName} · Collected ${formatDate(result.collectionDate)}`);
     setLabName(result.labName);
     setTestDate(new Date().toISOString().split('T')[0]);
     setParams(result.parameters);
@@ -178,9 +190,9 @@ export const PatientUploadReport: React.FC = () => {
         category: 'CBC',
         labName: 'Diagnostic Laboratory',
         parameters: [
-          { id: 'p-1', name: 'Hemoglobin', value: '13.5', unit: 'g/dL', referenceRange: '13.0 - 17.0', status: 'Normal' },
-          { id: 'p-2', name: 'Platelet Count', value: '250000', unit: '/µL', referenceRange: '150,000 - 450,000', status: 'Normal' },
-          { id: 'p-3', name: 'Total WBC Count', value: '7500', unit: '/µL', referenceRange: '4,000 - 11,000', status: 'Normal' },
+          { id: 'p-1', name: 'Hemoglobin', value: '', unit: 'g/dL', referenceRange: '13.0 - 17.0', status: 'Normal' },
+          { id: 'p-2', name: 'Platelet Count', value: '', unit: '/µL', referenceRange: '150,000 - 450,000', status: 'Normal' },
+          { id: 'p-3', name: 'Total WBC Count', value: '', unit: '/µL', referenceRange: '4,000 - 11,000', status: 'Normal' },
         ],
       },
       HbA1c: {
@@ -188,7 +200,7 @@ export const PatientUploadReport: React.FC = () => {
         category: 'HbA1c',
         labName: 'Diagnostic Laboratory',
         parameters: [
-          { id: 'p-1', name: 'HbA1c', value: '5.6', unit: '%', referenceRange: '< 5.7', status: 'Normal' },
+          { id: 'p-1', name: 'HbA1c', value: '', unit: '%', referenceRange: '< 5.7', status: 'Normal' },
         ],
       },
       Lipid: {
@@ -196,7 +208,7 @@ export const PatientUploadReport: React.FC = () => {
         category: 'Lipid',
         labName: 'Diagnostic Laboratory',
         parameters: [
-          { id: 'p-1', name: 'Total Cholesterol', value: '180', unit: 'mg/dL', referenceRange: '< 200', status: 'Normal' },
+          { id: 'p-1', name: 'Total Cholesterol', value: '', unit: 'mg/dL', referenceRange: '< 200', status: 'Normal' },
         ],
       },
       LFT: {
@@ -204,7 +216,7 @@ export const PatientUploadReport: React.FC = () => {
         category: 'LFT',
         labName: 'Diagnostic Laboratory',
         parameters: [
-          { id: 'p-1', name: 'SGPT / ALT', value: '28', unit: 'U/L', referenceRange: '< 41', status: 'Normal' },
+          { id: 'p-1', name: 'SGPT / ALT', value: '', unit: 'U/L', referenceRange: '< 41', status: 'Normal' },
         ],
       },
       KFT: {
@@ -212,7 +224,7 @@ export const PatientUploadReport: React.FC = () => {
         category: 'KFT',
         labName: 'Diagnostic Laboratory',
         parameters: [
-          { id: 'p-1', name: 'Serum Creatinine', value: '0.9', unit: 'mg/dL', referenceRange: '0.7 - 1.3', status: 'Normal' },
+          { id: 'p-1', name: 'Serum Creatinine', value: '', unit: 'mg/dL', referenceRange: '0.7 - 1.3', status: 'Normal' },
         ],
       },
     };
@@ -220,8 +232,8 @@ export const PatientUploadReport: React.FC = () => {
     setIsRecognized(true);
     setDetectedReportType(dataset.reportType);
     setDetectedCategory(dataset.category);
-    setDetectedLab(`${dataset.labName} · Collected ${new Date().toLocaleDateString('en-GB')}`);
-    setLabName(dataset.labName);
+    setDetectedLab('Type each value exactly as printed on your report');
+    setLabName('');
     setParams(dataset.parameters);
     setTotalValuesCount(dataset.parameters.length);
     setIsChangeModalOpen(false);
@@ -275,6 +287,15 @@ export const PatientUploadReport: React.FC = () => {
 
   // Final confirmation and transmission to doctor
   const handleConfirmAndSend = async () => {
+    const missing = params.filter((p) => !p.name?.toString().trim() || String(p.value ?? '').trim() === '' || Number.isNaN(parseFloat(String(p.value).replace(/,/g, ''))));
+    if (missing.length) {
+      notify(`Please enter a number for ${missing.length === 1 ? 'one value' : `${missing.length} values`} before sending.`, 'warning');
+      return;
+    }
+    if (!uploadedReportId) {
+      notify('This report has not been uploaded yet, so it cannot be sent. Please upload the file again.', 'error');
+      return;
+    }
     setIsSubmitting(true);
     // Calculate clinical statuses behind the scenes for physician triage dashboard
     const computedParams = params.map(p => {
@@ -303,51 +324,24 @@ export const PatientUploadReport: React.FC = () => {
     const hasUnbalanced = computedParams.some(p => p.status === 'Low' || p.status === 'High');
 
     try {
-      if (uploadedReportId) {
-        const { reportsApi } = await import('../../api/client');
-        await reportsApi.confirmReport(uploadedReportId, {
-          name: detectedReportType,
-          category: detectedCategory,
-          labName,
-          collectionDate: testDate,
-          parameters: computedParams,
-        });
-      }
-      await fetchReports();
-    } catch (err) {
-      console.warn('Confirm report sync note:', err);
-    } finally {
+      const { reportsApi } = await import('../../api/client');
+      await reportsApi.confirmReport(uploadedReportId, {
+        name: detectedReportType,
+        category: detectedCategory,
+        labName,
+        collectionDate: testDate,
+        parameters: computedParams,
+      });
+    } catch (err: any) {
+      // Stay on this step: nothing has reached the doctor.
+      notify(err?.message ? `Could not send to your doctor: ${err.message}` : 'Could not send to your doctor. Please try again.', 'error');
       setIsSubmitting(false);
+      return;
     }
-
-    const newReport: LabReport = {
-      id: uploadedReportId || `rep-${Date.now()}`,
-      name: detectedReportType,
-      category: detectedCategory,
-      patientId: currentPatient.id,
-      patientName: currentPatient.name,
-      patientAvatar: currentPatient.avatar,
-      labName,
-      collectionDate: testDate,
-      reportedDate: testDate,
-      status: hasCritical ? 'Critical' : hasUnbalanced ? 'Unbalanced' : 'Normal',
-      reviewed: false,
-      parameters: computedParams,
-      aiOverview: {
-        summary: `${detectedReportType} processed. Patient verified all values from source paper report. Parameters synchronized with ${connectedDoctorName}'s clinician triage portal.`,
-        pointsToConsider: ['Parameters extracted and verified against paper report.'],
-        keyFindings: computedParams.filter(p => p.status !== 'Normal').map(p => ({
-          parameter: p.name,
-          value: `${p.value}`,
-          unit: p.unit,
-          tag: p.status,
-          changeText: 'Initial baseline'
-        })),
-        generatedAt: 'Just now'
-      }
-    };
-
-    addReport(newReport);
+    await fetchReports().catch(() => {});
+    setIsSubmitting(false);
+    void hasCritical;
+    void hasUnbalanced;
     setCurrentStep(4);
   };
 
@@ -512,10 +506,11 @@ export const PatientUploadReport: React.FC = () => {
               </button>
             </div>
 
-            {/* Quick Test with Verified Sample CBC Reports */}
+            {/* Sample files: developer and demo builds only */}
+            {(import.meta.env.DEV || isDemoMode) && (
             <div className="mt-8 pt-6 border-t border-stone-200/60 w-full max-w-md">
               <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block mb-3">
-                Or test live ML extraction with sample CBC reports:
+                Developer samples (synthetic):
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
@@ -547,6 +542,7 @@ export const PatientUploadReport: React.FC = () => {
                 </button>
               </div>
             </div>
+            )}
 
           </div>
         </div>

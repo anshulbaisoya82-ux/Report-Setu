@@ -105,7 +105,7 @@ export const PatientAskDoctor: React.FC = () => {
           {
             id: 'welcome-msg',
             sender: 'assistant',
-            text: `Hello! I am your ReportSetu AI Medical Assistant powered by Gemini. You are connected with ${docName}. You can ask questions about your verified lab reports, upcoming appointment timings, or daily medicine schedule.`,
+            text: `Hello! I'm the ReportSetu assistant. I can explain what's in your doctor-approved reports, but I never suggest medicines or treatment. You are connected with ${docName}. You can ask questions about your verified lab reports, upcoming appointment timings, or daily medicine schedule.`,
             timestamp: 'Just now',
           },
         ]);
@@ -424,7 +424,7 @@ export const PatientAskDoctor: React.FC = () => {
                 <Sparkles className="w-4 h-4 text-[#0A887D] animate-spin" />
               </div>
               <div className="bg-white/90 border border-slate-200/80 rounded-2xl rounded-tl-xs px-4 py-2.5 text-xs text-slate-500 italic flex items-center gap-2 shadow-2xs animate-pulse">
-                <span>Analyzing verified clinical records with Gemini...</span>
+                <span>Checking your approved reports…</span>
               </div>
             </div>
           )}

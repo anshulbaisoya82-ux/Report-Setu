@@ -1,156 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Home,
-  FileText,
-  UploadCloud,
-  Pill,
-  Calendar,
-  MessageSquare,
-  Settings,
-  ShieldCheck,
-  LogOut,
-  UserCheck,
-  User,
-} from 'lucide-react';
-import { Logo } from '../common/Logo';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Home, FileText, UploadCloud, Pill, Calendar, MessageSquare, UserCheck, User } from 'lucide-react';
+import { AppShell, NavItem } from './AppShell';
 import { connectionsApi } from '../../api';
 
-import { useStore } from '../../store/useStore';
-
 export const PatientLayout: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { logout } = useStore();
-  const [pendingCount, setPendingCount] = useState<number>(0);
+  const { pathname } = useLocation();
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     connectionsApi
       .getPendingRequests()
-      .then((res) => {
-        setPendingCount(res?.requests?.length || 0);
-      })
+      .then((res) => setPendingCount(res?.requests?.length || 0))
       .catch(() => {});
-  }, [location.pathname]);
+  }, [pathname]);
 
-  const navItems = [
-    { name: 'Home', path: '/patient', icon: Home, exact: true },
-    { name: 'My reports', path: '/patient/reports', icon: FileText },
-    { name: 'Upload report', path: '/patient/upload', icon: UploadCloud },
-    { name: 'Medicines', path: '/patient/medicines', icon: Pill },
+  // Figma order, plus "My doctors" and "My profile" which exist in code and backend.
+  const items: NavItem[] = [
+    { name: 'Home', path: '/patient', icon: Home, exact: true, primary: true },
+    { name: 'My reports', path: '/patient/reports', icon: FileText, primary: true },
+    { name: 'Upload report', path: '/patient/upload', icon: UploadCloud, primary: true },
+    { name: 'Medicines', path: '/patient/medicines', icon: Pill, primary: true },
     { name: 'Appointments', path: '/patient/appointments', icon: Calendar },
-    { name: 'Ask doctor', path: '/patient/ask-doctor', icon: MessageSquare },
-    {
-      name: 'My Doctors',
-      path: '/patient/doctors',
-      icon: UserCheck,
-      badge: pendingCount > 0 ? pendingCount : undefined,
-    },
-    { name: 'My Profile', path: '/patient/profile', icon: User },
+    { name: 'Ask doctor', path: '/patient/ask-doctor', icon: MessageSquare, primary: true },
+    { name: 'My doctors', path: '/patient/doctors', icon: UserCheck, badge: pendingCount || undefined },
+    { name: 'My profile', path: '/patient/profile', icon: User },
   ];
 
   return (
-    <div className="min-h-screen bg-[#ECF2ED] flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#1E3F35] text-white flex flex-col justify-between p-6 flex-shrink-0 min-h-screen sticky top-0 h-screen overflow-y-auto">
-        <div className="space-y-8">
-          {/* Logo */}
-          <div className="pt-2">
-            <Logo size="md" />
-          </div>
-
-          {/* Navigation Links */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-white/50 tracking-wider uppercase px-3">
-              MENU
-            </p>
-            <nav className="space-y-1.5">
-              {navItems.map((item) => {
-                const isActive = item.exact
-                  ? location.pathname === item.path
-                  : location.pathname.startsWith(item.path);
-                const Icon = item.icon;
-
-                return (
-                  <NavLink
-                    key={item.name}
-                    to={item.path}
-                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-white text-[#1E3F35] shadow-sm font-semibold'
-                        : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#1E3F35]' : 'text-white/70'}`} />
-                      <span>{item.name}</span>
-                    </div>
-                    {item.badge ? (
-                      <span className="w-5 h-5 rounded-full bg-[#B53629] text-white text-[10px] font-bold flex items-center justify-center">
-                        {item.badge}
-                      </span>
-                    ) : null}
-                  </NavLink>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="space-y-4 pt-6">
-          {/* Trust Badge */}
-          <div className="bg-black/15 border border-white/10 rounded-2xl p-3.5 text-xs text-white/80">
-            <div className="flex items-center gap-2 font-medium text-white mb-1">
-              <ShieldCheck className="w-4 h-4 text-[#52B788]" />
-              <span>Private by design</span>
-            </div>
-            <p className="text-[11px] text-white/60 leading-relaxed">
-              Your reports are visible only to you and the doctors you connect.
-            </p>
-          </div>
-
-          {/* Settings */}
-          <NavLink
-            to="/patient/settings"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                isActive
-                  ? 'bg-white text-[#1E3F35] font-semibold'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
-              }`
-            }
-          >
-            <Settings className="w-4 h-4 text-white/70" />
-            <span>Settings</span>
-          </NavLink>
-
-          {/* Log Out */}
-          <button
-            onClick={async () => {
-              await logout();
-              navigate('/login');
-            }}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:text-red-300 hover:bg-white/10 transition-all text-left cursor-pointer"
-          >
-            <LogOut className="w-4 h-4 text-white/70" />
-            <span>Log out</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {location.pathname.startsWith('/patient/ask-doctor') ? (
-          <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
-            <Outlet />
-          </div>
-        ) : (
-          <div className="p-8 max-w-[1400px] w-full mx-auto flex-1 overflow-y-auto">
-            <Outlet />
-          </div>
-        )}
-      </main>
-    </div>
+    <AppShell
+      items={items}
+      settingsPath="/patient/settings"
+      privacyNote="Your reports are visible only to you and the doctors you connect."
+      fullBleed={(p) => p.startsWith('/patient/ask-doctor')}
+    />
   );
 };

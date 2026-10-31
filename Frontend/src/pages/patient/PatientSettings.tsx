@@ -103,10 +103,10 @@ export const PatientSettings: React.FC = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-forest-700" />
-              <h3 className="text-sm font-bold text-slate-900 font-serif">Universal Setu Health ID</h3>
+              <h3 className="text-sm font-bold text-slate-900 font-serif">Your ReportSetu ID</h3>
             </div>
             <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">
-              ABDM Compliant
+              Share only with your doctor
             </span>
           </div>
 
@@ -272,14 +272,15 @@ export const PatientSettings: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
+          <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 opacity-60 cursor-not-allowed">
             <div>
-              <span className="text-xs font-bold text-slate-900 block">WhatsApp Report & Prescription Updates</span>
-              <span className="text-[11px] text-slate-500">Receive verified PDF reports and doctor summaries directly on WhatsApp</span>
+              <span className="text-xs font-bold text-slate-900 block">WhatsApp updates <span className="font-medium text-slate-500">· not available yet</span></span>
+              <span className="text-[11px] text-slate-500">Doctor summaries are delivered in the app and by SMS today</span>
             </div>
             <input
               type="checkbox"
-              checked={waAlerts}
+              disabled
+              checked={false && waAlerts}
               onChange={(e) => setWaAlerts(e.target.checked)}
               className="w-4 h-4 text-forest-700 rounded focus:ring-forest-600"
             />

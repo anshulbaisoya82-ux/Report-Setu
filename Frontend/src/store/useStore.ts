@@ -112,7 +112,24 @@ export const useStore = create<AppState>((set, get) => ({
   currentRole: savedRole,
   setRole: (role) => set({ currentRole: role }),
   currentUser: savedUser,
-  setCurrentUser: (user) => set({ currentUser: user, isAuthenticated: !!user }),
+  setCurrentUser: (user) =>
+    set((state) => ({
+      currentUser: user,
+      isAuthenticated: !!user,
+      // Keep the doctor header in sync after login (it was only read once at startup).
+      doctorInfo:
+        state.currentRole === 'doctor' && user
+          ? {
+              name: user.name || '',
+              specialty: user.specialty || '',
+              regNumber: user.registrationNumber || '',
+              council: user.medicalCouncil || '',
+              clinic: user.clinic?.name || '',
+              email: user.email || '',
+              phone: user.phone || '',
+            }
+          : state.doctorInfo,
+    })),
   isAuthenticated: hasToken,
   isLoading: false,
   error: null,
@@ -185,18 +202,15 @@ export const useStore = create<AppState>((set, get) => ({
       reports: state.reports.map((r) => (r.id === reportId ? { ...r, ...updates } : r)),
     })),
   markReportReviewed: async (reportId, summary) => {
-    try {
-      await reportsApi.reviewReport(reportId, {
-        summaryText: summary.text,
-        hindiText: summary.hindiText,
-        tone: summary.tone,
-        nextTestDate: summary.nextTestDate,
-        medicinesStatus: summary.medicinesStatus,
-        sentVia: summary.sentVia as string[],
-      });
-    } catch (err) {
-      console.warn('Backend review sync note:', err);
-    }
+    // Errors propagate: a report must never look "sent to patient" if the server rejected it.
+    await reportsApi.reviewReport(reportId, {
+      summaryText: summary.text,
+      hindiText: summary.hindiText,
+      tone: summary.tone,
+      nextTestDate: summary.nextTestDate,
+      medicinesStatus: summary.medicinesStatus,
+      sentVia: summary.sentVia as string[],
+    });
 
     set((state) => ({
       reports: state.reports.map((r) =>
@@ -253,11 +267,8 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
   toggleMedicineSchedule: async (id, newState) => {
-    try {
-      await medicationsApi.recordDoseAction(id, newState);
-    } catch (err) {
-      console.warn('Backend medicine adherence sync note:', err);
-    }
+    // Errors propagate so the UI never shows a dose as taken when it wasn't saved.
+    await medicationsApi.recordDoseAction(id, newState);
 
     set((state) => ({
       medicineSchedule: state.medicineSchedule.map((item) =>

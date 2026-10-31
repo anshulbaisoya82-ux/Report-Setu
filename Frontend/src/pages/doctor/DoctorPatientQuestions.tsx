@@ -6,6 +6,7 @@ import {
   Sparkles, Phone, User, Check, Search, PauseCircle, Stethoscope
 } from 'lucide-react';
 import { doctorApi } from '../../api';
+import { notify } from '../../components/ui/Toast';
 
 export const DoctorPatientQuestions: React.FC = () => {
   const { questionThreads, fetchQuestionThreads, sendDoctorReply, currentUser } = useStore();
@@ -61,7 +62,7 @@ export const DoctorPatientQuestions: React.FC = () => {
       setTimeout(() => setToastInfo(null), 3500);
     } catch (err: any) {
       console.error('Error sending reply:', err);
-      alert(err.message || 'Failed to send reply');
+      notify(err.message || 'Failed to send reply', 'error');
     }
   };
 
@@ -80,7 +81,7 @@ export const DoctorPatientQuestions: React.FC = () => {
       setTimeout(() => setToastInfo(null), 4000);
     } catch (err: any) {
       console.error('Error toggling AI state:', err);
-      alert(err.message || 'Failed to toggle AI');
+      notify(err.message || 'Failed to toggle AI', 'error');
     } finally {
       setIsTogglingAi(false);
     }
@@ -279,7 +280,7 @@ export const DoctorPatientQuestions: React.FC = () => {
                       onClick={() => handleToggleAi('resume')}
                       disabled={isTogglingAi}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-300 rounded-xl hover:bg-emerald-100 transition-colors shadow-2xs cursor-pointer"
-                      title="Re-enable Gemini clinical assistant for this patient"
+                      title="Turn the AI assistant back on for this patient"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                       <span>{isTogglingAi ? 'Updating...' : 'Resume AI Assistant'}</span>

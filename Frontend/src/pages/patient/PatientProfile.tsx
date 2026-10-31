@@ -47,8 +47,9 @@ export const PatientProfile: React.FC = () => {
       try {
         setLoading(true);
         const res = await patientProfileApi.get();
-        if (res && res.data && isMounted) {
-          const p = res.data;
+        // apiFetch already unwraps the { data } envelope; accept either shape.
+        const p = (res as any)?.data ?? res;
+        if (p && p.rsId !== undefined && isMounted) {
           setFormData({
             name: p.name || '',
             rsId: p.rsId || '',
@@ -216,7 +217,7 @@ export const PatientProfile: React.FC = () => {
         <div className="h-28 bg-gradient-to-r from-[#17382E] via-[#1E3F35] to-[#2B5749] relative px-6 sm:px-8 flex items-end">
           <div className="absolute top-4 right-6 flex items-center gap-2">
             <span className="bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-accent-teal" /> ABDM Compliant
+              <ShieldCheck className="w-3.5 h-3.5 text-accent-teal" /> Private by design
             </span>
           </div>
         </div>
@@ -333,7 +334,7 @@ export const PatientProfile: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Universal Health ID (ABDM)</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">ReportSetu ID (RS ID)</label>
                 <input
                   type="text"
                   value={formData.rsId}

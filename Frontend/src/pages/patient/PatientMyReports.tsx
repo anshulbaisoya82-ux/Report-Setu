@@ -4,6 +4,7 @@ import { useStore } from '../../store/useStore';
 import { 
   FileText, Volume2, ArrowUpRight, Check, Info, ChevronDown
 } from 'lucide-react';
+import { formatDate } from '../../utils/format';
 
 export const PatientMyReports: React.FC = () => {
   const { reports, currentUser, fetchReports } = useStore();
@@ -146,7 +147,7 @@ export const PatientMyReports: React.FC = () => {
                   {report.name}
                 </h4>
                 <p className="text-[11px] text-[#5F736C]">
-                  Collected {report.collectionDate} · {report.labName}
+                  Collected {formatDate(report.collectionDate)} · {report.labName}
                 </p>
               </div>
             </div>

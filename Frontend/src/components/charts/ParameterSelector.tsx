@@ -1,5 +1,5 @@
 import React from 'react';
-import { BIOMARKER_CATALOG } from './clinicalDataTransformer';
+import { BIOMARKER_CATALOG, matchesBiomarker } from './clinicalDataTransformer';
 import { LabReport } from '../../types';
 
 interface ParameterSelectorProps {
@@ -23,10 +23,7 @@ export const ParameterSelector: React.FC<ParameterSelectorProps> = ({
     // Check if at least one report has a parameter matching this biomarker
     if (reports.length === 0) return true;
     return reports.some((rep) =>
-      rep.parameters?.some((p) => {
-        const name = (p.name || '').toLowerCase();
-        return bio.aliases.some((alias) => name.includes(alias) || alias.includes(name));
-      })
+      rep.parameters?.some((p) => matchesBiomarker(p.name || '', bio))
     );
   });
 
@@ -44,11 +41,12 @@ export const ParameterSelector: React.FC<ParameterSelectorProps> = ({
         let latestValue: string | undefined = undefined;
         let latestStatus: string | undefined = undefined;
 
-        for (let i = reports.length - 1; i >= 0; i--) {
-          const p = reports[i].parameters?.find((param) => {
-            const name = (param.name || '').toLowerCase();
-            return bio.aliases.some((alias) => name.includes(alias) || alias.includes(name));
-          });
+        // Newest first, whatever order the reports arrived in.
+        const newestFirst = [...reports].sort(
+          (a, b) => new Date(b.collectionDate || b.reportedDate || 0).getTime() - new Date(a.collectionDate || a.reportedDate || 0).getTime()
+        );
+        for (let i = 0; i < newestFirst.length; i++) {
+          const p = newestFirst[i].parameters?.find((param) => matchesBiomarker(param.name || '', bio));
           if (p) {
             latestValue = typeof p.value === 'number' && p.value > 1000 
               ? p.value.toLocaleString('en-IN') 

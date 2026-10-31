@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   Check,
 } from 'lucide-react';
+import { formatDate } from '../../utils/format';
 
 interface ReportDisplayItem {
   id: string;
@@ -43,7 +44,7 @@ export const DoctorReports: React.FC = () => {
   const displayReports: ReportDisplayItem[] = reports.map((r: any) => ({
     id: r.id || r._id,
     name: r.name || 'Lab Report',
-    uploadTime: `Uploaded ${r.reportedDate || r.collectionDate || 'recently'} · ${r.labName || 'Diagnostic Lab'}`,
+    uploadTime: `Collected ${formatDate(r.collectionDate || r.reportedDate) || 'recently'} · ${r.labName || 'Diagnostic Lab'}`,
     patientName: r.patientName || 'Patient',
     patientAvatar: r.patientAvatar || (r.patientName ? r.patientName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() : 'PT'),
     patientRsId: r.patientRsId || '',

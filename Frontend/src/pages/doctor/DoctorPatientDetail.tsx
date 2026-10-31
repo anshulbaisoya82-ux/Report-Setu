@@ -33,6 +33,7 @@ import {
   Search,
   CheckCircle,
 } from 'lucide-react';
+import { formatDate } from '../../utils/format';
 
 interface DoctorPatientDetailProps {
   initialTab?: 'Overview' | 'Lab Reports' | 'Appointments' | 'Medicines' | 'Notes';
@@ -612,7 +613,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                             </div>
 
                             <p className="text-xs text-stone-500 mt-1">
-                              <strong>Collected:</strong> {r.collectionDate || r.reportedDate || 'Recent'} ·{' '}
+                              <strong>Collected:</strong> {formatDate(r.collectionDate || r.reportedDate) || 'Recent'} ·{' '}
                               <strong>Reported:</strong> {r.reportedDate || 'Verified'} ·{' '}
                               <strong>Lab:</strong> {r.labName || 'Diagnostic Pathology Lab'}
                             </p>
@@ -1103,7 +1104,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <p className="text-xs font-semibold text-stone-500">Diagnostic Reports</p>
                 <h4 className="text-2xl font-extrabold text-[#172B25] mt-0.5">{chronologicalReports.length}</h4>
                 <p className="text-[11px] text-stone-400 mt-1">
-                  {latestReport ? `Latest: ${latestReport.collectionDate || latestReport.reportedDate}` : 'No reports yet'}
+                  {latestReport ? `Latest: ${formatDate(latestReport.collectionDate || latestReport.reportedDate)}` : 'No reports yet'}
                 </p>
               </div>
               <div className="w-11 h-11 rounded-xl bg-stone-100 text-[#1E3F35] flex items-center justify-center">
@@ -1153,7 +1154,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   <div>
                     <h3 className="text-lg font-bold text-[#172B25]">Latest Lab Report: {latestReport.name}</h3>
                     <p className="text-xs text-stone-500">
-                      Reported {latestReport.reportedDate} · {latestReport.labName}
+                      Reported {formatDate(latestReport.reportedDate)} · {latestReport.labName}
                     </p>
                   </div>
                   <button

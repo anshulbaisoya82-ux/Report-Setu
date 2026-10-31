@@ -14,7 +14,7 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', theme =
   return (
     <div className={`flex items-center gap-2.5 font-bold tracking-tight select-none ${className}`}>
       <div
-        className={`${iconSize} rounded-xl bg-[#52B788] flex items-center justify-center text-white shadow-sm flex-shrink-0`}
+        className={`${iconSize} rounded-xl bg-terracotta-500 flex items-center justify-center text-white shadow-sm flex-shrink-0`}
       >
         <svg
           viewBox="0 0 24 24"
