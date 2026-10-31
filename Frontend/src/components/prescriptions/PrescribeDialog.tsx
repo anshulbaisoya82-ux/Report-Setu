@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Plus, Trash2, X } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { notify } from '../ui/Toast';
+import { MedicineNameInput } from './MedicineNameInput';
 
 /** Reminder slots. Labels match what the backend turns into daily dose reminders. */
 const SLOTS = [
@@ -14,13 +15,6 @@ type Slot = (typeof SLOTS)[number]['key'];
 
 const FOOD = ['After food', 'Before food', 'With food', 'Empty stomach'] as const;
 type Food = (typeof FOOD)[number];
-
-/** Suggestions only — the doctor can type any medicine. */
-const COMMON_MEDICINES = [
-  'Metformin 500 mg', 'Metformin 1000 mg', 'Glimepiride 1 mg', 'Telmisartan 40 mg', 'Amlodipine 5 mg',
-  'Atorvastatin 10 mg', 'Rosuvastatin 10 mg', 'Pantoprazole 40 mg', 'Paracetamol 650 mg', 'Amoxicillin 500 mg',
-  'Vitamin D3 60,000 IU', 'Iron + Folic acid',
-];
 
 interface Med {
   id: number;
@@ -197,14 +191,9 @@ export const PrescribeDialog: React.FC<Props> = ({ open, onClose, patient }) => 
           <section>
             <h3 className="text-sm font-semibold text-ink">1. Medicines</h3>
             <p className="mb-3 text-sm text-stone-500">Name, how much each time, and for how many days.</p>
-            <datalist id="rx-medicines">
-              {COMMON_MEDICINES.map((m) => (
-                <option key={m} value={m} />
-              ))}
-            </datalist>
 
-            <div className="overflow-hidden rounded-xl border border-line">
-              <div className="hidden grid-cols-[minmax(0,1fr)_130px_110px_36px] gap-3 bg-stone-50 px-3 py-2 text-xs font-medium text-stone-500 sm:grid">
+            <div className="rounded-xl border border-line">
+              <div className="hidden grid-cols-[minmax(0,1fr)_130px_110px_36px] gap-3 rounded-t-xl bg-stone-50 px-3 py-2 text-xs font-medium text-stone-500 sm:grid">
                 <span>Medicine and strength</span>
                 <span>Dose</span>
                 <span>Course</span>
@@ -216,16 +205,13 @@ export const PrescribeDialog: React.FC<Props> = ({ open, onClose, patient }) => 
                   return (
                     <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_36px] gap-2 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_130px_110px_36px] sm:gap-3">
                       <div className="min-w-0">
-                        <input
+                        <MedicineNameInput
                           ref={i === meds.length - 1 ? lastNameRef : undefined}
                           id={`rx-name-${m.id}`}
-                          list="rx-medicines"
-                          autoComplete="off"
                           value={m.name}
-                          onChange={(e) => update(m.id, { name: e.target.value })}
-                          placeholder="e.g. Metformin 500 mg"
-                          aria-label={`Medicine ${i + 1} name and strength`}
-                          aria-invalid={(showErrors && p.name) || undefined}
+                          onChange={(v) => update(m.id, { name: v })}
+                          ariaLabel={`Medicine ${i + 1} name and strength`}
+                          invalid={showErrors && p.name}
                           className={`${input} ${showErrors && p.name ? 'border-red-400' : ''}`}
                         />
                         {showErrors && p.name && <span className="mt-1 block text-xs text-red-700">Enter the medicine name</span>}
@@ -266,7 +252,7 @@ export const PrescribeDialog: React.FC<Props> = ({ open, onClose, patient }) => 
                   focusLast.current = true;
                   setMeds((ms) => [...ms, blank(ms[ms.length - 1]?.slots, ms[ms.length - 1]?.food)]);
                 }}
-                className="flex w-full items-center gap-2 border-t border-line px-3 py-3 text-sm font-semibold text-forest-800 hover:bg-forest-50"
+                className="flex w-full items-center gap-2 rounded-b-xl border-t border-line px-3 py-3 text-sm font-semibold text-forest-800 hover:bg-forest-50"
               >
                 <Plus className="h-4 w-4" /> Add another medicine
               </button>
