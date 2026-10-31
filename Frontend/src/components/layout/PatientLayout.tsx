@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   LogOut,
   UserCheck,
+  User,
 } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { connectionsApi } from '../../api';
@@ -45,6 +46,7 @@ export const PatientLayout: React.FC = () => {
       icon: UserCheck,
       badge: pendingCount > 0 ? pendingCount : undefined,
     },
+    { name: 'My Profile', path: '/patient/profile', icon: User },
   ];
 
   return (

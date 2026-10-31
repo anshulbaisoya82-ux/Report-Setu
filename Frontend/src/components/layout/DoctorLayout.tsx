@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Bell,
   LogOut,
+  User,
 } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { useStore } from '../../store/useStore';
@@ -37,7 +38,7 @@ export const DoctorLayout: React.FC = () => {
       icon: MessageSquare,
       badge: totalUnreadQuestions,
     },
-    { name: 'Follow-ups', path: '/doctor/followups', icon: Clock },
+    { name: 'My Profile', path: '/doctor/profile', icon: User },
   ];
 
   return (

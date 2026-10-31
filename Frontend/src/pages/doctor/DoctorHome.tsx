@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import {
   Bell,
@@ -92,9 +92,13 @@ export const DoctorHome: React.FC = () => {
           </div>
 
           {/* Doctor Profile Avatar */}
-          <div className="w-10 h-10 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-semibold text-xs shadow-sm">
+          <Link
+            to="/doctor/profile"
+            className="w-10 h-10 rounded-full bg-[#1E3F35] hover:bg-[#162e26] text-white flex items-center justify-center font-semibold text-xs shadow-sm transition-transform hover:scale-105 active:scale-95"
+            title="View & Edit Doctor Profile"
+          >
             {doctorInitials}
-          </div>
+          </Link>
 
           {/* Add Patient CTA */}
           <button
