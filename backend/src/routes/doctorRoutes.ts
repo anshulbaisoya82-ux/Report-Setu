@@ -10,8 +10,16 @@ import {
   searchDoctorCopilot,
   generateSuggestedReply,
 } from '../controllers/doctorAiController';
+import {
+  getDoctorProfile,
+  updateDoctorProfile,
+} from '../controllers/doctorProfileController';
 
 const router = Router();
+
+// Doctor Profile & Practitioner Credentials
+router.get('/profile', authenticate, requireRole('doctor'), getDoctorProfile);
+router.put('/profile', authenticate, requireRole('doctor'), updateDoctorProfile);
 
 // Doctor Copilot search across connected patients
 router.get('/copilot/search', authenticate, requireRole('doctor'), searchDoctorCopilot);

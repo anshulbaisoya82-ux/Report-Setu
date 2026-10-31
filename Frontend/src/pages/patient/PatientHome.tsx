@@ -80,7 +80,11 @@ export const PatientHome: React.FC = () => {
           </Link>
 
           {/* User profile chip */}
-          <div className="flex items-center gap-2.5 bg-white border border-stone-200/80 rounded-2xl py-1 px-3 shadow-2xs">
+          <Link
+            to="/patient/profile"
+            className="flex items-center gap-2.5 bg-white hover:bg-slate-50 border border-stone-200/80 rounded-2xl py-1 px-3 shadow-2xs transition-transform hover:scale-102 active:scale-98"
+            title="View & Edit Patient Profile"
+          >
             <div className="w-8 h-8 rounded-full bg-[#1E3F35] text-white font-bold text-xs flex items-center justify-center">
               {patientAvatar}
             </div>
@@ -88,7 +92,7 @@ export const PatientHome: React.FC = () => {
               <span className="font-bold text-[#172B25] block leading-tight">{patientName}</span>
               <span className="text-[10px] text-[#5F736C] font-mono">RS ID · {patientRsId}</span>
             </div>
-          </div>
+          </Link>
         </div>
       </div>
 

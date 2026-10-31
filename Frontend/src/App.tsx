@@ -19,6 +19,7 @@ import { DoctorAppointments } from './pages/doctor/DoctorAppointments';
 import { DoctorReports } from './pages/doctor/DoctorReports';
 import { DoctorReportDetail } from './pages/doctor/DoctorReportDetail';
 import { DoctorPatientQuestions } from './pages/doctor/DoctorPatientQuestions';
+import { DoctorProfile } from './pages/doctor/DoctorProfile';
 
 // Patient Pages
 import { PatientHome } from './pages/patient/PatientHome';
@@ -30,6 +31,7 @@ import { PatientAppointments } from './pages/patient/PatientAppointments';
 import { PatientAskDoctor } from './pages/patient/PatientAskDoctor';
 import { PatientDoctors } from './pages/patient/PatientDoctors';
 import { PatientSettings } from './pages/patient/PatientSettings';
+import { PatientProfile } from './pages/patient/PatientProfile';
 import { PatientOnboarding } from './pages/patient/PatientOnboarding';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminPortal } from './pages/admin/AdminPortal';
@@ -58,6 +60,8 @@ export const App: React.FC = () => {
           <Route path="reports" element={<DoctorReports />} />
           <Route path="reports/:reportId" element={<DoctorReportDetail />} />
           <Route path="questions" element={<DoctorPatientQuestions />} />
+          <Route path="profile" element={<DoctorProfile />} />
+          <Route path="settings" element={<DoctorProfile />} />
         </Route>
 
         {/* Patient Portal Routes */}
@@ -71,6 +75,7 @@ export const App: React.FC = () => {
           <Route path="ask-doctor" element={<PatientAskDoctor />} />
           <Route path="doctors" element={<PatientDoctors />} />
           <Route path="requests" element={<PatientDoctors />} />
+          <Route path="profile" element={<PatientProfile />} />
           <Route path="settings" element={<PatientSettings />} />
         </Route>
         <Route path="/patient/onboarding" element={<ProtectedRoute role="patient"><PatientOnboarding /></ProtectedRoute>} />

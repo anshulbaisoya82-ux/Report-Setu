@@ -209,16 +209,43 @@ export const authApi = {
 };
 
 export const patientProfileApi = {
+  get: async () => apiFetch<any>('/patient/profile'),
   update: async (profile: {
-    name: string;
-    age: number;
-    gender: string;
-    bloodGroup: string;
-    conditions: string[];
-    location: string;
+    name?: string;
+    age?: number;
+    gender?: string;
+    bloodGroup?: string;
+    conditions?: string[];
+    location?: string;
+    avatar?: string;
+    email?: string;
+    emergencyContact?: { name?: string; relation?: string; phone?: string };
   }) => apiFetch<any>('/patient/profile', {
     method: 'PUT',
     body: JSON.stringify(profile),
+  }),
+};
+
+export const doctorProfileApi = {
+  get: async () => apiFetch<any>('/doctor/profile'),
+  update: async (doctor: {
+    name?: string;
+    specialty?: string;
+    phone?: string;
+    medicalCouncil?: string;
+    registrationNumber?: string;
+    clinic?: {
+      name?: string;
+      address?: string;
+      phone?: string;
+      timings?: string;
+      consultationFee?: number | string;
+    };
+    bio?: string;
+    qualifications?: string;
+  }) => apiFetch<any>('/doctor/profile', {
+    method: 'PUT',
+    body: JSON.stringify(doctor),
   }),
 };
 
