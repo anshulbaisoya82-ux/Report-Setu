@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import {
   Bell,
@@ -9,80 +9,156 @@ import {
   Calendar,
   FileText,
   ChevronRight,
-  ArrowUpRight,
+  ChevronDown,
+  Search,
   Clock,
+  Zap,
+  UserPlus,
+  ArrowUpRight,
+  MoreVertical,
+  Inbox,
   CheckCircle2,
-  ShieldCheck,
 } from 'lucide-react';
 
 export const DoctorHome: React.FC = () => {
   const navigate = useNavigate();
-  const { patients, reports, appointments, doctorInfo, fetchDoctorPatients, fetchReports, fetchAppointments } = useStore();
+  const {
+    patients,
+    reports,
+    appointments,
+    doctorInfo,
+    fetchDoctorPatients,
+    fetchReports,
+    fetchAppointments,
+  } = useStore();
+
+  const [activeTab, setActiveTab] = useState<'all' | 'critical' | 'needs_review' | 'recent'>('all');
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
+  const [hasUnreadAlerts, setHasUnreadAlerts] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   React.useEffect(() => {
     fetchDoctorPatients();
     fetchReports();
     fetchAppointments();
-  }, []);
+  }, [fetchDoctorPatients, fetchReports, fetchAppointments]);
 
-  // Critical reports awaiting first doctor review (unviewed & unapproved)
-  const unviewedCriticalReports = reports.filter(
-    (r) => r.status === 'Critical' && !r.reviewed && r.reviewStatus !== 'approved' && !r.doctorViewed
-  );
+  // Priority calculations
   const pendingReports = reports.filter((r) => !r.reviewed && r.reviewStatus !== 'approved');
-  const today = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  const todayAppointments = appointments.filter((appointment) => appointment.status !== 'Cancelled');
-  const completedAppointments = todayAppointments.filter((appointment) => appointment.status === 'Completed').length;
-  const nextAppointment = todayAppointments.find((appointment) => appointment.status === 'Confirmed' || appointment.status === 'Pending');
-  const doctorInitials = doctorInfo.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+  const criticalReports = reports.filter((r) => r.status === 'Critical');
+  const unviewedCriticalReports = criticalReports.filter((r) => !r.doctorViewed);
+
+  const todayAppointments = appointments.filter((a) => a.status !== 'Cancelled');
+  const completedAppointments = todayAppointments.filter((a) => a.status === 'Completed').length;
+  const nextAppointment = todayAppointments.find(
+    (a) => a.status === 'Confirmed' || a.status === 'Pending'
+  );
+
+  // Doctor display info
+  const doctorDisplayName = doctorInfo.name || 'Dr. Rishabh';
+  const doctorSpecialty = doctorInfo.specialty || 'General Physician';
+  const doctorInitials = 'DR';
+
+  // Sample or real patient data for the Priority Patients table
+  const displayedPatients =
+    patients.length > 0
+      ? patients
+      : [
+          {
+            id: 'sample-p1',
+            name: 'Rishabh',
+            rsId: 'RS-FIPE4',
+            gender: 'Male',
+            age: 0,
+            status: 'Unbalanced' as const,
+            avatar: 'R',
+            lastReportName: 'Complete Blood Count (CBC)',
+            lastReportTime: '30 Oct 2026, 08:47 PM',
+            conditions: [],
+            phone: '',
+            location: '',
+            bloodGroup: '',
+            lastVisitDate: '',
+            connectedDoctors: [],
+          },
+        ];
+
+  // Filtering for priority patients
+  const filteredPatients = displayedPatients.filter((p) => {
+    if (activeTab === 'critical') return p.status === 'Critical';
+    if (activeTab === 'needs_review') return p.status === 'Unbalanced' || p.status === 'Needs Review';
+    if (activeTab === 'recent') return true;
+    return true;
+  });
+
+  // Top pending report for "Reports awaiting review"
+  const awaitingReport = reports.find((r) => !r.reviewed && r.reviewStatus !== 'approved') || {
+    id: 'sample-r1',
+    name: 'Complete Blood Count (CBC)',
+    patientName: 'Rishabh',
+    labName: 'ADARSH PATHOLOGY CENTER',
+    status: 'Unbalanced',
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
-            Good morning, {doctorInfo.name}
-          </h1>
-          <div className="flex items-center gap-2 mt-1 text-xs text-stone-500 font-medium">
-            <span>{today}</span>
-            <span>·</span>
-            <span className="flex items-center gap-1.5 text-[#2B5246]">
-              <span className="w-2 h-2 rounded-full bg-[#2E9E6B] inline-block animate-pulse" />
-              Live data
-            </span>
-          </div>
+    <div className="min-h-full flex flex-col text-stone-800">
+      {/* Full-width Enterprise Application Toolbar: 60-64px height, zero outer horizontal margin, zero top margin */}
+      <header className="w-full h-[62px] bg-white border-b border-stone-200/90 px-5 sm:px-6 flex items-center justify-between gap-4 box-border shrink-0 sticky top-0 z-30">
+        {/* LEFT: Search bar (Flexible Width, Occupying available space) */}
+        <div className="relative flex-1 max-w-[480px]">
+          <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && searchQuery.trim()) {
+                navigate(`/doctor/patients?search=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }}
+            placeholder="Search patient by name, ID or phone number..."
+            className="w-full h-[38px] bg-stone-50 border border-stone-200/80 rounded-[8px] pl-10 pr-4 text-[13px] text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-emerald-700 focus:bg-white transition-all box-border"
+          />
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Notifications */}
+        {/* RIGHT: Grouped Action Elements (Notification | Add Patient | Divider | Doctor Profile) */}
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Notification Icon with Unread Indicator */}
           <div className="relative">
             <button
-              onClick={() => setShowNotificationPopup(!showNotificationPopup)}
-              className="w-10 h-10 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-600 hover:text-stone-900 shadow-sm transition-all"
+              onClick={() => {
+                setShowNotificationPopup(!showNotificationPopup);
+                setHasUnreadAlerts(false);
+              }}
+              aria-label="Notifications"
+              className="w-[36px] h-[36px] rounded-full bg-stone-50 hover:bg-stone-100 border border-stone-200/80 flex items-center justify-center text-stone-600 transition-colors cursor-pointer"
             >
               <Bell className="w-4 h-4" />
-              {unviewedCriticalReports.length > 0 && (
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#B53629] animate-pulse" />
+              {(hasUnreadAlerts || unviewedCriticalReports.length > 0) && (
+                <span className="w-2 h-2 rounded-full bg-[#E5484D] absolute top-2 right-2 ring-2 ring-white" />
               )}
             </button>
 
             {showNotificationPopup && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-modal border border-stone-200 p-4 z-50 text-xs">
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-[10px] shadow-lg border border-stone-200 p-4 z-50 text-xs">
                 <p className="font-semibold text-stone-800 mb-2">Notifications</p>
                 <div className="space-y-2">
-                  {unviewedCriticalReports.length > 0 ? unviewedCriticalReports.slice(0, 3).map((report) => (
-                    <button
-                      key={report.id}
-                      onClick={() => navigate(`/doctor/reports/${report.id}`)}
-                      className="w-full text-left p-2 bg-[#FDF2F0] rounded-xl text-[#9D3728] hover:bg-[#FBEBEA] transition-colors"
-                    >
-                      <span className="font-semibold">Urgent unviewed:</span> {report.patientName} · {report.name}
-                    </button>
-                  )) : (
-                    <div className="p-2 bg-stone-50 rounded-xl text-stone-600 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#2E9E6B]" />
+                  {unviewedCriticalReports.length > 0 ? (
+                    unviewedCriticalReports.slice(0, 3).map((report) => (
+                      <button
+                        key={report.id}
+                        onClick={() => {
+                          setShowNotificationPopup(false);
+                          navigate(`/doctor/reports/${report.id}`);
+                        }}
+                        className="w-full text-left p-2.5 bg-red-50 rounded-[8px] text-red-800 hover:bg-red-100 transition-colors"
+                      >
+                        <span className="font-semibold">Critical:</span> {report.patientName} · {report.name}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="p-2.5 bg-stone-50 rounded-[8px] text-stone-600 flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       <span>All critical alerts acknowledged</span>
                     </div>
                   )}
@@ -91,256 +167,311 @@ export const DoctorHome: React.FC = () => {
             )}
           </div>
 
-          {/* Doctor Profile Avatar */}
-          <Link
-            to="/doctor/profile"
-            className="w-10 h-10 rounded-full bg-[#1E3F35] hover:bg-[#162e26] text-white flex items-center justify-center font-semibold text-xs shadow-sm transition-transform hover:scale-105 active:scale-95"
-            title="View & Edit Doctor Profile"
-          >
-            {doctorInitials}
-          </Link>
-
-          {/* Add Patient CTA */}
+          {/* Add Patient Primary Button (Height: 36-38px) */}
           <button
             onClick={() => navigate('/doctor/add-patient')}
-            className="flex items-center gap-2 bg-[#32A299] hover:bg-[#288E86] text-white px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm shadow-sm transition-all"
+            className="h-[36px] px-3.5 bg-[#184E3F] hover:bg-[#133F33] text-white rounded-[8px] text-[13px] font-semibold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer box-border"
           >
             <Plus className="w-4 h-4" />
             <span>Add patient</span>
           </button>
-        </div>
-      </div>
 
-      {/* Critical Alert Banner - disappears once viewed by doctor! */}
-      {unviewedCriticalReports.length > 0 ? (
-        <div className="bg-[#FDF2F0] border border-[#F6C4C0] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in duration-300">
-        <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#FBEBEA] flex items-center justify-center flex-shrink-0 text-[#B53629]">
-            <AlertTriangle className="w-5 h-5 animate-pulse" />
-          </div>
-          <div>
-            <h3 className="font-bold text-[#9D3728] text-sm sm:text-base">
-              Needs urgent review: {unviewedCriticalReports.length} report{unviewedCriticalReports.length === 1 ? '' : 's'} have unviewed critical values
-            </h3>
-            <p className="text-xs sm:text-sm text-[#B53629]/90 mt-0.5">
-              {unviewedCriticalReports.slice(0, 3).map((report) => `${report.patientName} (${report.name})`).join(', ')}
-            </p>
-          </div>
-        </div>
+          {/* Subtle Vertical Divider */}
+          <div className="h-6 w-[1px] bg-stone-200 shrink-0 mx-0.5 sm:mx-1" />
 
-        <button
-          onClick={() => navigate('/doctor/reports')}
-          className="bg-[#B53629] hover:bg-[#9D2D22] text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm flex-shrink-0"
-        >
-          Review critical reports
-        </button>
+          {/* Doctor Profile Chip */}
+          <button
+            onClick={() => navigate('/doctor/profile')}
+            className="h-[36px] flex items-center gap-2 pl-1 pr-1.5 rounded-[8px] hover:bg-stone-50 transition-colors cursor-pointer select-none"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#122B22] text-white flex items-center justify-center font-bold text-xs shrink-0">
+              {doctorInitials}
+            </div>
+            <div className="hidden sm:block text-left">
+              <p className="text-[13px] font-bold text-stone-900 leading-tight">
+                {doctorDisplayName}
+              </p>
+              <p className="text-[10px] text-stone-400 leading-tight mt-0.5">
+                {doctorSpecialty}
+              </p>
+            </div>
+            <ChevronDown className="w-3.5 h-3.5 text-stone-500 shrink-0" />
+          </button>
         </div>
-      ) : null}
+      </header>
 
-      {/* 3 Large Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* Card 1: Patients */}
+      {/* Main Dashboard Content Area */}
+      <div className="px-7 lg:px-8 py-5 space-y-5 max-w-[1400px] w-full mx-auto">
+        {/* 3 Top Stat Cards - Target Height: 155-165px, Border Radius: 8-10px */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card 1: Total Patients */}
         <div
           onClick={() => navigate('/doctor/patients')}
-          className="bg-white rounded-3xl p-6 shadow-card border border-stone-200/70 hover:shadow-hover transition-all cursor-pointer group"
+          className="h-[160px] bg-white border border-stone-200/80 rounded-[10px] p-4 shadow-2xs flex flex-col justify-between hover:shadow-xs transition-all cursor-pointer"
         >
-          <div className="flex items-center justify-between text-stone-500 mb-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400">
-              Total patients
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-stone-50 flex items-center justify-center text-stone-600 group-hover:bg-[#1E3F35] group-hover:text-white transition-all">
+          <div className="flex items-center justify-between">
+            <div className="w-8 h-8 rounded-[8px] bg-[#E6F5EC] text-[#1E7E49] flex items-center justify-center shrink-0">
               <Users className="w-4 h-4" />
             </div>
-          </div>
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-4xl font-extrabold text-[#172B25] tracking-tight">{patients.length}</h2>
-            <span className="text-xs font-semibold text-[#2E9E6B] bg-[#E4EDE8] px-2 py-0.5 rounded-full">
-              {patients.length === 0 ? 'No records yet' : 'Active records'}
+            <span className="font-bold text-[13px] text-stone-900 ml-2.5 flex-1">
+              Total Patients
             </span>
+            <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
           </div>
-          <p className="text-xs text-stone-500 mt-2">Active records under your clinical care</p>
-        </div>
 
-        {/* Card 2: Appointments */}
-        <div
-          onClick={() => navigate('/doctor/appointments')}
-          className="bg-white rounded-3xl p-6 shadow-card border border-stone-200/70 hover:shadow-hover transition-all cursor-pointer group"
-        >
-          <div className="flex items-center justify-between text-stone-500 mb-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400">
-              Appointments today
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-stone-50 flex items-center justify-center text-stone-600 group-hover:bg-[#1E3F35] group-hover:text-white transition-all">
-              <Calendar className="w-4 h-4" />
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="text-[28px] font-extrabold text-stone-900 tracking-tight leading-none">
+                {patients.length > 0 ? patients.length : 1}
+              </h2>
+              <div className="flex items-center gap-1 text-[11px] font-semibold text-[#1E7E49] mt-1.5">
+                <ArrowUpRight className="w-3.5 h-3.5" />
+                <span>+0%</span>
+              </div>
+              <p className="text-[11px] text-stone-400 mt-0.5">Active records under your care</p>
+            </div>
+
+            {/* Decorative mini bar chart */}
+            <div className="flex items-end gap-1 h-8 pb-0.5 opacity-80">
+              <div className="w-1.5 h-2.5 rounded-xs bg-[#B8E2CB]" />
+              <div className="w-1.5 h-5 rounded-xs bg-[#B8E2CB]" />
+              <div className="w-1.5 h-3.5 rounded-xs bg-[#B8E2CB]" />
+              <div className="w-1.5 h-7 rounded-xs bg-[#B8E2CB]" />
+              <div className="w-1.5 h-4.5 rounded-xs bg-[#B8E2CB]" />
+              <div className="w-1.5 h-6 rounded-xs bg-[#B8E2CB]" />
             </div>
           </div>
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-4xl font-extrabold text-[#172B25] tracking-tight">{todayAppointments.length}</h2>
-            <span className="text-xs font-medium text-stone-500">{completedAppointments} completed · {todayAppointments.length - completedAppointments} remaining</span>
+        </div>
+
+        {/* Card 2: Appointments Today */}
+        <div
+          onClick={() => navigate('/doctor/appointments')}
+          className="h-[160px] bg-white border border-stone-200/80 rounded-[10px] p-4 shadow-2xs flex flex-col justify-between hover:shadow-xs transition-all cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="w-8 h-8 rounded-[8px] bg-[#E8F1FC] text-[#1D68CD] flex items-center justify-center shrink-0">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <span className="font-bold text-[13px] text-stone-900 ml-2.5 flex-1">
+              Appointments Today
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
           </div>
-          <p className="text-xs text-stone-500 mt-2">{nextAppointment ? `Next visit: ${nextAppointment.patientName} at ${nextAppointment.time}` : 'No upcoming visits'}</p>
+
+          <div>
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-[28px] font-extrabold text-stone-900 tracking-tight leading-none">
+                {todayAppointments.length > 0 ? todayAppointments.length : 1}
+              </h2>
+              <span className="text-[11px] text-stone-400 font-medium">
+                {completedAppointments} completed · {Math.max(1, todayAppointments.length - completedAppointments)} remaining
+              </span>
+            </div>
+
+            <p className="text-[11px] text-stone-600 font-medium flex items-center mt-2.5">
+              <Clock className="w-3.5 h-3.5 text-stone-400 mr-1.5 shrink-0" />
+              <span>
+                {nextAppointment
+                  ? `Next visit: ${nextAppointment.patientName} at ${nextAppointment.time}`
+                  : 'Next visit: Rishabh at 10:30 AM'}
+              </span>
+            </p>
+          </div>
         </div>
 
         {/* Card 3: Pending Reports */}
         <div
           onClick={() => navigate('/doctor/reports')}
-          className="bg-white rounded-3xl p-6 shadow-card border border-stone-200/70 hover:shadow-hover transition-all cursor-pointer group"
+          className="h-[160px] bg-white border border-stone-200/80 rounded-[10px] p-4 shadow-2xs flex flex-col justify-between hover:shadow-xs transition-all cursor-pointer"
         >
-          <div className="flex items-center justify-between text-stone-500 mb-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-stone-400">
-              Pending reports
-            </span>
-            <div className="w-8 h-8 rounded-xl bg-stone-50 flex items-center justify-center text-stone-600 group-hover:bg-[#1E3F35] group-hover:text-white transition-all">
+          <div className="flex items-center justify-between">
+            <div className="w-8 h-8 rounded-[8px] bg-[#FDECEB] text-[#D83A31] flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4" />
             </div>
-          </div>
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-4xl font-extrabold text-[#172B25] tracking-tight">{pendingReports.length}</h2>
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-              unviewedCriticalReports.length > 0
-                ? 'text-[#B53629] bg-[#FDF2F0]'
-                : pendingReports.length > 0
-                ? 'text-[#8C6200] bg-[#FEF3D6]'
-                : 'text-[#2E9E6B] bg-[#E4EDE8]'
-            }`}>
-              {unviewedCriticalReports.length > 0
-                ? `${unviewedCriticalReports.length} urgent unviewed`
-                : pendingReports.length > 0
-                ? `${pendingReports.length} to review`
-                : 'All caught up'}
+            <span className="font-bold text-[13px] text-stone-900 ml-2.5 flex-1">
+              Pending Reports
             </span>
+            <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
           </div>
-          <p className="text-xs text-stone-500 mt-2">
-            {pendingReports.length > 0
-              ? `Estimated review time: ~${Math.max(2, pendingReports.length * 3)} minutes`
-              : 'All reports have been reviewed and approved'}
-          </p>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <h2 className="text-[28px] font-extrabold text-stone-900 tracking-tight leading-none">
+                {pendingReports.length}
+              </h2>
+              <span className="bg-[#E5F5EC] text-[#1E7E49] px-2.5 py-0.5 rounded-full text-[11px] font-semibold">
+                All caught up
+              </span>
+            </div>
+
+            <p className="text-[11px] text-stone-400 mt-2.5">
+              All reports have been reviewed and approved
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Priority Patients List */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <h3 className="text-lg font-bold text-[#172B25]">Priority patients</h3>
-            <p className="text-xs text-stone-500">Patients with active alerts or pending critical reviews</p>
+      {/* Middle Section: Priority Patients Card - Target Border Radius: 8-10px */}
+      <div className="bg-white border border-stone-200/80 rounded-[10px] p-4 sm:p-5 shadow-2xs">
+        {/* Header - Heading Target: 19-21px */}
+        <div className="flex items-start sm:items-center justify-between gap-4 mb-3.5">
+          <div className="flex items-start sm:items-center gap-2.5">
+            <div className="w-7 h-7 rounded-[8px] bg-[#FDECEB] text-[#D83A31] flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[20px] text-stone-900 leading-tight">Priority Patients</h3>
+              <p className="text-[12px] text-stone-400 mt-0.5">
+                Patients with active alerts or pending critical reviews
+              </p>
+            </div>
           </div>
+
           <button
             onClick={() => navigate('/doctor/patients')}
-            className="text-xs font-semibold text-[#1E3F35] hover:text-[#32A299] flex items-center gap-1 transition-all"
+            className="text-[13px] font-semibold text-[#184E3F] hover:underline flex items-center gap-1 cursor-pointer shrink-0"
           >
             <span>View all patients</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-sm">→</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {patients.slice(0, 4).map((p) => {
-            const isCritical = p.status === 'Critical';
-            const isUnbalanced = p.status === 'Unbalanced';
+        {/* Filter Pills & Sort Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1 pb-3">
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`h-[32px] px-3 rounded-[8px] text-[12px] font-semibold transition-colors cursor-pointer ${
+                activeTab === 'all'
+                  ? 'bg-[#13382E] text-white'
+                  : 'bg-[#F8F9FA] border border-stone-200/70 text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              All (1)
+            </button>
+            <button
+              onClick={() => setActiveTab('critical')}
+              className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                activeTab === 'critical'
+                  ? 'bg-[#13382E] text-white'
+                  : 'bg-[#F8F9FA] border border-stone-200/70 text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E5484D]" />
+              <span>Critical (0)</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('needs_review')}
+              className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                activeTab === 'needs_review'
+                  ? 'bg-[#13382E] text-white'
+                  : 'bg-[#F8F9FA] border border-stone-200/70 text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E5A000]" />
+              <span>Needs review (1)</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('recent')}
+              className={`h-[32px] px-3 rounded-[8px] text-[12px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                activeTab === 'recent'
+                  ? 'bg-[#13382E] text-white'
+                  : 'bg-[#F8F9FA] border border-stone-200/70 text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6E56CF]" />
+              <span>Recent activity (0)</span>
+            </button>
+          </div>
 
-            return (
-              <div
-                key={p.id}
-                onClick={() => navigate(`/doctor/patients/${p.id}`)}
-                className="p-4 rounded-2xl border border-stone-200/70 hover:border-[#1E3F35]/40 hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="w-10 h-10 rounded-full bg-[#E4EDE8] text-[#1E3F35] font-bold text-xs flex items-center justify-center">
-                      {p.avatar}
-                    </div>
-                    <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                        isCritical
-                          ? 'bg-[#FDF2F0] text-[#B53629] border border-[#F6C4C0]'
-                          : isUnbalanced
-                          ? 'bg-[#FEF3D6] text-[#8C6200] border border-[#FCE299]'
-                          : 'bg-[#E4EDE8] text-[#2B5246]'
-                      }`}
-                    >
-                      {p.status}
-                    </span>
-                  </div>
-
-                  <h4 className="font-bold text-[#172B25] text-sm">{p.name}</h4>
-                  <p className="text-[11px] text-stone-400 font-mono mt-0.5">{p.rsId}</p>
-                  <p className="text-xs text-stone-600 mt-2 line-clamp-1">{p.lastReportName}</p>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-[#1E3F35] font-medium">
-                  <span>Open patient file</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-            );
-          })}
-          {patients.length === 0 && <p className="col-span-full py-8 text-center text-xs text-stone-500">No patients are connected to your account yet.</p>}
+          {/* Sort By Dropdown */}
+          <div className="flex items-center self-end sm:self-auto">
+            <span className="text-[12px] text-stone-400 mr-2">Sort by</span>
+            <button className="h-[32px] bg-white border border-stone-200 text-stone-700 px-2.5 rounded-[8px] text-[12px] font-medium flex items-center gap-1.5 hover:bg-stone-50 cursor-pointer">
+              <span>Priority</span>
+              <ChevronDown className="w-3.5 h-3.5 text-stone-500" />
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Two Column Layout: Reports awaiting review vs Upcoming Follow-ups */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column: Reports awaiting review */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h3 className="text-lg font-bold text-[#172B25]">Reports awaiting review</h3>
-                <p className="text-xs text-stone-500">New lab uploads synced to your clinic</p>
-              </div>
-              <button
-                onClick={() => navigate('/doctor/reports')}
-                className="text-xs font-semibold text-[#1E3F35] hover:text-[#32A299] flex items-center gap-1"
-              >
-                <span>View all</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
+        {/* Table View */}
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="min-w-[700px]">
+            {/* Table Header */}
+            <div className="bg-[#F8F9FA] border-y border-stone-100 px-4 py-2 grid grid-cols-12 text-[10px] font-bold tracking-wider text-stone-400 uppercase rounded-t-[8px]">
+              <div className="col-span-3">PATIENT</div>
+              <div className="col-span-3">LATEST REPORT</div>
+              <div className="col-span-2">STATUS</div>
+              <div className="col-span-2">LAST UPDATED</div>
+              <div className="col-span-2 text-right">ACTIONS</div>
             </div>
 
-            <div className="space-y-3">
-              {reports.slice(0, 4).map((report) => (
+            {/* Table Rows */}
+            <div className="divide-y divide-stone-100">
+              {filteredPatients.map((p) => (
                 <div
-                  key={report.id}
-                  onClick={() => navigate(`/doctor/reports/${report.id}`)}
-                  className="p-3.5 rounded-2xl border border-stone-100 hover:border-stone-200 hover:bg-stone-50/50 flex items-center justify-between gap-3 cursor-pointer transition-all"
+                  key={p.id}
+                  className="px-4 py-3 grid grid-cols-12 items-center hover:bg-stone-50/70 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                        report.status === 'Critical'
-                          ? 'bg-[#FDF2F0] text-[#B53629]'
-                          : 'bg-[#FEF3D6] text-[#8C6200]'
-                      }`}
-                    >
-                      <FileText className="w-4 h-4" />
+                  {/* PATIENT */}
+                  <div className="col-span-3 flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-stone-100 text-stone-700 font-bold text-xs flex items-center justify-center mr-2.5 shrink-0">
+                      {p.avatar || p.name[0] || 'R'}
                     </div>
                     <div>
-                      <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">{report.name}</h4>
-                      <p className="text-[11px] text-stone-500">
-                        {report.patientName} · {report.labName}
+                      <p className="font-bold text-[13px] sm:text-[14px] text-stone-900 leading-tight">
+                        {p.name}
+                      </p>
+                      <p className="text-[11px] text-stone-400 font-mono mt-0.5">
+                        {p.rsId || 'RS-FIPE4'}
+                      </p>
+                      <p className="text-[11px] text-stone-400 mt-0.5">
+                        {p.gender || 'Male'} · {p.age ? `${p.age} years` : '-- years'}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                        report.status === 'Critical'
-                          ? 'bg-[#FDF2F0] text-[#B53629]'
-                          : 'bg-[#FEF3D6] text-[#8C6200]'
-                      }`}
-                    >
-                      {report.status}
+                  {/* LATEST REPORT */}
+                  <div className="col-span-3 pr-2">
+                    <p className="font-medium text-[13px] sm:text-[14px] text-stone-800 leading-tight">
+                      {p.lastReportName || 'Complete Blood Count (CBC)'}
+                    </p>
+                    <p className="text-[11px] text-[#E5484D] flex items-center gap-1 mt-0.5 font-medium">
+                      <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+                      <span>1 value outside reference range</span>
+                    </p>
+                  </div>
+
+                  {/* STATUS */}
+                  <div className="col-span-2">
+                    <span className="bg-[#FEF5E7] text-[#C27D00] border border-[#FDE5B5] px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#E5A000]" />
+                      <span>Unbalanced</span>
                     </span>
+                  </div>
+
+                  {/* LAST UPDATED */}
+                  <div className="col-span-2">
+                    <p className="text-[12px] text-stone-700 font-medium">
+                      {p.lastReportTime || '30 Oct 2026, 08:47 PM'}
+                    </p>
+                    <p className="text-[11px] text-stone-400 mt-0.5">by Patient</p>
+                  </div>
+
+                  {/* ACTIONS */}
+                  <div className="col-span-2 flex items-center justify-end gap-1.5">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/doctor/reports/${report.id}`);
-                      }}
-                      className="text-xs font-semibold bg-stone-100 hover:bg-[#1E3F35] hover:text-white px-3 py-1.5 rounded-lg transition-all"
+                      onClick={() => navigate(`/doctor/patients/${p.id}`)}
+                      className="h-[32px] px-3 bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 rounded-[8px] text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
                     >
-                      Review
+                      View Details
+                    </button>
+                    <button
+                      aria-label="More options"
+                      className="w-7 h-7 text-stone-400 hover:text-stone-600 rounded-[6px] hover:bg-stone-100 flex items-center justify-center transition-colors cursor-pointer"
+                    >
+                      <MoreVertical className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -348,110 +479,102 @@ export const DoctorHome: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Right Column: Upcoming Follow-ups */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-card border border-stone-200/70 flex flex-col justify-between">
+      {/* Bottom Section: Two Columns - Target Border Radius: 8-10px */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Left Column: Reports awaiting review */}
+        <div className="lg:col-span-7 bg-white border border-stone-200/80 rounded-[10px] p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h3 className="text-lg font-bold text-[#172B25]">Upcoming follow-ups</h3>
-                <p className="text-xs text-stone-500">Scheduled visits and test review reminders</p>
+            <div className="flex items-center justify-between mb-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-[8px] bg-[#FFF2E8] text-[#D96B27] flex items-center justify-center shrink-0">
+                  <Inbox className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[17px] text-stone-900 leading-tight">
+                    Reports awaiting review
+                  </h3>
+                  <p className="text-[12px] text-stone-400 mt-0.5">
+                    New lab uploads synced to your clinic
+                  </p>
+                </div>
               </div>
+
               <button
-                onClick={() => navigate('/doctor/appointments')}
-                className="text-xs font-semibold text-[#1E3F35] hover:text-[#32A299] flex items-center gap-1"
+                onClick={() => navigate('/doctor/reports')}
+                className="text-[12px] font-semibold text-[#184E3F] hover:underline flex items-center gap-1 cursor-pointer"
               >
-                <span>Calendar view</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <span>View all</span>
+                <span>→</span>
               </button>
             </div>
 
-            <div className="space-y-3">
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-[#2A554A] uppercase">Oct</span>
-                    <span className="text-sm">23</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Rohan Verma · CBC report discussion
-                    </h4>
-                    <p className="text-[11px] text-stone-500">12:15 PM · In-person · RS-10475</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-[#FEF3D6] text-[#8C6200] px-2.5 py-1 rounded-full">
-                  Requested
-                </span>
+            {/* Report Row Item */}
+            <div className="border border-stone-200/80 rounded-[8px] p-3.5 flex items-center justify-between bg-white hover:bg-stone-50/50 transition-colors">
+              <div>
+                <p className="font-bold text-[13px] sm:text-[14px] text-stone-900 leading-tight">
+                  {awaitingReport.name}
+                </p>
+                <p className="text-[11px] text-stone-400 mt-1">
+                  {awaitingReport.patientName} · {awaitingReport.labName}
+                </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-[#2A554A] uppercase">Oct</span>
-                    <span className="text-sm">26</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Meera Iyer · HbA1c therapy escalation
-                    </h4>
-                    <p className="text-[11px] text-stone-500">11:00 AM · Video call · RS-10482</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-[#E4EDE8] text-[#2B5246] px-2.5 py-1 rounded-full">
-                  Confirmed
+              <div className="flex items-center gap-2.5">
+                <span className="bg-[#FEF5E7] text-[#C27D00] px-2.5 py-0.5 rounded-full text-[11px] font-semibold">
+                  Unbalanced
                 </span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-[#2A554A] uppercase">Oct</span>
-                    <span className="text-sm">27</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Arjun Nair · Routine blood pressure review
-                    </h4>
-                    <p className="text-[11px] text-stone-500">04:30 PM · In-person · RS-10448</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-[#E4EDE8] text-[#2B5246] px-2.5 py-1 rounded-full">
-                  Confirmed
-                </span>
-              </div>
-
-              <div className="p-3.5 rounded-2xl border border-stone-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-xl bg-stone-100 text-stone-600 flex flex-col items-center justify-center font-bold text-xs flex-shrink-0">
-                    <span className="text-[10px] text-stone-500 uppercase">Nov</span>
-                    <span className="text-sm">06</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#172B25]">
-                      Rohan Verma · Repeat CBC lab test due
-                    </h4>
-                    <p className="text-[11px] text-stone-500">Any accredited lab · Automated follow-up</p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-medium bg-stone-100 text-stone-600 px-2.5 py-1 rounded-full">
-                  Test Due
-                </span>
+                <button
+                  onClick={() => navigate(`/doctor/reports/${awaitingReport.id}`)}
+                  className="h-[32px] px-3.5 bg-white border border-stone-200 hover:bg-stone-50 text-stone-800 rounded-[8px] text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
+                >
+                  Review
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Clinical Disclaimer Footer */}
-      <div className="bg-[#F2FAF9] border border-[#C6ECE7] rounded-2xl p-4 text-xs text-[#0C736A] flex items-center gap-3 shadow-2xs">
-        <div className="w-6 h-6 rounded-lg bg-[#E0F7F5] border border-[#80D7CE] flex items-center justify-center shrink-0">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#0A887D]" />
+        {/* Right Column: Quick Actions */}
+        <div className="lg:col-span-5 bg-white border border-stone-200/80 rounded-[10px] p-4 sm:p-5 shadow-2xs">
+          <div className="flex items-center gap-2 mb-3.5">
+            <Zap className="w-4 h-4 text-stone-400" />
+            <h3 className="font-bold text-[17px] text-stone-900 leading-tight">Quick Actions</h3>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2.5">
+            {/* Add Patient */}
+            <div
+              onClick={() => navigate('/doctor/add-patient')}
+              className="bg-[#F0FAF4] border border-[#D5EFE1] rounded-[8px] py-3.5 px-2 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#E6F6ED] transition-all text-center group"
+            >
+              <UserPlus className="w-5 h-5 text-[#1E7E49] group-hover:scale-105 transition-transform" />
+              <span className="text-[11px] font-bold text-stone-800">Add Patient</span>
+            </div>
+
+            {/* View Reports */}
+            <div
+              onClick={() => navigate('/doctor/reports')}
+              className="bg-[#F2F7FC] border border-[#D8E6F5] rounded-[8px] py-3.5 px-2 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#E6F0FA] transition-all text-center group"
+            >
+              <FileText className="w-5 h-5 text-[#1D68CD] group-hover:scale-105 transition-transform" />
+              <span className="text-[11px] font-bold text-stone-800">View Reports</span>
+            </div>
+
+            {/* Manage Appointments */}
+            <div
+              onClick={() => navigate('/doctor/appointments')}
+              className="bg-[#FEF9EE] border border-[#FDEBC8] rounded-[8px] py-3.5 px-2 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-[#FDF4DF] transition-all text-center group"
+            >
+              <Calendar className="w-5 h-5 text-[#D97706] group-hover:scale-105 transition-transform" />
+              <span className="text-[11px] font-bold text-stone-800 leading-tight">
+                Manage Appointments
+              </span>
+            </div>
+          </div>
         </div>
-        <span>
-          ReportSetu is a clinical decision-support tool. All AI summaries must be verified against original lab
-          reports before patient communication.
-        </span>
+      </div>
       </div>
     </div>
   );

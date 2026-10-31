@@ -5,18 +5,15 @@ import { connectionsApi } from '../../api';
 import {
   ArrowLeft,
   ArrowRight,
-  ShieldCheck,
+  Shield,
   CheckCircle2,
-  KeyRound,
+  Calendar,
   UserCheck,
-  Search,
-  Sparkles,
-  Lock,
+  User,
   Clock,
   RefreshCw,
   Send,
   AlertCircle,
-  HelpCircle,
 } from 'lucide-react';
 
 export const DoctorAddPatient: React.FC = () => {
@@ -24,8 +21,8 @@ export const DoctorAddPatient: React.FC = () => {
   const { patients, fetchDoctorPatients } = useStore();
 
   useEffect(() => {
-    fetchDoctorPatients();
-    loadPendingRequests();
+    void fetchDoctorPatients();
+    void loadPendingRequests();
   }, []);
 
   // Workflow steps: 'request' (enter RS-ID) or 'verify' (enter 6-digit code)
@@ -33,7 +30,6 @@ export const DoctorAddPatient: React.FC = () => {
 
   // Input states
   const [rsId, setRsId] = useState('RS-10475');
-  const [connectCode, setConnectCode] = useState<string[]>(['', '', '', '', '', '']);
   const [codeInputs, setCodeInputs] = useState<string[]>(['', '', '', '', '', '']);
 
   // Loading & error states
@@ -58,11 +54,6 @@ export const DoctorAddPatient: React.FC = () => {
     }
   };
 
-  // Matched patient preview
-  const matchedPatient = patients.find(
-    (p) => p.rsId.toLowerCase() === rsId.trim().toLowerCase()
-  ) || patients[0];
-
   // ─── Step 1: Send Connection Request ──────────────────────────────────────
   const handleSendRequest = async () => {
     const cleanRsId = rsId.trim().toUpperCase();
@@ -81,7 +72,7 @@ export const DoctorAddPatient: React.FC = () => {
       );
       // Advance to Step 2 (Verification code entry)
       setCurrentStep('verify');
-      loadPendingRequests();
+      void loadPendingRequests();
     } catch (err: any) {
       setErrorMessage(
         err?.message || 'Failed to send connection request. Please verify the RS-ID.'
@@ -104,7 +95,7 @@ export const DoctorAddPatient: React.FC = () => {
     try {
       setVerifyLoading(true);
       setErrorMessage('');
-      const res = await connectionsApi.verifyDoctorConnectCode(cleanRsId, code);
+      await connectionsApi.verifyDoctorConnectCode(cleanRsId, code);
 
       setSuccess(true);
       setSuccessMessage('Patient connected successfully! Clinical access is now active.');
@@ -160,61 +151,91 @@ export const DoctorAddPatient: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-12">
+    <div className="p-6 lg:p-7 max-w-[1400px] w-full mx-auto space-y-4 text-slate-800">
       {/* Back button */}
-      <button
-        onClick={() => navigate('/doctor/patients')}
-        className="flex items-center gap-2 text-xs font-semibold text-stone-500 hover:text-stone-800 transition-all"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to Patients</span>
-      </button>
-
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] tracking-tight">
-          Connect new patient
+        <button
+          onClick={() => navigate('/doctor/patients')}
+          className="flex items-center gap-1.5 text-xs font-bold text-[#13382E] hover:text-[#184639] transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Patients</span>
+        </button>
+      </div>
+
+      {/* Main Title & Subtitle */}
+      <div>
+        <h1 className="text-[26px] font-black text-slate-900 tracking-tight leading-tight">
+          Connect New Patient
         </h1>
-        <p className="text-xs sm:text-sm text-stone-500 mt-1">
+        <p className="text-xs text-slate-500 font-medium mt-1">
           Request access with the patient's ReportSetu ID, then verify using their temporary 2-minute approval code.
         </p>
       </div>
 
-      {/* Progress Indicators */}
-      <div className="flex items-center gap-3">
+      {/* Stepper Progress */}
+      <div className="flex items-center gap-3 pt-1 select-none">
+        {/* Step 1 */}
         <div
           onClick={() => setCurrentStep('request')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
-            currentStep === 'request'
-              ? 'bg-[#1E3F35] text-white shadow-xs'
-              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-          }`}
+          className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="w-4 h-4 rounded-full bg-white/20 text-center text-[10px] leading-4 font-bold">1</span>
-          <span>Send Request</span>
+          <div
+            className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
+              currentStep === 'request'
+                ? 'bg-[#13382E] text-white shadow-2xs'
+                : 'bg-[#D4EFE0] text-[#136C4F]'
+            }`}
+          >
+            1
+          </div>
+          <span
+            className={`text-xs ${
+              currentStep === 'request'
+                ? 'font-bold text-slate-900'
+                : 'font-semibold text-slate-600'
+            }`}
+          >
+            Send Request
+          </span>
         </div>
 
-        <div className="w-6 h-0.5 bg-stone-300" />
+        {/* Divider */}
+        <div className="w-12 h-[1px] bg-slate-300" />
 
+        {/* Step 2 */}
         <div
           onClick={() => setCurrentStep('verify')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all ${
-            currentStep === 'verify'
-              ? 'bg-[#1E3F35] text-white shadow-xs'
-              : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-          }`}
+          className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="w-4 h-4 rounded-full bg-white/20 text-center text-[10px] leading-4 font-bold">2</span>
-          <span>Verify 2-Min Code</span>
+          <div
+            className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-colors ${
+              currentStep === 'verify'
+                ? 'bg-[#13382E] text-white shadow-2xs'
+                : 'bg-slate-200 text-slate-600'
+            }`}
+          >
+            2
+          </div>
+          <span
+            className={`text-xs ${
+              currentStep === 'verify'
+                ? 'font-bold text-slate-900'
+                : 'font-semibold text-slate-700'
+            }`}
+          >
+            Verify 2-Min Code
+          </span>
         </div>
       </div>
 
       {/* Alerts */}
       {errorMessage && (
-        <div className="bg-rose-50 border border-rose-200 p-4 rounded-2xl text-xs text-rose-700 flex items-center justify-between gap-3 animate-in fade-in">
+        <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-[2px] text-xs text-rose-700 flex items-center justify-between gap-3 shadow-2xs animate-in fade-in">
           <div className="flex items-start gap-2.5">
             <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-rose-600" />
-            <div className="space-y-0.5">
-              <span className="font-bold block">Verification Notice</span>
+            <div>
+              <span className="font-bold block">Notice</span>
               <span>{errorMessage}</span>
             </div>
           </div>
@@ -223,98 +244,137 @@ export const DoctorAddPatient: React.FC = () => {
             errorMessage.toLowerCase().includes('token')) && (
             <Link
               to="/login"
-              className="px-3.5 py-1.5 bg-[#B53629] text-white font-semibold rounded-xl hover:bg-[#962B20] transition-colors whitespace-nowrap text-xs shadow-xs flex-shrink-0"
+              className="px-3 py-1 bg-[#B53629] text-white font-semibold rounded-[2px] hover:bg-[#962B20] transition-colors whitespace-nowrap text-xs shadow-2xs flex-shrink-0"
             >
               Log in again
-            </Link>
-          )}
-          {errorMessage.toLowerCase().includes('pending medical council verification') && (
-            <Link
-              to="/admin"
-              className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-stone-900 font-bold rounded-xl transition-colors whitespace-nowrap text-xs shadow-xs flex-shrink-0 flex items-center gap-1"
-            >
-              <span>Approve in Admin Portal</span>
-              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           )}
         </div>
       )}
 
       {successMessage && !errorMessage && (
-        <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-xs text-emerald-800 flex items-center gap-2.5 animate-in fade-in">
+        <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-[2px] text-xs text-emerald-800 flex items-center gap-2.5 shadow-2xs animate-in fade-in">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600" />
-          <span className="font-medium">{successMessage}</span>
+          <span className="font-semibold">{successMessage}</span>
         </div>
       )}
 
-      {/* Main Form Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-        {/* Left Form (7 cols) */}
-        <div className="md:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-stone-200/70 space-y-6">
+      {/* Two-Column Grid Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start pt-1">
+        {/* LEFT COLUMN: Main Form Card (7 cols) */}
+        <div className="lg:col-span-7 xl:col-span-8 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-6 md:p-7">
           {/* STEP 1: SEND REQUEST */}
           {currentStep === 'request' && (
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-bold text-xs">
-                    1
-                  </span>
-                  <h3 className="font-bold text-sm text-[#172B25]">Enter patient's ReportSetu ID</h3>
-                </div>
-                <p className="text-xs text-stone-500 pl-8">
-                  Ask the patient for their ReportSetu ID (found on their home screen or profile).
-                </p>
+            <div>
+              <h2 className="text-base font-bold text-slate-900 tracking-tight">
+                Enter Patient's ReportSetu ID
+              </h2>
+              <p className="text-xs text-slate-500 font-medium mt-1 mb-5">
+                Ask the patient for their ReportSetu ID (found on their home screen or profile).
+              </p>
 
-                <div className="pl-8 pt-1 flex gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      value={rsId}
-                      onChange={(e) => setRsId(e.target.value.toUpperCase())}
-                      placeholder="e.g. RS-10475"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 font-mono text-sm text-[#172B25] focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35]"
-                    />
+              {/* Input & Send Button Row */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void handleSendRequest();
+                }}
+                className="flex items-center gap-3"
+              >
+                <div className="relative flex-1">
+                  <User className="w-4 h-4 text-slate-700 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={rsId}
+                    onChange={(e) => setRsId(e.target.value.toUpperCase())}
+                    placeholder="e.g. RS-10475"
+                    className="w-full h-[40px] bg-white border border-slate-200 rounded-[2px] pl-9 pr-3 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 transition-all uppercase shadow-2xs"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={requestLoading || !rsId.trim()}
+                  className="h-[40px] px-5 bg-[#13382E] hover:bg-[#184639] text-white text-xs font-semibold rounded-[2px] flex items-center gap-2 shadow-2xs shrink-0 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {requestLoading ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Send className="w-3.5 h-3.5" />
+                  )}
+                  <span>Send Request</span>
+                </button>
+              </form>
+
+              {/* Subtle Divider */}
+              <div className="border-b border-stone-100 my-6" />
+
+              {/* Protocol Instructions List */}
+              <div>
+                <h3 className="text-xs font-bold text-slate-900 mb-3.5">
+                  How the connection protocol works
+                </h3>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 text-xs text-slate-700 leading-normal">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#D4EFE0] text-[#136C4F] flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">
+                      1
+                    </span>
+                    <span>You send a request with the patient's RS-ID.</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleSendRequest}
-                    disabled={requestLoading}
-                    className="bg-[#1E3F35] hover:bg-[#16322A] text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2 active:scale-95 disabled:opacity-50"
-                  >
-                    {requestLoading ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Send className="w-3.5 h-3.5 text-[#52B788]" />
-                    )}
-                    <span>Send Request</span>
-                  </button>
+
+                  <div className="flex items-start gap-3 text-xs text-slate-700 leading-normal">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#D4EFE0] text-[#136C4F] flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">
+                      2
+                    </span>
+                    <span>
+                      Patient receives an in-app alert under{' '}
+                      <strong className="font-bold text-slate-900">Doctor Requests</strong>.
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-3 text-xs text-slate-700 leading-normal">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#D4EFE0] text-[#136C4F] flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">
+                      3
+                    </span>
+                    <span>
+                      Patient reviews your credentials and taps{' '}
+                      <strong className="font-bold text-slate-900">Approve</strong>.
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-3 text-xs text-slate-700 leading-normal">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#D4EFE0] text-[#136C4F] flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">
+                      4
+                    </span>
+                    <span>
+                      A temporary <strong className="font-bold text-slate-900">2-minute code</strong> is revealed to the patient.
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-3 text-xs text-slate-700 leading-normal">
+                    <span className="w-5 h-5 rounded-[2px] bg-[#D4EFE0] text-[#136C4F] flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5">
+                      5
+                    </span>
+                    <span>
+                      Patient reads this code to you, and you enter it to finalize consent.
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Informational Workflow Callout */}
-              <div className="pl-8">
-                <div className="bg-[#EBF4F0] border border-[#C6DBD0] rounded-2xl p-4 text-xs text-[#2A554A] space-y-2">
-                  <div className="flex items-center gap-1.5 font-bold text-[#1E3F35]">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>How the connection protocol works:</span>
-                  </div>
-                  <ol className="list-decimal list-inside space-y-1 text-[11px] text-[#2A554A]/90 pl-1">
-                    <li>You send a request with the patient's RS-ID.</li>
-                    <li>Patient receives an in-app alert under <strong>Doctor Requests</strong>.</li>
-                    <li>Patient reviews your credentials and taps <strong>Approve</strong>.</li>
-                    <li>A temporary <strong>2-minute code</strong> is revealed to the patient.</li>
-                    <li>Patient reads this code to you, and you enter it to finalize consent.</li>
-                  </ol>
-                </div>
-              </div>
-
-              {/* Direct skip if doctor already has patient's code */}
-              <div className="pl-8 pt-2 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
-                <span>Already requested or patient has code ready?</span>
+              {/* Bottom Jump Row */}
+              <div className="border-t border-stone-100 mt-6 pt-4 flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-normal">
+                  Already requested or patient has code ready?
+                </span>
                 <button
                   type="button"
-                  onClick={() => setCurrentStep('verify')}
-                  className="font-bold text-[#1E3F35] hover:underline flex items-center gap-1"
+                  onClick={() => {
+                    setCurrentStep('verify');
+                    setErrorMessage('');
+                  }}
+                  className="font-bold text-[#13382E] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <span>Enter Code →</span>
                 </button>
@@ -322,36 +382,40 @@ export const DoctorAddPatient: React.FC = () => {
             </div>
           )}
 
-          {/* STEP 2: CODE VERIFICATION (DEDICATED VIEW) */}
+          {/* STEP 2: VERIFICATION CODE ENTRY */}
           {currentStep === 'verify' && (
-            <div className="space-y-6 animate-in fade-in">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-[#1E3F35] text-white flex items-center justify-center font-bold text-xs">
-                      2
-                    </span>
-                    <h3 className="font-bold text-sm text-[#172B25]">
-                      Enter patient's 2-minute verification code
-                    </h3>
-                  </div>
-
-                  <button
-                    onClick={() => setCurrentStep('request')}
-                    className="text-[11px] font-semibold text-stone-500 hover:text-stone-800"
-                  >
-                    Change RS-ID ({rsId})
-                  </button>
+            <div className="space-y-5 animate-in fade-in">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 tracking-tight">
+                    Enter Patient's 2-Minute Verification Code
+                  </h2>
+                  <p className="text-xs text-slate-500 font-medium mt-1">
+                    Patient must open their ReportSetu app → tap{' '}
+                    <strong className="text-slate-800">Doctor Requests</strong> → tap{' '}
+                    <strong className="text-slate-800">Approve</strong> to reveal the 6-digit code.
+                  </p>
                 </div>
-
-                <p className="text-xs text-stone-500 pl-8">
-                  Patient must open their ReportSetu app → tap <strong>Doctor Requests</strong> → tap <strong>Approve</strong> to reveal the 6-digit code.
-                </p>
               </div>
 
-              {/* 6-digit inputs */}
-              <div className="pl-8 space-y-4">
-                <div className="flex items-center gap-2" onPaste={handlePaste}>
+              {/* Patient RS-ID chip */}
+              <div className="flex items-center justify-between bg-[#F8FAF9] border border-stone-200/80 p-2.5 px-3 rounded-[2px] text-xs">
+                <div>
+                  <span className="text-slate-500 font-normal">Target Patient: </span>
+                  <span className="font-bold text-slate-900 font-mono">{rsId}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep('request')}
+                  className="text-[#13382E] font-semibold hover:underline cursor-pointer"
+                >
+                  Change RS-ID
+                </button>
+              </div>
+
+              {/* 6 Digit Input Boxes */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2.5" onPaste={handlePaste}>
                   {codeInputs.map((digit, idx) => (
                     <input
                       key={idx}
@@ -361,81 +425,93 @@ export const DoctorAddPatient: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleCodeChange(idx, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(idx, e)}
-                      className="w-11 h-12 text-center text-lg font-bold font-mono rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/30 focus:border-[#1E3F35] bg-stone-50 uppercase"
+                      className="w-11 h-12 text-center text-lg font-bold font-mono rounded-[2px] border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white uppercase shadow-2xs"
                     />
                   ))}
                 </div>
 
-                <div className="flex items-center gap-2 text-[11px] text-stone-400">
-                  <Clock className="w-3.5 h-3.5 text-[#52B788]" />
+                <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                  <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>Codes are valid for 2 minutes from when the patient approves.</span>
                 </div>
 
                 <div className="pt-2">
                   <button
                     onClick={handleVerifyCode}
-                    disabled={verifyLoading || success}
-                    className="w-full py-3 bg-[#1E3F35] hover:bg-[#16322A] text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                    disabled={verifyLoading || success || codeInputs.join('').length < 6}
+                    className="w-full py-2.5 bg-[#13382E] hover:bg-[#184639] text-white font-semibold text-xs rounded-[2px] shadow-2xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {verifyLoading ? (
                       <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                         <span>Verifying with Patient...</span>
                       </>
                     ) : success ? (
                       <>
-                        <CheckCircle2 className="w-4 h-4 text-[#52B788]" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Connected! Redirecting...</span>
                       </>
                     ) : (
                       <>
-                        <UserCheck className="w-4 h-4 text-[#52B788]" />
+                        <UserCheck className="w-3.5 h-3.5" />
                         <span>Verify Code & Connect Patient</span>
                       </>
                     )}
                   </button>
                 </div>
               </div>
+
+              {/* Bottom Jump Row */}
+              <div className="border-t border-stone-100 mt-6 pt-4 flex items-center justify-between text-xs">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep('request')}
+                  className="font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>← Back to Step 1</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Right Column: Pending Requests Sent & Security Info (5 cols) */}
-        <div className="md:col-span-5 space-y-5">
-          {/* Pending Requests Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-card border border-stone-200/70 space-y-4">
+        {/* RIGHT COLUMN: Pending Requests & Consent (5 cols) */}
+        <div className="lg:col-span-5 xl:col-span-4 space-y-4">
+          {/* Card 1: Pending Requests Sent */}
+          <div className="bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500">
-                Pending Requests Sent
-              </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                <Calendar className="w-4 h-4 text-[#136C4F]" />
+                <span>Pending Requests Sent</span>
+              </div>
+              <span className="bg-[#D4EFE0] text-[#136C4F] text-[11px] font-semibold px-2 py-0.5 rounded-[2px]">
                 {pendingRequests.length} pending
               </span>
             </div>
 
             {pendingRequests.length === 0 ? (
-              <p className="text-xs text-stone-400 py-2">
+              <p className="text-xs text-slate-500 mt-3 font-normal leading-relaxed">
                 No connection requests currently awaiting patient approval.
               </p>
             ) : (
-              <div className="space-y-2">
+              <div className="mt-3 space-y-2">
                 {pendingRequests.map((req) => (
                   <div
                     key={req.connectionId}
-                    className="p-3 bg-stone-50 rounded-xl border border-stone-200/80 flex items-center justify-between text-xs"
+                    className="p-2.5 bg-[#F8FAF9] rounded-[2px] border border-stone-200/70 flex items-center justify-between text-xs"
                   >
                     <div>
-                      <span className="font-bold text-stone-800 block">
+                      <span className="font-bold text-slate-900 block">
                         {req.patientName || 'Patient'}
                       </span>
-                      <span className="font-mono text-[10px] text-stone-500">
+                      <span className="font-mono text-[10px] text-slate-500">
                         {req.patientRsId}
                       </span>
                     </div>
 
                     <button
                       onClick={() => selectPendingRequest(req)}
-                      className="px-2.5 py-1 bg-[#1E3F35] text-white text-[11px] font-semibold rounded-lg hover:bg-[#16322A] transition-colors"
+                      className="px-2.5 py-1 bg-[#13382E] text-white text-[11px] font-semibold rounded-[2px] hover:bg-[#184639] transition-colors cursor-pointer"
                     >
                       Enter Code
                     </button>
@@ -445,13 +521,13 @@ export const DoctorAddPatient: React.FC = () => {
             )}
           </div>
 
-          {/* Privacy & Clinical Consent Card */}
-          <div className="bg-[#1E3F35] text-white rounded-3xl p-6 shadow-card space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#52B788]" />
-              <h4 className="font-bold text-sm">Doctor-Patient Consent</h4>
+          {/* Card 2: Doctor-Patient Consent */}
+          <div className="bg-[#EAF6F0]/70 border border-[#C6EAD8] rounded-[2px] p-5">
+            <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
+              <Shield className="w-4 h-4 text-[#136C4F]" />
+              <span>Doctor–Patient Consent</span>
             </div>
-            <p className="text-xs text-white/80 leading-relaxed">
+            <p className="text-xs text-slate-700 leading-relaxed mt-2.5 font-normal">
               ReportSetu enforces the Digital Personal Data Protection (DPDP) Act. Medical records are encrypted at rest and accessible only when active consent is validated via single-use verification codes.
             </p>
           </div>
