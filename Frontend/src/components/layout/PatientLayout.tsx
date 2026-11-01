@@ -23,6 +23,7 @@ export const PatientLayout: React.FC = () => {
 
   const navItems = [
     { name: 'Home', path: '/patient', icon: Home, exact: true },
+    { name: 'Reports', path: '/patient/reports', icon: FileText },
     { name: 'Medicines', path: '/patient/medicines', icon: Pill },
     { name: 'Appointments', path: '/patient/appointments', icon: Calendar },
     { name: 'Ask Doctor', path: '/patient/ask-doctor', icon: MessageSquare },
