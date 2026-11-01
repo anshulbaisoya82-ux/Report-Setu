@@ -59,29 +59,8 @@ export const DoctorPatients: React.FC = () => {
   const doctorSpecialty = doctorInfo.specialty || 'General Physician';
   const doctorInitials = 'DR';
 
-  // Sample or real patient data matching reference design
-  const displayedPatients =
-    patients.length > 0
-      ? patients
-      : [
-          {
-            id: 'sample-p1',
-            name: 'Rishabh',
-            rsId: 'RS-FTPE4',
-            gender: 'Male',
-            age: 23,
-            status: 'Unbalanced' as const,
-            avatar: 'R',
-            lastReportName: 'Complete Blood Count (CBC)',
-            lastReportTime: '30 Oct 2026, 08:47 PM',
-            conditions: [],
-            phone: '',
-            location: '',
-            bloodGroup: '',
-            lastVisitDate: '',
-            connectedDoctors: [],
-          },
-        ];
+  // Real patient data from database (no mock fallback when patient disconnects)
+  const displayedPatients = patients;
 
   // Filter calculations
   const criticalCount = displayedPatients.filter((p) => p.status === 'Critical').length;
@@ -279,73 +258,93 @@ export const DoctorPatients: React.FC = () => {
 
               {/* Table Rows */}
               <div className="divide-y divide-stone-100">
-                {filteredPatients.map((p) => (
-                  <div
-                    key={p.id}
-                    className="px-5 py-3.5 grid grid-cols-12 items-center hover:bg-stone-50/70 transition-colors"
-                  >
-                    {/* PATIENT */}
-                    <div className="col-span-3 flex items-center">
-                      <div className="w-9 h-9 rounded-full bg-[#E2EBE6] text-[#2A554A] font-bold text-sm flex items-center justify-center mr-3 shrink-0">
-                        {p.avatar || p.name[0] || 'R'}
-                      </div>
-                      <div>
-                        <p className="font-bold text-[13px] sm:text-[14px] text-stone-900 leading-tight">
-                          {p.name}
-                        </p>
-                        <p className="text-[11px] text-stone-400 font-mono mt-0.5">
-                          {p.rsId || 'RS-FTPE4'}
-                        </p>
-                        <p className="text-[11px] text-stone-400 mt-0.5">
-                          {p.gender || 'Male'} · {p.age ? `${p.age} years` : '23 years'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* LATEST REPORT */}
-                    <div className="col-span-3 pr-2">
-                      <p className="font-medium text-[13px] sm:text-[14px] text-stone-800 leading-tight">
-                        {p.lastReportName || 'Complete Blood Count (CBC)'}
-                      </p>
-                      <p className="text-[11px] text-[#E5484D] flex items-center gap-1 mt-0.5 font-medium">
-                        <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
-                        <span>1 value outside reference range</span>
-                      </p>
-                    </div>
-
-                    {/* STATUS */}
-                    <div className="col-span-2">
-                      <span className="bg-[#FEF5E7] text-[#C27D00] border border-[#FDE5B5] px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#E5A000]" />
-                        <span>{p.status || 'Unbalanced'}</span>
-                      </span>
-                    </div>
-
-                    {/* LAST UPDATED */}
-                    <div className="col-span-2">
-                      <p className="text-[12px] text-stone-700 font-medium">
-                        {formatDisplayDate(p.lastReportTime)}
-                      </p>
-                      <p className="text-[11px] text-stone-400 mt-0.5">by Patient</p>
-                    </div>
-
-                    {/* ACTIONS */}
-                    <div className="col-span-2 flex items-center justify-end gap-2">
+                {filteredPatients.length === 0 ? (
+                  <div className="py-12 px-4 text-center space-y-2">
+                    <p className="text-xs font-semibold text-stone-600">No connected patients found</p>
+                    <p className="text-[11px] text-stone-400 max-w-sm mx-auto">
+                      {searchQuery
+                        ? 'No patients matched your search query.'
+                        : 'You do not have any active patient connections. Connect a new patient with their ReportSetu ID to review their health records.'}
+                    </p>
+                    {!searchQuery && (
                       <button
-                        onClick={() => navigate(`/doctor/patients/${p.id}`)}
-                        className="h-[32px] px-3 bg-white border border-stone-200 hover:bg-stone-50 text-[#184E3F] rounded-[2px] text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
+                        onClick={() => navigate('/doctor/add-patient')}
+                        className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#13382E] text-white rounded-[2px] text-xs font-semibold hover:bg-[#0c241e] cursor-pointer shadow-2xs"
                       >
-                        View File
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Connect New Patient</span>
                       </button>
-                      <button
-                        aria-label="More options"
-                        className="w-7 h-7 text-stone-400 hover:text-stone-600 rounded-[2px] hover:bg-stone-100 flex items-center justify-center transition-colors cursor-pointer"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                    </div>
+                    )}
                   </div>
-                ))}
+                ) : (
+                  filteredPatients.map((p) => (
+                    <div
+                      key={p.id}
+                      className="px-5 py-3.5 grid grid-cols-12 items-center hover:bg-stone-50/70 transition-colors"
+                    >
+                      {/* PATIENT */}
+                      <div className="col-span-3 flex items-center">
+                        <div className="w-9 h-9 rounded-full bg-[#E2EBE6] text-[#2A554A] font-bold text-sm flex items-center justify-center mr-3 shrink-0">
+                          {p.avatar || p.name[0] || 'R'}
+                        </div>
+                        <div>
+                          <p className="font-bold text-[13px] sm:text-[14px] text-stone-900 leading-tight">
+                            {p.name}
+                          </p>
+                          <p className="text-[11px] text-stone-400 font-mono mt-0.5">
+                            {p.rsId || 'RS-FTPE4'}
+                          </p>
+                          <p className="text-[11px] text-stone-400 mt-0.5">
+                            {p.gender || 'Male'} · {p.age ? `${p.age} years` : '23 years'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* LATEST REPORT */}
+                      <div className="col-span-3 pr-2">
+                        <p className="font-medium text-[13px] sm:text-[14px] text-stone-800 leading-tight">
+                          {p.lastReportName || 'Complete Blood Count (CBC)'}
+                        </p>
+                        <p className="text-[11px] text-[#E5484D] flex items-center gap-1 mt-0.5 font-medium">
+                          <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+                          <span>1 value outside reference range</span>
+                        </p>
+                      </div>
+
+                      {/* STATUS */}
+                      <div className="col-span-2">
+                        <span className="bg-[#FEF5E7] text-[#C27D00] border border-[#FDE5B5] px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#E5A000]" />
+                          <span>{p.status || 'Unbalanced'}</span>
+                        </span>
+                      </div>
+
+                      {/* LAST UPDATED */}
+                      <div className="col-span-2">
+                        <p className="text-[12px] text-stone-700 font-medium">
+                          {formatDisplayDate(p.lastReportTime)}
+                        </p>
+                        <p className="text-[11px] text-stone-400 mt-0.5">by Patient</p>
+                      </div>
+
+                      {/* ACTIONS */}
+                      <div className="col-span-2 flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => navigate(`/doctor/patients/${p.id}`)}
+                          className="h-[32px] px-3 bg-white border border-stone-200 hover:bg-stone-50 text-[#184E3F] rounded-[2px] text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
+                        >
+                          View File
+                        </button>
+                        <button
+                          aria-label="More options"
+                          className="w-7 h-7 text-stone-400 hover:text-stone-600 rounded-[2px] hover:bg-stone-100 flex items-center justify-center transition-colors cursor-pointer"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

@@ -14,7 +14,8 @@
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "db:import-medicines": "node scripts/importMedicines.js"
   },
   "keywords": [
     "healthcare",

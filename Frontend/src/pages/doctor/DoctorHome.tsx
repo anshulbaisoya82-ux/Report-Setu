@@ -60,28 +60,7 @@ export const DoctorHome: React.FC = () => {
   const doctorInitials = 'DR';
 
   // Sample or real patient data for the Priority Patients table
-  const displayedPatients =
-    patients.length > 0
-      ? patients
-      : [
-          {
-            id: 'sample-p1',
-            name: 'Rishabh',
-            rsId: 'RS-FIPE4',
-            gender: 'Male',
-            age: 0,
-            status: 'Unbalanced' as const,
-            avatar: 'R',
-            lastReportName: 'Complete Blood Count (CBC)',
-            lastReportTime: '30 Oct 2026, 08:47 PM',
-            conditions: [],
-            phone: '',
-            location: '',
-            bloodGroup: '',
-            lastVisitDate: '',
-            connectedDoctors: [],
-          },
-        ];
+  const displayedPatients = patients;
 
   // Filtering for priority patients
   const filteredPatients = displayedPatients.filter((p) => {
@@ -92,13 +71,7 @@ export const DoctorHome: React.FC = () => {
   });
 
   // Top pending report for "Reports awaiting review"
-  const awaitingReport = reports.find((r) => !r.reviewed && r.reviewStatus !== 'approved') || {
-    id: 'sample-r1',
-    name: 'Complete Blood Count (CBC)',
-    patientName: 'Rishabh',
-    labName: 'ADARSH PATHOLOGY CENTER',
-    status: 'Unbalanced',
-  };
+  const awaitingReport = reports.find((r) => !r.reviewed && r.reviewStatus !== 'approved') || null;
 
   return (
     <div className="min-h-full flex flex-col text-stone-800">
@@ -222,7 +195,7 @@ export const DoctorHome: React.FC = () => {
           <div className="flex items-end justify-between">
             <div>
               <h2 className="text-[28px] font-extrabold text-stone-900 tracking-tight leading-none">
-                {patients.length > 0 ? patients.length : 1}
+                {patients.length}
               </h2>
               <div className="flex items-center gap-1 text-[11px] font-semibold text-[#1E7E49] mt-1.5">
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -261,10 +234,10 @@ export const DoctorHome: React.FC = () => {
           <div>
             <div className="flex items-baseline justify-between">
               <h2 className="text-[28px] font-extrabold text-stone-900 tracking-tight leading-none">
-                {todayAppointments.length > 0 ? todayAppointments.length : 1}
+                {todayAppointments.length}
               </h2>
               <span className="text-[11px] text-stone-400 font-medium">
-                {completedAppointments} completed · {Math.max(1, todayAppointments.length - completedAppointments)} remaining
+                {completedAppointments} completed · {Math.max(0, todayAppointments.length - completedAppointments)} remaining
               </span>
             </div>
 
@@ -273,7 +246,7 @@ export const DoctorHome: React.FC = () => {
               <span>
                 {nextAppointment
                   ? `Next visit: ${nextAppointment.patientName} at ${nextAppointment.time}`
-                  : 'Next visit: Rishabh at 10:30 AM'}
+                  : 'No upcoming visits scheduled'}
               </span>
             </p>
           </div>
@@ -348,7 +321,7 @@ export const DoctorHome: React.FC = () => {
                   : 'bg-[#F8F9FA] border border-stone-200/70 text-stone-600 hover:bg-stone-100'
               }`}
             >
-              All (1)
+              All ({displayedPatients.length})
             </button>
             <button
               onClick={() => setActiveTab('critical')}
@@ -359,7 +332,7 @@ export const DoctorHome: React.FC = () => {
               }`}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#E5484D]" />
-              <span>Critical (0)</span>
+              <span>Critical ({displayedPatients.filter((p) => p.status === 'Critical').length})</span>
             </button>
             <button
               onClick={() => setActiveTab('needs_review')}
@@ -370,7 +343,7 @@ export const DoctorHome: React.FC = () => {
               }`}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#E5A000]" />
-              <span>Needs review (1)</span>
+              <span>Needs review ({displayedPatients.filter((p) => p.status === 'Unbalanced' || p.status === 'Needs Review').length})</span>
             </button>
             <button
               onClick={() => setActiveTab('recent')}
@@ -381,7 +354,7 @@ export const DoctorHome: React.FC = () => {
               }`}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#6E56CF]" />
-              <span>Recent activity (0)</span>
+              <span>Recent activity ({displayedPatients.length})</span>
             </button>
           </div>
 
@@ -409,7 +382,8 @@ export const DoctorHome: React.FC = () => {
 
             {/* Table Rows */}
             <div className="divide-y divide-stone-100">
-              {filteredPatients.map((p) => (
+              {filteredPatients.length > 0 ? (
+                filteredPatients.map((p) => (
                 <div
                   key={p.id}
                   className="px-4 py-3 grid grid-cols-12 items-center hover:bg-stone-50/70 transition-colors"
@@ -475,7 +449,16 @@ export const DoctorHome: React.FC = () => {
                     </button>
                   </div>
                 </div>
-              ))}
+              ))
+              ) : (
+                <div className="px-6 py-12 text-center text-stone-400">
+                  <Users className="w-8 h-8 mx-auto mb-2 text-stone-300" />
+                  <p className="text-[13px] font-semibold text-stone-600">No active priority patients</p>
+                  <p className="text-[11px] text-stone-400 mt-1 max-w-sm mx-auto">
+                    Patients with active clinical consent and priority findings will be displayed here.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -511,28 +494,36 @@ export const DoctorHome: React.FC = () => {
             </div>
 
             {/* Report Row Item */}
-            <div className="border border-stone-200/80 rounded-[8px] p-3.5 flex items-center justify-between bg-white hover:bg-stone-50/50 transition-colors">
-              <div>
-                <p className="font-bold text-[13px] sm:text-[14px] text-stone-900 leading-tight">
-                  {awaitingReport.name}
-                </p>
-                <p className="text-[11px] text-stone-400 mt-1">
-                  {awaitingReport.patientName} · {awaitingReport.labName}
-                </p>
-              </div>
+            {awaitingReport ? (
+              <div className="border border-stone-200/80 rounded-[8px] p-3.5 flex items-center justify-between bg-white hover:bg-stone-50/50 transition-colors">
+                <div>
+                  <p className="font-bold text-[13px] sm:text-[14px] text-stone-900 leading-tight">
+                    {awaitingReport.name}
+                  </p>
+                  <p className="text-[11px] text-stone-400 mt-1">
+                    {awaitingReport.patientName} · {awaitingReport.labName}
+                  </p>
+                </div>
 
-              <div className="flex items-center gap-2.5">
-                <span className="bg-[#FEF5E7] text-[#C27D00] px-2.5 py-0.5 rounded-full text-[11px] font-semibold">
-                  Unbalanced
-                </span>
-                <button
-                  onClick={() => navigate(`/doctor/reports/${awaitingReport.id}`)}
-                  className="h-[32px] px-3.5 bg-white border border-stone-200 hover:bg-stone-50 text-stone-800 rounded-[8px] text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
-                >
-                  Review
-                </button>
+                <div className="flex items-center gap-2.5">
+                  <span className="bg-[#FEF5E7] text-[#C27D00] px-2.5 py-0.5 rounded-full text-[11px] font-semibold">
+                    {awaitingReport.status || 'Unbalanced'}
+                  </span>
+                  <button
+                    onClick={() => navigate(`/doctor/reports/${awaitingReport.id}`)}
+                    className="h-[32px] px-3.5 bg-white border border-stone-200 hover:bg-stone-50 text-stone-800 rounded-[8px] text-[12px] font-semibold shadow-2xs transition-colors cursor-pointer"
+                  >
+                    Review
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="border border-stone-200/80 rounded-[8px] p-6 text-center bg-stone-50/50">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto mb-1.5" />
+                <p className="font-semibold text-[13px] text-stone-700">All reports reviewed</p>
+                <p className="text-[11px] text-stone-400 mt-0.5">No pending patient lab reports require clinical review.</p>
+              </div>
+            )}
           </div>
         </div>
 

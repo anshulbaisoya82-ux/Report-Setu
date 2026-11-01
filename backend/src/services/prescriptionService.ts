@@ -229,3 +229,61 @@ export async function getPrescriptions(
   const list = await Prescription.find(query).sort({ createdAt: -1 });
   return list.map(formatPrescriptionResponse);
 }
+
+
+/**
+ * Service: Revokes an active prescription in between the prescribed time period.
+ */
+export async function revokePrescription(
+  userId: string,
+  prescriptionId: string,
+  reason?: string
+): Promise<FormattedPrescription> {
+  const doctor = await DoctorProfile.findOne({ userId });
+  if (!doctor) {
+    throw new ForbiddenError('Doctor profile not found');
+  }
+
+  const prescription = await Prescription.findById(prescriptionId);
+  if (!prescription) {
+    throw new NotFoundError('Prescription not found');
+  }
+
+  if (prescription.doctorId.toString() !== doctor._id.toString()) {
+    const connection = await Connection.findOne({
+      doctorId: doctor._id,
+      patientId: prescription.patientId,
+      status: 'active',
+    });
+    if (!connection) {
+      throw new ForbiddenError('You are not authorized to revoke this prescription');
+    }
+  }
+
+  prescription.status = 'Ended';
+  if (reason) {
+    prescription.instructions = `${prescription.instructions} [Discontinued on ${formatDisplayDate(new Date())}: ${reason}]`;
+  }
+  await prescription.save();
+
+  const patient = await PatientProfile.findById(prescription.patientId);
+  const formatted = formatPrescriptionResponse(prescription);
+
+  if (patient) {
+    emitToUser(patient.userId.toString(), 'prescription:updated', formatted);
+    emitToUser(patient.userId.toString(), 'medication:schedule_updated', { patientId: patient._id.toString() });
+
+    try {
+      await dispatchNotificationWithPreferences(
+        patient.userId.toString(),
+        'medicine_reminder',
+        `Prescription Discontinued: ${prescription.name}`,
+        `Dr. ${doctor.name} has revoked / discontinued ${prescription.name}${reason ? ` (${reason})` : ''}. Please stop taking this medication.`
+      );
+    } catch (err: any) {
+      console.warn('Failed to dispatch revoke notification:', err?.message);
+    }
+  }
+
+  return formatted;
+}

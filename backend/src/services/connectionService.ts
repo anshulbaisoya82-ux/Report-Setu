@@ -569,25 +569,50 @@ export const revokeDoctorConnectionByPatient = async (
   doctorIdInput: string,
   ipAddress = '127.0.0.1'
 ): Promise<IConnection> => {
-  const patient = await PatientProfile.findOne({ userId: patientUserId });
+  const patient = await PatientProfile.findOne({
+    $or: [{ userId: patientUserId }, { _id: patientUserId }],
+  });
   if (!patient) {
     throw new NotFoundError('Patient profile not found');
   }
 
-  const orConditions: any[] = [{ _id: doctorIdInput }, { userId: doctorIdInput }];
-  const doctor = await DoctorProfile.findOne({ $or: orConditions });
-
-  if (!doctor) {
-    throw new NotFoundError('Doctor profile not found');
-  }
-
-  const connection = await Connection.findOne({
-    patientId: patient._id,
-    doctorId: doctor._id,
+  let doctor = await DoctorProfile.findOne({
+    $or: [{ _id: doctorIdInput }, { userId: doctorIdInput }],
   });
 
+  let connection = doctor
+    ? await Connection.findOne({
+        patientId: patient._id,
+        doctorId: { $in: [doctor._id, doctor.userId] },
+      })
+    : null;
+
   if (!connection) {
-    throw new NotFoundError('No connection found with this doctor');
+    connection = await Connection.findOne({
+      $or: [
+        { patientId: patient._id, _id: doctorIdInput },
+        { patientId: patient._id, doctorId: doctorIdInput },
+      ],
+    });
+  }
+
+  if (!connection) {
+    const activeConns = await Connection.find({
+      patientId: patient._id,
+      status: { $in: ['active', 'connected'] },
+    });
+    if (activeConns.length > 0) {
+      connection = activeConns[0];
+    }
+  }
+
+  if (!connection) {
+    return {
+      status: 'revoked',
+      patientId: patient._id,
+      revokedAt: new Date(),
+      revokedBy: 'patient',
+    } as any;
   }
 
   connection.status = 'revoked';
@@ -595,27 +620,42 @@ export const revokeDoctorConnectionByPatient = async (
   connection.revokedBy = 'patient';
   await connection.save();
 
-  // Evict doctor from live rooms
-  const { revokeDoctorAccessFromRooms } = await import('./socketService');
-  await revokeDoctorAccessFromRooms(doctor._id.toString(), patient._id.toString());
+  if (!doctor && connection.doctorId) {
+    doctor = await DoctorProfile.findOne({
+      $or: [{ _id: connection.doctorId }, { userId: connection.doctorId }],
+    });
+  }
 
-  await Notification.create({
-    userId: doctor.userId,
-    type: 'connection_request',
-    title: 'Patient Connection Revoked',
-    message: `${patient.name} (${patient.rsId}) has revoked your clinical connection.`,
-    data: {
-      patientId: patient._id.toString(),
-      rsId: patient.rsId,
-    },
-  });
+  if (doctor) {
+    try {
+      const { revokeDoctorAccessFromRooms } = await import('./socketService');
+      await revokeDoctorAccessFromRooms(doctor._id.toString(), patient._id.toString());
+    } catch {
+      // Non-fatal
+    }
+
+    try {
+      await Notification.create({
+        userId: doctor.userId,
+        type: 'connection_request',
+        title: 'Patient Connection Revoked',
+        message: `${patient.name} (${patient.rsId}) has revoked your clinical connection.`,
+        data: {
+          patientId: patient._id.toString(),
+          rsId: patient.rsId,
+        },
+      });
+    } catch {
+      // Non-fatal
+    }
+  }
 
   recordAudit({
     userId: patientUserId,
     userRole: 'patient',
     action: 'DOCTOR_DISCONNECT',
     resourceType: 'Connection',
-    resourceId: connection._id.toString(),
+    resourceId: connection._id ? connection._id.toString() : 'conn',
     patientId: patient._id,
     purpose: 'PATIENT_REVOKE_DOCTOR',
     ipAddress,

@@ -437,9 +437,17 @@ export const Login: React.FC = () => {
         </div>
 
         {/* Footer Note */}
-        <div className="text-center text-xs text-stone-400 flex items-center justify-center gap-1.5 pb-2">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>ReportSetu strictly protects your medical information and authentication credentials.</span>
+        <div className="text-center text-xs text-stone-400 flex flex-col items-center justify-center gap-1.5 pb-2">
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>ReportSetu strictly protects your medical information and authentication credentials.</span>
+          </div>
+          <Link
+            to="/admin"
+            className="text-[11px] font-mono text-stone-400 hover:text-stone-700 flex items-center gap-1 mt-1 transition"
+          >
+            <span>🔒 Central Security Vault & Operations Matrix (/admin)</span>
+          </Link>
         </div>
       </div>
     </div>

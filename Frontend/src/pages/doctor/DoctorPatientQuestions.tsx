@@ -4,6 +4,7 @@ import { useStore } from '../../store/useStore';
 import {
   Search,
   Send,
+  MessageSquare,
   Sparkles,
   User,
   Check,
@@ -25,58 +26,17 @@ export const DoctorPatientQuestions: React.FC = () => {
   const [isTogglingAi, setIsTogglingAi] = useState(false);
   const [toastInfo, setToastInfo] = useState<{ message: string; sub?: string } | null>(null);
 
-  // Fallback thread matching the exact reference image
-  const defaultThreads: PatientQuestionThread[] = [
-    {
-      id: 'thread-sample-1',
-      patientId: 'sample-p1',
-      patientName: 'Rishabh',
-      patientAvatar: 'R',
-      patientRsId: 'RS-FTPE4',
-      doctorName: currentUser?.name || 'Dr. Rishabh',
-      reportContext: 'Complete Blood Count (CBC)',
-      category: 'Medicine',
-      isAiPaused: false,
-      unreadCount: 2,
-      lastMessageTime: '31 Oct 2026, 03:16 PM',
-      messages: [
-        {
-          id: 'msg-1',
-          sender: 'patient',
-          text: 'What was my platelet count in my report?',
-          timestamp: '31 Oct 2026, 03:16 PM',
-        },
-        {
-          id: 'msg-2',
-          sender: 'assistant',
-          text: "Hello Rishabh, your platelet count from your recent CBC report is 124,000/cu.mm. Please don't worry about these numbers, and remember to discuss them with Dr. Rishabh during your upcoming follow-up appointment on October 31, 2026, at 10:30 AM.",
-          timestamp: '31 Oct 2026, 03:16 PM',
-        },
-        {
-          id: 'msg-3',
-          sender: 'patient',
-          text: 'Can you prescribe me medicine for cold and fever?',
-          timestamp: '31 Oct 2026, 03:17 PM',
-        },
-      ],
-    },
-  ];
-
-  const [threads, setThreads] = useState<PatientQuestionThread[]>(defaultThreads);
+  const [threads, setThreads] = useState<PatientQuestionThread[]>([]);
 
   useEffect(() => {
     void fetchQuestionThreads();
   }, [fetchQuestionThreads]);
 
   useEffect(() => {
-    if (questionThreads && questionThreads.length > 0) {
-      setThreads(questionThreads);
-    }
+    setThreads(questionThreads || []);
   }, [questionThreads]);
 
-  const [selectedThreadId, setSelectedThreadId] = useState<string>(
-    threads[0]?.id || 'thread-sample-1'
-  );
+  const [selectedThreadId, setSelectedThreadId] = useState<string>('');
 
   // References for scrolling
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -411,7 +371,7 @@ export const DoctorPatientQuestions: React.FC = () => {
 
             {filteredThreads.length === 0 && (
               <div className="py-12 text-center text-slate-400 text-xs">
-                No patient questions match this filter.
+                No patient questions found. Only inquiries from connected patients are displayed.
               </div>
             )}
           </div>
@@ -595,8 +555,12 @@ export const DoctorPatientQuestions: React.FC = () => {
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-slate-400 text-xs">
-              Select an inquiry thread from the left to view and answer.
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-2">
+              <MessageSquare className="w-8 h-8 text-slate-300" />
+              <h4 className="text-xs font-bold text-slate-700">No Patient Conversation Selected</h4>
+              <p className="text-[11px] text-slate-400 max-w-sm">
+                Patient questions and clinical consultations are only accessible while patient consent is active.
+              </p>
             </div>
           )}
         </div>

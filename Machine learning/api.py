@@ -31,6 +31,7 @@ from typing import List, Dict, Any, Optional, Literal
 from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+import httpx
 
 # Ensure workspace root is in sys.path
 WORKSPACE_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -483,6 +484,70 @@ app.add_middleware(
 
 # Include router
 app.include_router(router)
+
+
+# ---------------------------------------------------------------------------
+# Medicine Search Autocomplete Endpoints (Task: Medicine Search Service)
+# ---------------------------------------------------------------------------
+@router.get("/api/medicines/search", summary="Search Medicines Autocomplete")
+@app.get("/api/medicines/search", summary="Search Medicines Autocomplete")
+async def search_medicines_api(q: str = "", limit: int = 8):
+    """
+    Search Indian Medicine dataset and DrugDB for medicine autocomplete.
+    """
+    if not q or len(q.strip()) < 2:
+        return {"medicines": [], "count": 0, "query": q}
+    
+    clean_q = q.strip()
+    try:
+        # 1. Query Node/Express backend service if running
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"http://127.0.0.1:5000/api/v1/medicines/search?q={clean_q}&limit={limit}")
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("data", data)
+    except Exception:
+        pass
+
+    # 2. Fallback to DrugDB search API directly
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"https://drugdb.in/search?q={clean_q}&type=medicine&limit={limit}")
+            if resp.status_code == 200:
+                data = resp.json()
+                results = []
+                for item in data.get("results", []):
+                    med_name = item.get("medicineName", "")
+                    results.append({
+                        "id": f"drugdb-{item.get('medicineSctid', '')}",
+                        "name": med_name,
+                        "brandName": item.get("brand.brandName", med_name.split()[0] if med_name else ""),
+                        "genericName": item.get("generic.genericName"),
+                        "composition": item.get("generic.genericName"),
+                        "dosageForm": "Tablet" if "tablet" in med_name.lower() else "Capsule" if "capsule" in med_name.lower() else "Syrup" if "syrup" in med_name.lower() else "Injection" if "injection" in med_name.lower() else "Tablet",
+                        "manufacturer": item.get("manufacturer.manufacturerName"),
+                        "source": "drugdb",
+                        "isDiscontinued": False
+                    })
+                return {"medicines": results, "count": len(results), "query": q}
+    except Exception as e:
+        return {"medicines": [], "count": 0, "query": q, "error": str(e)}
+
+    return {"medicines": [], "count": 0, "query": q}
+
+
+@router.get("/api/medicines/{medicine_id}", summary="Get Medicine Details")
+@app.get("/api/medicines/{medicine_id}", summary="Get Medicine Details")
+async def get_medicine_by_id_api(medicine_id: str):
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            resp = await client.get(f"http://127.0.0.1:5000/api/v1/medicines/detail/{medicine_id}")
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("data", data)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Medicine {medicine_id} not found: {str(e)}")
+    raise HTTPException(status_code=404, detail=f"Medicine {medicine_id} not found")
 
 
 @app.get("/", summary="Root Status")

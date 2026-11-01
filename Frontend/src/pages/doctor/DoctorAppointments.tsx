@@ -78,19 +78,8 @@ export const DoctorAppointments: React.FC = () => {
   const doctorSpecialty = doctorInfo.specialty || 'General Physician';
   const doctorInitials = 'DR';
 
-  // Available patients or fallback
-  const availablePatients =
-    patients && patients.length > 0
-      ? patients
-      : [
-          {
-            id: 'sample-p1',
-            name: 'Rishabh',
-            rsId: 'RS-FTPE4',
-            age: 23,
-            gender: 'Male',
-          },
-        ];
+  // Available patients
+  const availablePatients = patients || [];
 
   // Set default selected patient once available
   useEffect(() => {
@@ -118,24 +107,7 @@ export const DoctorAppointments: React.FC = () => {
     '05:30 PM',
   ];
 
-  // Fallback appointments matching reference image if appointments store is empty
-  const displayedAppointments: Appointment[] =
-    appointments.length > 0
-      ? appointments
-      : [
-          {
-            id: 'apt-sample-1',
-            patientId: 'sample-p1',
-            patientName: 'Rishabh',
-            patientRsId: 'RS-FTPE4',
-            doctorName: doctorDisplayName,
-            date: '2026-10-31',
-            time: '10:30 AM',
-            type: 'In-person',
-            status: 'Completed',
-            reason: 'Follow-up CBC report review',
-          },
-        ];
+  const displayedAppointments: Appointment[] = appointments || [];
 
   // Calculated Stats
   const pendingRequests = displayedAppointments.filter((a) => a.status === 'Pending');

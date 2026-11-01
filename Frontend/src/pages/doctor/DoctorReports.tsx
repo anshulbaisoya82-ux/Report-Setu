@@ -91,57 +91,35 @@ export const DoctorReports: React.FC = () => {
   const doctorInitials = 'DR';
 
   // Sample or real reports mapped with patient details
-  const displayedReports: ReportDisplayItem[] =
-    reports.length > 0
-      ? reports.map((r: any) => {
-          const patient = patients.find(
-            (p) => p.id === r.patientId || p.rsId === r.patientRsId || p.name === r.patientName
-          );
-          const { date, time } = formatReportDateTime(r.reportedDate || r.collectionDate || r.createdAt);
-          return {
-            id: r.id || r._id || 'sample-r1',
-            name: r.name || 'Complete Blood Count (CBC)',
-            category: r.category === 'CBC' || !r.category ? 'Blood Report' : `${r.category} Report`,
-            dateStr: date,
-            timeStr: time,
-            patientId: r.patientId || patient?.id || 'sample-p1',
-            patientName: r.patientName || patient?.name || 'Rishabh',
-            patientAvatar: patient?.avatar || r.patientAvatar || 'R',
-            patientRsId: r.patientRsId || patient?.rsId || 'RS-FTPE4',
-            patientGender: patient?.gender || 'Male',
-            patientAge: patient?.age || 23,
-            status: (r.status as any) || 'Unbalanced',
-            reviewed: Boolean(r.reviewed || r.reviewStatus === 'approved'),
-            reviewStatus: r.reviewStatus,
-            doctorViewed: Boolean(r.doctorViewed || r.reviewStatus === 'in_review' || r.reviewStatus === 'approved' || r.reviewed),
-            outsideRangeText:
-              r.status === 'Critical'
-                ? '2 values critical'
-                : r.status === 'Unbalanced'
-                ? '1 value outside reference range'
-                : undefined,
-          };
-        })
-      : [
-          {
-            id: 'sample-r1',
-            name: 'Complete Blood Count (CBC)',
-            category: 'Blood Report',
-            dateStr: '30 Oct 2026,',
-            timeStr: '08:47 PM',
-            patientId: 'sample-p1',
-            patientName: 'Rishabh',
-            patientAvatar: 'R',
-            patientRsId: 'RS-FTPE4',
-            patientGender: 'Male',
-            patientAge: 23,
-            status: 'Unbalanced',
-            reviewed: true,
-            reviewStatus: 'approved',
-            doctorViewed: true,
-            outsideRangeText: '1 value outside reference range',
-          },
-        ];
+  const displayedReports: ReportDisplayItem[] = reports.map((r: any) => {
+    const patient = patients.find(
+      (p) => p.id === r.patientId || p.rsId === r.patientRsId || p.name === r.patientName
+    );
+    const { date, time } = formatReportDateTime(r.reportedDate || r.collectionDate || r.createdAt);
+    return {
+      id: r.id || r._id || 'rep-1',
+      name: r.name || 'Complete Blood Count (CBC)',
+      category: r.category === 'CBC' || !r.category ? 'Blood Report' : `${r.category} Report`,
+      dateStr: date,
+      timeStr: time,
+      patientId: r.patientId || patient?.id || '',
+      patientName: r.patientName || patient?.name || 'Patient',
+      patientAvatar: patient?.avatar || r.patientAvatar || 'P',
+      patientRsId: r.patientRsId || patient?.rsId || '',
+      patientGender: patient?.gender || 'Male',
+      patientAge: patient?.age || 25,
+      status: (r.status as any) || 'Normal',
+      reviewed: Boolean(r.reviewed || r.reviewStatus === 'approved'),
+      reviewStatus: r.reviewStatus,
+      doctorViewed: Boolean(r.doctorViewed || r.reviewStatus === 'in_review' || r.reviewStatus === 'approved' || r.reviewed),
+      outsideRangeText:
+        r.status === 'Critical'
+          ? 'Critical values detected'
+          : r.status === 'Unbalanced'
+          ? 'Values outside reference range'
+          : undefined,
+    };
+  });
 
   // Critical alerts that require urgent attention
   const criticalReports = displayedReports.filter((r) => r.status === 'Critical');

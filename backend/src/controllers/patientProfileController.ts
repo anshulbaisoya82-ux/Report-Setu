@@ -5,6 +5,7 @@ import { NotFoundError } from '../utils/errors';
 
 const profileUpdateSchema = z.object({
   name: z.string().min(2).optional(),
+  phone: z.string().optional(),
   age: z.number().int().min(0).max(130).optional(),
   gender: z.string().min(1).optional(),
   bloodGroup: z.string().min(1).optional(),
@@ -54,6 +55,10 @@ export async function getPatientProfile(req: Request, res: Response, next: NextF
       orderBy: { createdAt: 'desc' },
     });
 
+    const currentPrefs = (profile.notificationPreferences as any) || {};
+    const emergencyContact = currentPrefs.emergencyContact || null;
+    const activeDoctor = (activeConnection as any)?.doctor || null;
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -61,7 +66,7 @@ export async function getPatientProfile(req: Request, res: Response, next: NextF
         userId: user.id,
         rsId: profile.rsId,
         name: profile.name,
-        phone: profile.phone || user.phone,
+        phone: profile.phone || user.phone || '',
         email: user.email || '',
         avatar: profile.avatar || '',
         age: profile.age,
@@ -70,16 +75,17 @@ export async function getPatientProfile(req: Request, res: Response, next: NextF
         conditions: profile.conditions || [],
         location: profile.location,
         status: profile.status,
+        emergencyContact,
         lastVisitDate: profile.lastVisitDate,
         lastReportTime: profile.lastReportTime,
         lastReportName: profile.lastReportName,
         notificationPreferences: profile.notificationPreferences,
-        primaryDoctor: activeConnection?.doctor
+        primaryDoctor: activeDoctor
           ? {
-              id: activeConnection.doctor.id,
-              name: activeConnection.doctor.name,
-              specialty: activeConnection.doctor.specialty,
-              clinic: activeConnection.doctor.clinic,
+              id: activeDoctor.id,
+              name: activeDoctor.name,
+              specialty: activeDoctor.specialty,
+              clinic: activeDoctor.clinic,
             }
           : null,
         stats: {
@@ -111,23 +117,58 @@ export async function updatePatientProfile(req: Request, res: Response, next: Ne
 
     // If email provided, sync to user table
     if (input.email) {
-      await prisma.user.update({
-        where: { id: userId },
-        data: { email: input.email },
-      });
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { email: input.email },
+        });
+      } catch (emailErr) {
+        // Continue if duplicate or unchanged
+      }
     }
 
-    const { email, ...patientData } = input;
+    // If phone provided, sync to user table
+    if (input.phone) {
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { phone: input.phone },
+        });
+      } catch (phoneErr) {
+        // Continue if duplicate or unchanged
+      }
+    }
+
+    const { email, emergencyContact, phone, ...patientData } = input;
+
+    // Persist emergencyContact inside notificationPreferences JSON column
+    const currentPrefs = (profile.notificationPreferences as any) || {};
+    const updatedPrefs = emergencyContact !== undefined
+      ? { ...currentPrefs, emergencyContact }
+      : currentPrefs;
+
+    const dataToUpdate: any = {
+      ...patientData,
+      notificationPreferences: updatedPrefs,
+      updatedAt: new Date(),
+    };
+    if (phone) {
+      dataToUpdate.phone = phone;
+    }
 
     const updated = await prisma.patientProfile.update({
       where: { userId },
-      data: {
-        ...patientData,
-        updatedAt: new Date(),
-      },
+      data: dataToUpdate,
     });
 
-    res.status(200).json({ status: 'success', data: updated });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        ...updated,
+        email: input.email || undefined,
+        emergencyContact: emergencyContact || currentPrefs.emergencyContact || null,
+      },
+    });
   } catch (err) {
     next(err);
   }

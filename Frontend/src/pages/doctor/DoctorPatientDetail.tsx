@@ -24,8 +24,11 @@ import {
   Send,
   RefreshCw,
   Eye,
+  ChevronDown,
+  Trash2,
 } from 'lucide-react';
 import { LabReport, Appointment, Prescription } from '../../types';
+import { MedicineAutocomplete, MedicineSuggestion } from '../../components/common/MedicineAutocomplete';
 
 interface DoctorPatientDetailProps {
   initialTab?: 'Overview' | 'Lab Reports' | 'Appointments' | 'Medicines' | 'Notes';
@@ -73,6 +76,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     fetchAppointments,
     fetchPrescriptions,
     createPrescription,
+    revokePrescription,
     requestAppointment,
     updateAppointmentStatus,
   } = useStore();
@@ -84,31 +88,12 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     void fetchPrescriptions();
   }, []);
 
-  // Fallback patient matching exact reference image
-  const fallbackPatient = {
-    id: 'sample-p1',
-    userId: 'sample-p1',
-    name: 'Rishabh',
-    rsId: 'RS-FTPE4',
-    gender: 'Male',
-    age: 23,
-    phone: '+917800689652',
-    location: 'Ghaziabad',
-    bloodGroup: 'O+',
-    conditions: [] as string[],
-    lastVisitDate: 'Not recorded',
-    status: 'Critical' as const,
-    avatar: 'R',
-    connectedDoctorName: currentUser?.name || 'Dr. Rishabh',
-    lastReportName: 'Complete Blood Count (CBC)',
-    lastReportTime: '31 Oct 2026, 10:41 AM',
-  };
+
 
   const patient =
     patients.find((p) => p.id === id || p.rsId === id) ||
     patients.find((p) => (p as any)._id === id) ||
-    patients.find((p) => (p as any).userId === id) ||
-    fallbackPatient;
+    patients.find((p) => (p as any).userId === id);
 
   // Fallback reports matching reference image
   const defaultCbcParameters = [
@@ -130,7 +115,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
   const defaultReports: any[] = [
     {
       id: 'rep-cbc-1',
-      patientId: patient.id,
+      patientId: patient?.id || '',
       name: 'Complete Blood Count (CBC)',
       type: 'Blood Test',
       labName: 'Labsmar',
@@ -145,7 +130,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     },
     {
       id: 'rep-lipid-1',
-      patientId: patient.id,
+      patientId: patient?.id || '',
       name: 'Lipid Profile',
       type: 'Blood Test',
       labName: 'City Labs',
@@ -163,7 +148,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     },
     {
       id: 'rep-hba1c-1',
-      patientId: patient.id,
+      patientId: patient?.id || '',
       name: 'HbA1c Glycated Hemoglobin',
       type: 'Blood Test',
       labName: 'City Labs',
@@ -183,9 +168,9 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
   const defaultAppointments: any[] = [
     {
       id: 'app-1',
-      patientId: patient.id,
-      patientName: patient.name,
-      patientRsId: patient.rsId,
+      patientId: patient?.id || '',
+      patientName: patient?.name || '',
+      patientRsId: patient?.rsId || '',
       doctorName: currentUser?.name || 'Dr. Rishabh',
       date: '11 Nov 2026',
       time: '11:30 AM',
@@ -195,9 +180,9 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     },
     {
       id: 'app-2',
-      patientId: patient.id,
-      patientName: patient.name,
-      patientRsId: patient.rsId,
+      patientId: patient?.id || '',
+      patientName: patient?.name || '',
+      patientRsId: patient?.rsId || '',
       doctorName: currentUser?.name || 'Dr. Rishabh',
       date: '31 Oct 2026',
       time: '10:30 AM',
@@ -207,9 +192,9 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     },
     {
       id: 'app-3',
-      patientId: patient.id,
-      patientName: patient.name,
-      patientRsId: patient.rsId,
+      patientId: patient?.id || '',
+      patientName: patient?.name || '',
+      patientRsId: patient?.rsId || '',
       doctorName: currentUser?.name || 'Dr. Rishabh',
       date: '20 Oct 2026',
       time: '04:00 PM',
@@ -222,7 +207,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
   const defaultPrescriptions: any[] = [
     {
       id: 'rx-1',
-      patientId: patient.id,
+      patientId: patient?.id || '',
       doctorName: currentUser?.name || 'Dr. Rishabh',
       name: 'Paracetamol',
       dosage: '650 mg',
@@ -234,7 +219,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     },
     {
       id: 'rx-2',
-      patientId: patient.id,
+      patientId: patient?.id || '',
       doctorName: currentUser?.name || 'Dr. Rishabh',
       name: 'Metformin',
       dosage: '500 mg',
@@ -246,7 +231,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     },
     {
       id: 'rx-3',
-      patientId: patient.id,
+      patientId: patient?.id || '',
       doctorName: currentUser?.name || 'Dr. Rishabh',
       name: 'Pantoprazole',
       dosage: '40 mg',
@@ -258,30 +243,36 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     },
   ];
 
-  const patientReports: any[] = (reports as any[]).filter(
-    (r) =>
-      r.patientId === patient.id ||
-      (r as any).patientId === (patient as any)._id ||
-      (r as any).patientId === (patient as any).userId
-  );
-  const chronologicalReports: any[] = patientReports.length > 0 ? patientReports : defaultReports;
+  const patientReports: any[] = patient
+    ? (reports as any[]).filter(
+        (r) =>
+          r.patientId === patient.id ||
+          (r as any).patientId === (patient as any)._id ||
+          (r as any).patientId === (patient as any).userId
+      )
+    : [];
+  const chronologicalReports: any[] = patientReports.length > 0 ? patientReports : (patient ? defaultReports : []);
 
-  const patientAppointments = appointments.filter(
-    (a) =>
-      a.patientId === patient.id ||
-      (a as any).patientId === (patient as any)._id ||
-      a.patientRsId === patient.rsId ||
-      (a.patientName && patient.name && a.patientName.toLowerCase() === patient.name.toLowerCase())
-  );
-  const chronologicalAppointments = patientAppointments.length > 0 ? patientAppointments : defaultAppointments;
+  const patientAppointments = patient
+    ? appointments.filter(
+        (a) =>
+          a.patientId === patient.id ||
+          (a as any).patientId === (patient as any)._id ||
+          a.patientRsId === patient.rsId ||
+          (a.patientName && patient.name && a.patientName.toLowerCase() === patient.name.toLowerCase())
+      )
+    : [];
+  const chronologicalAppointments = patientAppointments.length > 0 ? patientAppointments : (patient ? defaultAppointments : []);
 
-  const patientPrescriptionsList = prescriptions.filter(
-    (p) =>
-      p.patientId === patient.id ||
-      (patient as any)._id === p.patientId ||
-      (patient as any).userId === p.patientId
-  );
-  const patientPrescriptions: any[] = patientPrescriptionsList.length > 0 ? patientPrescriptionsList : defaultPrescriptions;
+  const patientPrescriptionsList = patient
+    ? prescriptions.filter(
+        (p) =>
+          p.patientId === patient.id ||
+          (patient as any)._id === p.patientId ||
+          (patient as any).userId === p.patientId
+      )
+    : [];
+  const patientPrescriptions: any[] = patientPrescriptionsList.length > 0 ? patientPrescriptionsList : (patient ? defaultPrescriptions : []);
 
   // Selected report
   const latestReport = chronologicalReports[0] || defaultReports[0];
@@ -554,21 +545,85 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
   const [isSubmittingAppointment, setIsSubmittingAppointment] = useState(false);
   const [appointmentSuccess, setAppointmentSuccess] = useState(false);
 
+  // New Prescription Modal State (Matching Image Reference)
+  interface PrescriptionMedicineRow {
+    id: string;
+    name: string;
+    dose: string;
+    duration: number;
+  }
+
   const [showPrescribeModal, setShowPrescribeModal] = useState(false);
-  const [prescribeName, setPrescribeName] = useState('');
-  const [prescribeDose, setPrescribeDose] = useState('1 tablet');
-  const [prescribeFrequency, setPrescribeFrequency] = useState('Morning and Night');
+  const [prescribeMedicines, setPrescribeMedicines] = useState<PrescriptionMedicineRow[]>([
+    { id: '1', name: '', dose: '1 Tablet', duration: 30 },
+  ]);
+  const [selectedTimings, setSelectedTimings] = useState<string[]>(['morning', 'night']);
+  const [foodInstruction, setFoodInstruction] = useState('After food');
   const [isPrescribing, setIsPrescribing] = useState(false);
   const [prescribeSuccess, setPrescribeSuccess] = useState(false);
+  const [prescribeError, setPrescribeError] = useState<string | null>(null);
+
+  const timingOptions = [
+    { id: 'morning', label: 'Morning (8:00 AM)', time: '08:00 AM', period: 'Morning' },
+    { id: 'noon', label: 'Noon (1:00 PM)', time: '01:00 PM', period: 'Noon' },
+    { id: 'evening', label: 'Evening (6:30 PM)', time: '06:30 PM', period: 'Evening' },
+    { id: 'night', label: 'Night (9:00 PM)', time: '09:00 PM', period: 'Night' },
+  ];
+
+  const addMedicineRow = () => {
+    setPrescribeMedicines((prev) => [
+      ...prev,
+      { id: Date.now().toString(), name: '', dose: '1 Tablet', duration: 30 },
+    ]);
+  };
+
+  const removeMedicineRow = (id: string) => {
+    setPrescribeMedicines((prev) => (prev.length > 1 ? prev.filter((m) => m.id !== id) : prev));
+  };
+
+  const updateMedicineRow = (id: string, field: 'name' | 'dose' | 'duration', value: any) => {
+    setPrescribeMedicines((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, [field]: value } : m))
+    );
+  };
+
+  const handleSelectMedicineSuggestion = (rowId: string, med: MedicineSuggestion) => {
+    let defaultDose = '1 Tablet';
+    const formLower = (med.dosageForm || '').toLowerCase();
+    if (formLower.includes('capsule')) defaultDose = '1 Capsule';
+    else if (formLower.includes('syrup') || formLower.includes('suspension')) defaultDose = '5 ml';
+    else if (formLower.includes('drop')) defaultDose = '1 Drop';
+    else if (formLower.includes('puff') || formLower.includes('inhaler')) defaultDose = '1 Puff';
+    else if (formLower.includes('sachet')) defaultDose = '1 Sachet';
+    else if (formLower.includes('injection')) defaultDose = '1 Injection';
+
+    setPrescribeMedicines((prev) =>
+      prev.map((row) =>
+        row.id === rowId
+          ? {
+              ...row,
+              name: med.name,
+              dose: defaultDose,
+            }
+          : row
+      )
+    );
+  };
+
+  const toggleTiming = (timingId: string) => {
+    setSelectedTimings((prev) =>
+      prev.includes(timingId) ? prev.filter((t) => t !== timingId) : [...prev, timingId]
+    );
+  };
 
   const handleCreateAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmittingAppointment(true);
     try {
       await requestAppointment({
-        patientId: patient.id,
-        patientName: patient.name,
-        patientRsId: patient.rsId,
+        patientId: patient?.id || '',
+        patientName: patient?.name || '',
+        patientRsId: patient?.rsId || '',
         doctorName: currentUser?.name || 'Dr. Rishabh',
         date: appointmentDate,
         time: appointmentTime,
@@ -592,37 +647,125 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     }
   };
 
+  
+  const handleRevokePrescription = async (id: string, name: string) => {
+    const reason = window.prompt(`Revoke prescription for ${name} before scheduled end date? Enter reason:`, 'Discontinued by Doctor');
+    if (reason !== null) {
+      try {
+        await revokePrescription(id, reason);
+        if (patient) {
+          void fetchPrescriptions(patient.id);
+        }
+      } catch (e: any) {
+        alert(e.message || 'Failed to revoke prescription');
+      }
+    }
+  };
+
   const handlePrescribeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!prescribeName.trim()) return;
+    const validMedicines = prescribeMedicines.filter((m) => m.name.trim().length > 0);
+    if (validMedicines.length === 0) {
+      setPrescribeError('Please enter at least one medicine & strength');
+      return;
+    }
+    if (selectedTimings.length === 0) {
+      setPrescribeError('Please select at least one time for "When to Take"');
+      return;
+    }
+
+    setPrescribeError(null);
     setIsPrescribing(true);
+
     try {
+      const timingMap: Record<string, { label: string; period: string }> = {
+        morning: { label: 'Morning (8:00 AM)', period: 'Morning' },
+        noon: { label: 'Noon (1:00 PM)', period: 'Noon' },
+        evening: { label: 'Evening (6:30 PM)', period: 'Evening' },
+        night: { label: 'Night (9:00 PM)', period: 'Night' },
+      };
+
+      const orderedKeys = ['morning', 'noon', 'evening', 'night'].filter((k) =>
+        selectedTimings.includes(k)
+      );
+      const selectedLabels = orderedKeys.map((k) => timingMap[k].label);
+      const selectedPeriods = orderedKeys.map((k) => timingMap[k].period);
+
+      const timingSummary =
+        selectedPeriods.length === 1
+          ? `${selectedPeriods[0]} daily`
+          : selectedPeriods.length === 2
+          ? `${selectedPeriods[0]} and ${selectedPeriods[1]}`
+          : `${selectedPeriods.slice(0, -1).join(', ')} and ${selectedPeriods[selectedPeriods.length - 1]}`;
+
+      const maxDuration = Math.max(...validMedicines.map((m) => m.duration || 30));
+      const combinedMedNames = validMedicines.map((m) => m.name.trim()).join(' + ');
+
+      const payloadMedicines = validMedicines.map((m) => ({
+        name: m.name.trim(),
+        dose: m.dose,
+        timing: selectedLabels.join(', '),
+        frequency: timingSummary,
+        instructions: `${m.dose} · ${timingSummary} · ${foodInstruction}`,
+        duration: `${m.duration} days`,
+        totalDays: m.duration,
+      }));
+
       await createPrescription({
-        patientId: patient.id,
+        patientId: patient?.id || '',
         doctorName: currentUser?.name || 'Dr. Rishabh',
-        name: prescribeName,
-        dosage: prescribeDose,
-        frequency: prescribeFrequency,
-        duration: '14 days',
-        instructions: `${prescribeDose} · ${prescribeFrequency} · After food`,
-        startDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        name: combinedMedNames,
+        dosage: validMedicines[0].dose,
+        frequency: timingSummary,
+        duration: `${maxDuration} days`,
+        totalDays: maxDuration,
+        instructions: `${validMedicines[0].dose} · ${timingSummary} · ${foodInstruction}`,
+        startDate: new Date().toISOString(),
         active: true,
+        medicines: payloadMedicines,
       });
+
+      if (patient?.id) {
+        void fetchPrescriptions(patient.id);
+      }
+
       setPrescribeSuccess(true);
       setTimeout(() => {
         setPrescribeSuccess(false);
         setShowPrescribeModal(false);
+        // Reset to initial state matching reference
+        setPrescribeMedicines([{ id: '1', name: '', dose: '1 Tablet', duration: 30 }]);
+        setSelectedTimings(['morning', 'night']);
+        setFoodInstruction('After food');
       }, 1200);
-    } catch {
-      setPrescribeSuccess(true);
-      setTimeout(() => {
-        setPrescribeSuccess(false);
-        setShowPrescribeModal(false);
-      }, 1200);
+    } catch (err: any) {
+      setPrescribeError(err?.message || 'Failed to save prescription');
     } finally {
       setIsPrescribing(false);
     }
   };
+
+  if (!patient) {
+    return (
+      <div className="p-8 max-w-lg mx-auto text-center space-y-4 font-sans text-stone-800 my-16 bg-white rounded-[3px] border border-stone-200/90 shadow-2xs">
+        <div className="w-12 h-12 rounded-[3px] bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200">
+          <Shield className="w-6 h-6 text-rose-600" />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-slate-900">Access Restricted / Consent Not Active</h2>
+          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
+            Under the Digital Personal Data Protection (DPDP) Act, patient health records, lab reports, and consultations are confidential and accessible only when active consent is authorized by the patient.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/doctor/patients')}
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#13382E] text-white text-xs font-semibold rounded-[3px] hover:bg-[#0c241e] shadow-2xs cursor-pointer"
+        >
+          <span>Back to Patients Directory</span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 lg:p-7 max-w-[1400px] w-full mx-auto space-y-4 text-slate-800">
@@ -1206,42 +1349,104 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
       {/* Medicines Tab */}
       {activeTab === 'Medicines' && (
-        <div className="bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-5 md:p-6 space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-[6px] border border-stone-200/80 shadow-2xs p-5 md:p-6 space-y-4 font-sans">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <h3 className="text-base font-bold text-slate-900">Active Prescriptions</h3>
               <p className="text-xs text-slate-500">Current medications and therapeutic plans</p>
             </div>
             <button
               onClick={() => setShowPrescribeModal(true)}
-              className="px-3 py-1.5 bg-[#13382E] text-white text-xs font-bold rounded-[2px] shadow-xs cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 py-2 bg-[#0E382F] hover:bg-[#092720] text-white text-xs font-bold rounded-[6px] shadow-xs cursor-pointer flex items-center gap-1.5 transition-colors"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               <span>Add Medicine</span>
             </button>
           </div>
 
-          <div className="divide-y divide-stone-100">
-            {patientPrescriptions.map((rx) => (
-              <div key={rx.id} className="py-4 flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-[2px] bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
-                    <Pill className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">{rx.name} {(rx as any).dosage}</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {rx.instructions || `${(rx as any).dosage} · ${(rx as any).frequency}`} &nbsp;|&nbsp; Started: {formatDateFriendly(rx.startDate)}
-                    </p>
-                  </div>
-                </div>
-
-                <span className="bg-[#EAF6F0] text-[#136C4F] text-xs font-semibold px-2.5 py-0.5 rounded-[2px]">
-                  Active
-                </span>
+          {patientPrescriptions.length === 0 ? (
+            <div className="py-12 text-center text-slate-500 space-y-3 bg-[#FAFBFB] rounded-[6px] border border-dashed border-stone-200">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto">
+                <Pill className="w-5 h-5 -rotate-45" />
               </div>
-            ))}
-          </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">No Prescriptions Issued Yet</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">Click &ldquo;Add Medicine&rdquo; to prescribe medication regimen for {patient.name}.</p>
+              </div>
+              <button
+                onClick={() => setShowPrescribeModal(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0E382F] text-white text-xs font-semibold rounded-[4px] shadow-2xs hover:bg-[#092720] transition-colors cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Prescribe Medicine</span>
+              </button>
+            </div>
+          ) : (
+            <div className="divide-y divide-stone-100">
+              {patientPrescriptions.map((rx) => {
+                const isActive = rx.status === 'Active';
+                const hasDetailedMeds = (rx as any).medicines && (rx as any).medicines.length > 0;
+
+                return (
+                  <div key={rx.id} className="py-4 space-y-2.5">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-[6px] bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
+                          <Pill className="w-5 h-5 -rotate-45" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-sm font-bold text-slate-900 leading-tight">
+                            {rx.name} {(rx as any).dosage ? `• ${(rx as any).dosage}` : ''}
+                          </h4>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            {rx.instructions || `${(rx as any).dosage || ''} · ${(rx as any).frequency || ''}`} &nbsp;|&nbsp; Started: {formatDateFriendly(rx.startDate)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`text-xs font-semibold px-2.5 py-0.5 rounded-[4px] ${
+                            isActive
+                              ? 'bg-[#EAF6F0] text-[#136C4F]'
+                              : 'bg-stone-100 text-slate-600'
+                          }`}
+                        >
+                          {rx.status || 'Active'}
+                        </span>
+
+                        {isActive && (
+                          <button
+                            onClick={() => handleRevokePrescription(rx.id, rx.name)}
+                            className="text-xs text-rose-600 hover:text-rose-700 font-semibold px-2.5 py-1 rounded-[4px] border border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
+                            title="Revoke Prescription"
+                          >
+                            Revoke
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* If multiple individual medicines exist in this prescription */}
+                    {hasDetailedMeds && (
+                      <div className="pl-13 pr-2 pt-1 flex items-center gap-2 flex-wrap">
+                        {(rx as any).medicines.map((m: any, mIdx: number) => (
+                          <span
+                            key={mIdx}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-stone-50 border border-stone-200/80 rounded-[4px] text-[11px] text-slate-700 font-medium"
+                          >
+                            <span className="font-semibold text-slate-900">{m.name}</span>
+                            <span className="text-slate-500 font-normal">({m.dose || m.dosage})</span>
+                            {m.timing && <span className="text-emerald-700">• {m.timing}</span>}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -1346,78 +1551,235 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
         </div>
       )}
 
-      {/* MODAL 2: Add Medicine / Prescription Modal */}
+      {/* MODAL 2: New Prescription Modal (Matching Exact Reference Layout & Design) */}
       {showPrescribeModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2px] border border-stone-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200">
-              <h3 className="text-base font-bold text-slate-900">Add Prescription</h3>
+        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-2xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-[6px] border border-stone-200/90 shadow-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 my-8 animate-in fade-in zoom-in-95 duration-150">
+            {/* Header: Title, Patient Subtitle, Close Button */}
+            <div className="flex items-start justify-between pb-3.5 border-b border-stone-200">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-tight">
+                  New Prescription
+                </h2>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  {patient.name} • {patient.rsId || 'RS-10482'}
+                </p>
+              </div>
               <button
-                onClick={() => setShowPrescribeModal(false)}
-                className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                type="button"
+                onClick={() => {
+                  setShowPrescribeModal(false);
+                  setPrescribeError(null);
+                }}
+                className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-1 -mr-1 -mt-1"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {prescribeSuccess ? (
-              <div className="p-4 bg-[#EAF6F0] text-[#136C4F] text-xs font-bold rounded-[2px] flex items-center gap-2">
+              <div className="p-4 bg-[#EAF6F0] text-[#136C4F] text-xs font-bold rounded-[4px] flex items-center gap-2 border border-[#C6EAD8]">
                 <Check className="w-4 h-4" />
-                <span>Prescription saved successfully!</span>
+                <span>Prescription saved successfully! Schedule and daily reminders updated.</span>
               </div>
             ) : (
-              <form onSubmit={handlePrescribeSubmit} className="space-y-3.5 text-xs">
-                <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Medication Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Paracetamol, Metformin"
-                    value={prescribeName}
-                    onChange={(e) => setPrescribeName(e.target.value)}
-                    className="w-full border border-stone-300 rounded-[2px] p-2 text-slate-800 focus:outline-none focus:border-[#136C4F]"
-                  />
+              <form onSubmit={handlePrescribeSubmit} className="space-y-4 text-xs font-sans">
+                {prescribeError && (
+                  <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 rounded-[4px] text-xs font-semibold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                    <span>{prescribeError}</span>
+                  </div>
+                )}
+
+                {/* Section 1: Add Medicines */}
+                <div className="space-y-2">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                      Add Medicines
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Enter the medicine, dose, and duration.
+                    </p>
+                  </div>
+
+                  {/* Medicines Container Table/Card */}
+                  <div className="border border-stone-200 rounded-[6px] p-3 sm:p-3.5 bg-white space-y-3">
+                    {/* Column Headers */}
+                    <div className="grid grid-cols-12 gap-2.5 sm:gap-3 text-xs font-semibold text-slate-700 px-0.5">
+                      <div className="col-span-6 sm:col-span-6">Medicine & Strength</div>
+                      <div className="col-span-3 sm:col-span-3">Dose</div>
+                      <div className="col-span-3 sm:col-span-3">Duration</div>
+                    </div>
+
+                    {/* Medicine Rows */}
+                    <div className="space-y-2.5">
+                      {prescribeMedicines.map((med) => (
+                        <div key={med.id} className="grid grid-cols-12 gap-2.5 sm:gap-3 items-center">
+                          {/* Medicine & Strength Input with Real Indian Dataset + DrugDB Autocomplete */}
+                          <div className="col-span-6 sm:col-span-6">
+                            <MedicineAutocomplete
+                              value={med.name}
+                              onChange={(val) => updateMedicineRow(med.id, 'name', val)}
+                              onSelect={(selectedMed) => handleSelectMedicineSuggestion(med.id, selectedMed)}
+                              placeholder="e.g. Metformin 500 mg, Dolo, Augmentin"
+                            />
+                          </div>
+
+                          {/* Dose Select Dropdown */}
+                          <div className="col-span-3 sm:col-span-3 relative">
+                            <select
+                              value={med.dose}
+                              onChange={(e) => updateMedicineRow(med.id, 'dose', e.target.value)}
+                              className="w-full h-10 px-2.5 border border-stone-200 rounded-[4px] text-xs text-slate-800 focus:outline-none focus:border-[#0E382F] bg-white cursor-pointer appearance-none pr-7"
+                            >
+                              <option value="1 Tablet">1 Tablet</option>
+                              <option value="2 Tablets">2 Tablets</option>
+                              <option value="1/2 Tablet">1/2 Tablet</option>
+                              <option value="1 Capsule">1 Capsule</option>
+                              <option value="2 Capsules">2 Capsules</option>
+                              <option value="5 ml">5 ml</option>
+                              <option value="10 ml">10 ml</option>
+                              <option value="15 ml">15 ml</option>
+                              <option value="1 Sachet">1 Sachet</option>
+                              <option value="1 Drop">1 Drop</option>
+                              <option value="1 Puff">1 Puff</option>
+                              <option value="1 Injection">1 Injection</option>
+                              <option value="As directed">As directed</option>
+                            </select>
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          </div>
+
+                          {/* Duration Group + Optional Remove Action */}
+                          <div className="col-span-3 sm:col-span-3 flex items-center gap-1.5">
+                            <div className="flex-1 flex h-10 border border-stone-200 rounded-[4px] bg-white overflow-hidden focus-within:border-[#0E382F] focus-within:ring-1 focus-within:ring-[#0E382F]">
+                              <input
+                                type="number"
+                                min="1"
+                                max="365"
+                                required
+                                value={med.duration}
+                                onChange={(e) =>
+                                  updateMedicineRow(
+                                    med.id,
+                                    'duration',
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="w-full h-full px-2.5 text-xs text-slate-800 focus:outline-none"
+                              />
+                              <span className="px-2.5 sm:px-3 text-xs text-slate-500 bg-stone-50 border-l border-stone-200 h-full flex items-center font-medium select-none">
+                                Days
+                              </span>
+                            </div>
+
+                            {prescribeMedicines.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeMedicineRow(med.id)}
+                                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer shrink-0"
+                                title="Remove medicine"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add another medicine button */}
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={addMedicineRow}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#16A36A] hover:text-[#0E382F] transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>Add another medicine</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                {/* Section 2: When to Take */}
+                <div className="space-y-2 pt-1">
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Dosage</label>
-                    <input
-                      type="text"
-                      required
-                      value={prescribeDose}
-                      onChange={(e) => setPrescribeDose(e.target.value)}
-                      placeholder="650 mg"
-                      className="w-full border border-stone-300 rounded-[2px] p-2 text-slate-800 focus:outline-none focus:border-[#136C4F]"
-                    />
+                    <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                      When to Take
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Select the times for this medicine.
+                    </p>
                   </div>
-                  <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Frequency</label>
-                    <input
-                      type="text"
-                      required
-                      value={prescribeFrequency}
-                      onChange={(e) => setPrescribeFrequency(e.target.value)}
-                      placeholder="Twice daily"
-                      className="w-full border border-stone-300 rounded-[2px] p-2 text-slate-800 focus:outline-none focus:border-[#136C4F]"
-                    />
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-0.5">
+                    {timingOptions.map((t) => {
+                      const isChecked = selectedTimings.includes(t.id);
+                      return (
+                        <div
+                          key={t.id}
+                          onClick={() => toggleTiming(t.id)}
+                          className="flex items-center gap-2.5 cursor-pointer select-none py-1 group"
+                        >
+                          <div
+                            className={`w-4 h-4 rounded-[3px] flex items-center justify-center transition-all ${
+                              isChecked
+                                ? 'bg-[#0E382F] text-white'
+                                : 'border border-stone-300 bg-white group-hover:border-stone-400'
+                            }`}
+                          >
+                            {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                          </div>
+                          <span className="text-xs font-semibold text-slate-800">
+                            {t.label}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-stone-200">
+                {/* Section 3: Food Instruction */}
+                <div className="space-y-1.5 pt-1">
+                  <h3 className="text-sm font-bold text-slate-900 leading-tight">
+                    Food Instruction
+                  </h3>
+                  <div className="relative">
+                    <select
+                      value={foodInstruction}
+                      onChange={(e) => setFoodInstruction(e.target.value)}
+                      className="w-full h-10 px-3 bg-white border border-stone-200 rounded-[4px] text-xs text-slate-800 focus:outline-none focus:border-[#0E382F] cursor-pointer appearance-none pr-8"
+                    >
+                      <option value="After food">After food</option>
+                      <option value="Before food">Before food</option>
+                      <option value="With food / meals">With food / meals</option>
+                      <option value="Empty stomach">Empty stomach</option>
+                      <option value="Before bedtime">Before bedtime</option>
+                      <option value="As directed">As directed</option>
+                    </select>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Modal Footer Actions */}
+                <div className="flex items-center justify-end gap-2.5 pt-4 mt-6 border-t border-stone-200">
                   <button
                     type="button"
-                    onClick={() => setShowPrescribeModal(false)}
-                    className="px-3.5 py-1.5 text-slate-600 hover:text-slate-800 font-semibold cursor-pointer"
+                    onClick={() => {
+                      setShowPrescribeModal(false);
+                      setPrescribeError(null);
+                    }}
+                    className="px-4 py-2 border border-stone-200 rounded-[6px] text-xs font-semibold text-slate-700 hover:bg-stone-50 transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isPrescribing}
-                    className="px-4 py-1.5 bg-[#13382E] text-white font-bold rounded-[2px] hover:bg-[#0E2922] transition-colors cursor-pointer"
+                    className="px-5 py-2 bg-[#0E382F] hover:bg-[#092720] text-white text-xs font-bold rounded-[6px] shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    {isPrescribing ? 'Saving...' : 'Add Prescription'}
+                    {isPrescribing ? 'Prescribing...' : 'Prescribe'}
                   </button>
                 </div>
               </form>
