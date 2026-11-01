@@ -25,6 +25,9 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Copy compiled JavaScript output
 COPY --from=builder /app/dist ./dist
 
+# Medicine-name catalogue used for prescription suggestions
+COPY data/ ./data/
+
 # Run as unprivileged node user for container security
 USER node
 

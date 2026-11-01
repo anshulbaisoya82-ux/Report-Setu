@@ -283,6 +283,26 @@ export class MlClient {
     }
   }
 
+  /**
+   * Medicine-name suggestions from the ML service (GET /drug/suggest?q=&limit=).
+   * No fallback list: if the ML service is unreachable this throws, so the caller can
+   * tell the doctor that suggestions are unavailable instead of inventing names.
+   */
+  async suggestMedicines(query: string, limit = 10): Promise<string[]> {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), Math.min(this.timeoutMs, 5000));
+    try {
+      const qs = new URLSearchParams({ q: query, limit: String(limit) });
+      const res = await fetch(`${this.baseUrl}/drug/suggest?${qs.toString()}`, { signal: controller.signal });
+      if (!res.ok) throw new Error(`ML /drug/suggest responded ${res.status}`);
+      const body = (await res.json()) as { suggestions?: unknown };
+      const list = Array.isArray(body.suggestions) ? body.suggestions : [];
+      return [...new Set(list.filter((s): s is string => typeof s === 'string').map((s) => s.trim()).filter(Boolean))].slice(0, limit);
+    } finally {
+      clearTimeout(id);
+    }
+  }
+
   // --------------------------------------------------------------------------
   // Internal HTTP helper
   // --------------------------------------------------------------------------

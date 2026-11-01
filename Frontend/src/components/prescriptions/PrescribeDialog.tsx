@@ -203,7 +203,7 @@ export const PrescribeDialog: React.FC<Props> = ({ open, onClose, patient }) => 
                 {meds.map((m, i) => {
                   const p = problems(m);
                   return (
-                    <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_36px] gap-2 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_130px_110px_36px] sm:gap-3">
+                    <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_36px] items-start gap-2 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_130px_110px_36px] sm:gap-3">
                       <div className="min-w-0">
                         <MedicineNameInput
                           ref={i === meds.length - 1 ? lastNameRef : undefined}

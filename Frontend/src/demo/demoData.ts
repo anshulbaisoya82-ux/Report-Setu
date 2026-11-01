@@ -206,3 +206,4 @@ export const DEMO_ADMIN_DOCTORS = [
   { id: 'doc-3', name: 'Dr. Fatima Sheikh', email: 'fatima.s@demo.reportsetu.in', phone: '+91 90000 00003', registrationNumber: 'KMC-DEMO-77031', medicalCouncil: 'Karnataka Medical Council', specialty: 'Haematologist', clinic: { name: 'Lakeside Clinic (demo)' }, verificationStatus: 'pending', createdAt: iso('2026-10-30') },
   { id: 'doc-4', name: 'Dr. Rakesh Bansal', email: 'rakesh.b@demo.reportsetu.in', phone: '+91 90000 00004', registrationNumber: 'UNVERIFIED-001', medicalCouncil: 'Unknown', specialty: 'General Physician', clinic: { name: '—' }, verificationStatus: 'rejected', rejectionReason: 'Registration number not found in council register', createdAt: iso('2026-10-11') },
 ];
+

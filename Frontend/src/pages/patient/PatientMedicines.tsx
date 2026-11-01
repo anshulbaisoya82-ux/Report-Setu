@@ -1,240 +1,143 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Check, Pill } from 'lucide-react';
 import { useStore } from '../../store/useStore';
-import { 
-  Check, Download, 
-  ShieldAlert, FileText
-} from 'lucide-react';
 import { notify } from '../../components/ui/Toast';
-import { formatDate } from '../../utils/format';
+import { PageHeader, Card, SectionTitle, EmptyState, btn } from '../../components/ui/kit';
+import { AdherenceBlock, CourseCard, DoseTag, byTime, doseDetail } from '../../components/medicines/MedicineParts';
+import { medicationsApi, type AdherenceSummary } from '../../api/client';
+import type { MedicineScheduleItem } from '../../types';
 
+type DoseState = MedicineScheduleItem['state'];
+
+/**
+ * Patient › Medicines: today's doses with Taken / Snooze / Missed (and Undo),
+ * the last 7 days, and the prescriptions. Only the doctor can change medicines.
+ */
 export const PatientMedicines: React.FC = () => {
   const { medicineSchedule, prescriptions, toggleMedicineSchedule, fetchMedicineSchedule, fetchPrescriptions } = useStore();
-  const [activeTab, setActiveTab] = useState<'schedule' | 'active' | 'past'>('schedule');
+  const [busy, setBusy] = useState<string | null>(null);
+  const [adherence, setAdherence] = useState<AdherenceSummary | null>(null);
+  const [adhError, setAdhError] = useState<string | null>(null);
+  const [adhLoading, setAdhLoading] = useState(true);
 
-  React.useEffect(() => {
+  const loadAdherence = () => {
+    setAdhError(null);
+    medicationsApi
+      .getAdherence()
+      .then(setAdherence)
+      .catch((e: any) => setAdhError(e?.message || 'Please try again.'))
+      .finally(() => setAdhLoading(false));
+  };
+
+  useEffect(() => {
     fetchMedicineSchedule();
     fetchPrescriptions();
+    loadAdherence();
   }, []);
 
+  const act = async (id: string, state: DoseState, done: string) => {
+    setBusy(id);
+    try {
+      await toggleMedicineSchedule(id, state);
+      notify(done, 'success');
+      loadAdherence();
+    } catch (e: any) {
+      notify(e?.message || 'Could not save. Please try again.', 'error');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const today = [...medicineSchedule].sort(byTime);
+  const doneCount = today.filter((d) => d.state === 'taken').length;
+  const active = prescriptions.filter((p) => p.status === 'Active');
+  const ended = prescriptions.filter((p) => p.status === 'Ended');
+  const doctorName = active[0]?.doctorName || prescriptions[0]?.doctorName;
+
   return (
-    <div className="space-y-6 pb-12 max-w-4xl mx-auto">
-      {/* Header & Streak Banner */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">My Medication Schedule</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            {prescriptions.length > 0
-              ? `Active regimen prescribed by ${prescriptions[0].doctorName}`
-              : 'Your prescribed medicines and daily schedule will appear here.'}
-          </p>
-        </div>
+    <div className="mx-auto max-w-6xl pb-12">
+      <PageHeader
+        title="Medicines"
+        subtitle={doctorName ? `As prescribed by ${doctorName}. Only your doctor can change them.` : 'Medicines your doctor prescribes appear here.'}
+      />
 
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl text-xs font-semibold overflow-x-auto">
-        <button
-          onClick={() => setActiveTab('schedule')}
-          className={`px-4 py-2 rounded-xl transition-all ${
-            activeTab === 'schedule'
-              ? 'bg-white text-forest-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Daily Schedule (Morning · Noon · Night)
-        </button>
-        <button
-          onClick={() => setActiveTab('active')}
-          className={`px-4 py-2 rounded-xl transition-all ${
-            activeTab === 'active'
-              ? 'bg-white text-forest-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Active Prescriptions ({prescriptions.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('past')}
-          className={`px-4 py-2 rounded-xl transition-all ${
-            activeTab === 'past'
-              ? 'bg-white text-forest-900 shadow-xs'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Completed / Past Medicines ({prescriptions.filter(p => p.status === 'Ended').length})
-        </button>
-      </div>
-
-      {/* SCHEDULE VIEW */}
-      {activeTab === 'schedule' && (
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Scheduled Today</h3>
-              </div>
-              <span className="text-xs text-slate-500">{medicineSchedule.length} medications</span>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+        <Card className="p-5 lg:col-span-7">
+          <SectionTitle
+            title="Today"
+            subtitle={today.length ? `${doneCount} of ${today.length} done` : undefined}
+          />
+          {today.length > 0 && (
+            <div className="mb-2 flex gap-1" aria-hidden="true">
+              {today.map((d) => (
+                <span key={d.id} className={`h-1.5 flex-1 rounded-full ${d.state === 'taken' ? 'bg-forest-800' : d.state === 'missed' ? 'bg-red-300' : 'bg-stone-200'}`} />
+              ))}
             </div>
-
-            <div className="space-y-2">
-              {medicineSchedule.length === 0 && (
-                <div className="p-8 text-center text-xs text-stone-500 bg-stone-50/60 rounded-xl border border-stone-200/80 space-y-1">
-                  <p className="font-semibold text-stone-700">No medications scheduled for today</p>
-                  <p className="text-stone-400">
-                    When your attending doctor prescribes medications or sets reminder alarms, your daily intake doses will appear here.
-                  </p>
-                </div>
-              )}
-              {medicineSchedule.map(med => {
-                const isTaken = med.state === 'taken';
+          )}
+          {today.length === 0 ? (
+            <EmptyState icon={Pill} title="Nothing scheduled today" body="When your doctor prescribes a medicine, each dose time shows up here with a reminder." />
+          ) : (
+            <ul className="divide-y divide-line">
+              {today.map((d) => {
+                const isBusy = busy === d.id;
+                const open = d.state === 'due' || d.state === 'snoozed';
                 return (
-                  <div 
-                    key={med.id}
-                    onClick={() => toggleMedicineSchedule(med.id, isTaken ? 'due' : 'taken').catch((e: any) => notify(e?.message || 'Could not save. Please try again.', 'error'))}
-                    className={`p-4 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-all ${
-                      isTaken ? 'bg-slate-50/70 border-slate-200' : 'bg-white border-forest-300 shadow-xs'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                        isTaken ? 'bg-forest-900 text-accent-teal' : 'border-2 border-slate-300'
-                      }`}>
-                        {isTaken && <Check className="w-4 h-4 stroke-[3]" />}
-                      </div>
-                      <div>
-                        <h4 className={`text-xs font-bold ${isTaken ? 'line-through text-slate-500' : 'text-slate-900'}`}>
-                          {med.name} {med.dose}
-                        </h4>
-                        <p className="text-xs text-slate-500">
-                          {med.instructions || med.timing} · <span className="font-semibold text-forest-800">{med.scheduledTime}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full uppercase ${
-                      isTaken ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                    }`}>
-                      {isTaken ? (med.takenAt || 'Taken') : 'Take Now'}
+                  <li key={d.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-3.5">
+                    <span className="w-[72px] shrink-0 text-sm font-semibold tabular-nums text-stone-600">{d.scheduledTime}</span>
+                    <span className="min-w-[150px] flex-1">
+                      <span className={`block text-[15px] font-medium ${d.state === 'taken' ? 'text-stone-500' : 'text-ink'}`}>{d.name}</span>
+                      <span className="block text-sm text-stone-500">{doseDetail(d)}</span>
                     </span>
-                  </div>
+                    {open ? (
+                      <span className="flex basis-full flex-wrap gap-2 pl-[88px] sm:basis-auto sm:pl-0">
+                        {d.state === 'snoozed' && <DoseTag item={d} />}
+                        <button type="button" disabled={isBusy} onClick={() => act(d.id, 'missed', 'Marked as missed')} className={btn('secondary', 'sm')}>Missed</button>
+                        {d.state !== 'snoozed' && (
+                          <button type="button" disabled={isBusy} onClick={() => act(d.id, 'snoozed', 'Snoozed. We will remind you again.')} className={btn('secondary', 'sm')}>Snooze</button>
+                        )}
+                        <button type="button" disabled={isBusy} onClick={() => act(d.id, 'taken', 'Marked as taken')} className={btn('primary', 'sm')}>
+                          <Check className="h-4 w-4" /> Taken
+                        </button>
+                      </span>
+                    ) : (
+                      <span className="flex basis-full items-center gap-2 pl-[88px] sm:basis-auto sm:pl-0">
+                        <DoseTag item={d} />
+                        <button type="button" disabled={isBusy} onClick={() => act(d.id, 'due', 'Undone')} className="rounded-md px-2 py-1 text-sm font-medium text-forest-800 underline-offset-2 hover:underline">
+                          Undo
+                        </button>
+                      </span>
+                    )}
+                  </li>
                 );
               })}
-            </div>
-          </div>
-        </div>
-      )}
+            </ul>
+          )}
+        </Card>
 
-      {/* ACTIVE PRESCRIPTIONS TAB */}
-      {activeTab === 'active' && (
-        <div className="space-y-4">
+        <Card className="flex flex-col p-5 lg:col-span-5">
+          <SectionTitle title="Last 7 days" subtitle="From the doses you mark here" />
+          <AdherenceBlock data={adherence} error={adhError} loading={adhLoading} />
+          <p className="mt-4 text-sm text-stone-500">Missed a dose? Mark it honestly so your doctor sees the real picture.</p>
+          <Link to="/patient/ask-doctor" className={`${btn('secondary')} mt-auto w-full`} style={{ marginTop: 20 }}>
+            Ask your doctor about a medicine
+          </Link>
+        </Card>
+
+        <Card className="p-5 lg:col-span-12">
+          <SectionTitle title="Prescriptions" subtitle={active.length ? `${active.length} active` : undefined} />
           {prescriptions.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-xs text-slate-500 space-y-1">
-              <p className="font-semibold text-slate-700">No active prescriptions yet</p>
-              <p className="text-slate-400">
-                Prescriptions issued by your doctor with dosage duration and lifestyle instructions will appear here.
-              </p>
-            </div>
+            <p className="text-sm text-stone-500">No prescriptions yet.</p>
           ) : (
-            prescriptions.map(p => (
-              <div key={p.id} className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900 font-serif">{p.name}</h3>
-                    <span className="text-xs font-medium text-slate-500">Doctor: {p.doctorName}</span>
-                  </div>
-                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    {p.status} ({p.remainingDays} days left)
-                  </span>
-                </div>
-                <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                  <strong>Doctor's Advice:</strong> {p.instructions}
-                </p>
-                {p.advice && p.advice.length > 0 && (
-                  <div className="text-xs text-emerald-800 bg-emerald-50/70 p-2.5 rounded-xl border border-emerald-200/60">
-                    <strong>Care Advice:</strong> {p.advice.join(' · ')}
-                  </div>
-                )}
-                <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
-                  <span>Start: <strong>{p.startDate}</strong></span>
-                  <span>End: <strong>{p.endDate}</strong></span>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* PAST MEDICINES TAB */}
-      {activeTab === 'past' && (
-        <div className="space-y-3">
-          {prescriptions.filter(p => p.status === 'Ended').map(p => (
-            <div key={p.id} className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 font-serif line-through text-slate-500">{p.name}</h3>
-                  <span className="text-xs text-slate-400">{p.instructions}</span>
-                </div>
-                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                  Completed
-                </span>
-              </div>
-              <p className="text-xs text-slate-500">Prescribed by {p.doctorName} from {p.startDate} to {p.endDate}.</p>
-            </div>
-          ))}
-          {prescriptions.filter(p => p.status === 'Ended').length === 0 && (
-            <div className="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-xs text-slate-500">
-              No completed medicines found.
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {[...active, ...ended].map((rx) => <CourseCard key={rx.id} rx={rx} showDoctor />)}
             </div>
           )}
-        </div>
-      )}
-
-      {/* Drug Safety Protocol Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-3">
-          <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-xs font-bold text-amber-950 font-serif">Important Medication Safety Advice</h4>
-            <p className="text-xs text-amber-900 mt-0.5 leading-relaxed">
-              Never stop or change the dose of any prescription without consulting {prescriptions[0]?.doctorName || 'your attending doctor'}. If you notice nausea, rash, or dizziness, send a message immediately.
-            </p>
-          </div>
-        </div>
-
-        <Link
-          to="/patient/ask-doctor"
-          className="shrink-0 px-4 py-2 text-xs font-bold text-white bg-forest-900 rounded-xl hover:bg-forest-800 transition-colors shadow-2xs whitespace-nowrap"
-        >
-          Ask Doctor about Medicines
-        </Link>
+          <p className="mt-4 text-sm text-stone-500">
+            Never stop or change a medicine on your own. If something feels wrong, message your doctor. Emergency: call 108.
+          </p>
+        </Card>
       </div>
-
-      {/* Prescription card (from the active prescription) */}
-      {prescriptions.find((rx) => rx.status === 'Active') && (() => {
-        const rx = prescriptions.find((x) => x.status === 'Active')!;
-        return (
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-forest-100 text-forest-900 flex items-center justify-center shrink-0">
-            <FileText className="w-5 h-5 text-forest-800" />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-slate-900">Current prescription · {rx.name}</h4>
-            <p className="text-xs text-slate-500">Prescribed by {rx.doctorName}{rx.startDate ? ` on ${formatDate(rx.startDate)}` : ''}</p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => notify('Prescription PDF download is not available yet.', 'info')}
-          className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors shadow-2xs"
-        >
-          <Download className="w-4 h-4 text-slate-500" /> Download PDF
-        </button>
-      </div>
-        );
-      })()}
     </div>
   );
 };

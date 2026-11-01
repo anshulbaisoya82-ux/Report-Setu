@@ -15,6 +15,7 @@ import {
   DEMO_DOCTOR, DEMO_PATIENTS, DEMO_PATIENT_SELF, DEMO_REPORTS, DEMO_PRESCRIPTIONS,
   DEMO_SCHEDULE, DEMO_APPOINTMENTS, DEMO_THREADS, DEMO_ADMIN_DOCTORS,
 } from './demoData';
+import { demoSearchMedicines } from './demoMedicineSearch';
 
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
@@ -28,6 +29,10 @@ const db = {
   adminDoctors: clone(DEMO_ADMIN_DOCTORS) as any[],
   notes: [] as any[],
   patientCode: '7K429Q',
+  // Synthetic demo: food rules "set by" the demo doctor for the demo patient.
+  foodRules: {
+    'pat-rohan': { limits: { sugar: 5, salt: 1.5, saturatedFat: null }, allergies: ['Peanut'], avoid: ['Added sugar'], note: 'Check portion size too.', updatedAt: '2026-10-23T10:00:00.000Z', updatedBy: 'Dr. Priya Mehta' },
+  } as Record<string, any>,
 };
 
 const role = () => localStorage.getItem('reportsetu_role') || 'doctor';
@@ -131,9 +136,27 @@ const routes: [string, RegExp, Handler][] = [
   ['GET', /^\/reports\/([^/]+)$/, (m) => { const r = db.reports.find((x) => x.id === m[1]); return r ? ok(r) : fail('Report not found', 404); }],
 
   // ── Medicines & prescriptions ───────────────────────────────────────────
-  ['GET', /^\/medicines\/today$/, () => ok({ schedule: db.schedule, total: db.schedule.length })],
-  ['GET', /^\/medicines\/adherence$/, () => ok({ adherenceRate: 86, taken: 12, total: 14 })],
+  ['GET', /^\/medicines\/today$/, (_m, _b, u) => { const pid = u.searchParams.get('patientId'); const list = !pid || pid === DEMO_PATIENT_SELF.id ? db.schedule : []; return ok({ schedule: list, total: list.length }); }],
+  ['GET', /^\/medicines\/adherence$/, (_m, _b, u) => (u.searchParams.get('patientId') && u.searchParams.get('patientId') !== DEMO_PATIENT_SELF.id) ? ok({ adherenceRate: 100, streakDays: 0, totalScheduled: 0, totalTaken: 0, totalMissed: 0 }) : ok({ adherenceRate: 86, streakDays: 2, totalScheduled: 14, totalTaken: 12, totalMissed: 1, message: 'Last 7 days' })],
   ['POST', /^\/medicines\/([^/]+)\/action$/, (m, b) => { const s = db.schedule.find((x) => x.id === m[1]); if (s) { s.state = b.action; s.takenAt = b.action === 'taken' ? `Taken at ${nowTime()}` : undefined; } return ok(s); }],
+  ['GET', /^\/prescriptions\/medicine-suggestions$/, async (_m, _b, u) => {
+    const q = (u.searchParams.get('q') || '').trim();
+    const limit = Math.min(Number(u.searchParams.get('limit')) || 30, 100);
+    const offset = Math.max(Number(u.searchParams.get('offset')) || 0, 0);
+    const { total, items } = await demoSearchMedicines(q, limit, offset);
+    return ok({ query: q, total, offset, suggestions: items.map((i) => i.name), items, source: 'demo' });
+  }],
+  // Food rules (doctor sets, patient checks labels against them)
+  ['GET', /^\/food-rules\/me$/, () => ok({ rules: db.foodRules[DEMO_PATIENT_SELF.id] || null, conditions: DEMO_PATIENT_SELF.conditions || [] })],
+  ['GET', /^\/food-rules\/patient\/([^/]+)$/, (m) => ok({ rules: db.foodRules[m[1]] || null, conditions: db.patients.find((p: any) => p.id === m[1])?.conditions || [] })],
+  ['PUT', /^\/food-rules\/patient\/([^/]+)$/, (m, b) => {
+    const clean = (l: unknown) => (Array.isArray(l) ? [...new Set(l.map((x) => String(x).trim()).filter((x) => x.length >= 2))] : []);
+    const rules = { limits: b.limits || { sugar: null, salt: null, saturatedFat: null }, allergies: clean(b.allergies), avoid: clean(b.avoid), note: String(b.note || '').slice(0, 300), updatedAt: new Date().toISOString(), updatedBy: DEMO_DOCTOR.name };
+    db.foodRules[m[1]] = rules;
+    return ok({ rules });
+  }],
+  // Demo has no server reader: the page then reads the photo on the device (on-device OCR).
+  ['POST', /^\/food-rules\/read-label$/, () => fail('Server photo reading is not available in the demo.', 503)],
   ['GET', /^\/prescriptions$/, () => ok({ prescriptions: db.prescriptions })],
   ['POST', /^\/prescriptions$/, (_m, b) => { const rx = { id: `rx-${Date.now()}`, status: 'Active', doctorName: DEMO_DOCTOR.name, remainingDays: b.totalDays || 30, advice: [], ...b }; db.prescriptions.unshift(rx); return ok(rx, 201); }],
 

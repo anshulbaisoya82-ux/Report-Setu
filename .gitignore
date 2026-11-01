@@ -129,3 +129,6 @@ logs/
 
 # Frontend demo build
 Frontend/dist-demo/
+
+# On-device OCR engine, copied from node_modules by Frontend/scripts/copy-ocr-assets.mjs
+Frontend/public/ocr/

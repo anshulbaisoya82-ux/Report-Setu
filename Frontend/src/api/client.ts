@@ -401,6 +401,15 @@ export const reportsApi = {
 /* =======================================================================
  * Medications & Prescriptions API
  * ======================================================================= */
+export interface AdherenceSummary {
+  adherenceRate: number;
+  streakDays?: number;
+  totalScheduled: number;
+  totalTaken: number;
+  totalMissed: number;
+  message?: string;
+}
+
 export const medicationsApi = {
   getTodaySchedule: async (patientId?: string) => {
     const qs = patientId ? `?patientId=${encodeURIComponent(patientId)}` : '';
@@ -415,8 +424,10 @@ export const medicationsApi = {
     });
   },
 
-  getAdherence: async () => {
-    return await apiFetch<any>('/medicines/adherence');
+  /** Last 7 days. Doctors must pass the patient's id. */
+  getAdherence: async (patientId?: string): Promise<AdherenceSummary> => {
+    const qs = patientId ? `?patientId=${encodeURIComponent(patientId)}` : '';
+    return await apiFetch<AdherenceSummary>(`/medicines/adherence${qs}`);
   },
 };
 

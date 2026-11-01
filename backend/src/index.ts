@@ -5,6 +5,7 @@ import { connectDatabase, disconnectDatabase } from './config/database';
 import { initSocketServer, getSocketServer } from './services/socketService';
 import { startReminderScheduler, stopReminderScheduler } from './services/reminderScheduler';
 import { logger } from './utils/logger';
+import { getMedicineCatalog } from './services/medicineCatalog';
 
 const PORT = config.PORT || 5000;
 const app = createApp();
@@ -24,6 +25,8 @@ if (config.NODE_ENV !== 'test') {
           env: config.NODE_ENV,
           apiPrefix: '/api/v1',
         });
+        // Warm the medicine-name catalogue (~1.5 s, ~130 MB) so the first search is instant.
+        if (process.env.MEDICINE_SEARCH_SOURCE !== 'ml') setImmediate(() => getMedicineCatalog());
       });
     } catch (err) {
       logger.error({ message: 'Fatal server startup error', error: (err as Error).message });

@@ -16,6 +16,7 @@ import connectionRoutes from './routes/connectionRoutes';
 import reportRoutes from './routes/reportRoutes';
 import doctorRoutes from './routes/doctorRoutes';
 import prescriptionRoutes from './routes/prescriptionRoutes';
+import foodRulesRoutes from './routes/foodRulesRoutes';
 import medicationRoutes from './routes/medicationRoutes';
 import appointmentRoutes from './routes/appointmentRoutes';
 import notificationRoutes from './routes/notificationRoutes';
@@ -85,6 +86,7 @@ export const createApp = (): Express => {
   app.use('/api/v1/reports', reportRoutes);
   app.use('/api/v1/doctor', doctorRoutes);
   app.use('/api/v1/prescriptions', prescriptionRoutes);
+  app.use('/api/v1/food-rules', foodRulesRoutes);
   app.use('/api/v1/medicines', medicationRoutes);
   app.use('/api/v1/appointments', appointmentRoutes);
   app.use('/api/v1/notifications', notificationRoutes);

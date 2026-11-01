@@ -39,6 +39,7 @@ const PatientAskDoctor = lazy(() => import('./pages/patient/PatientAskDoctor').t
 const PatientDoctors = lazy(() => import('./pages/patient/PatientDoctors').then((m) => ({ default: m.PatientDoctors })));
 const PatientSettings = lazy(() => import('./pages/patient/PatientSettings').then((m) => ({ default: m.PatientSettings })));
 const PatientProfile = lazy(() => import('./pages/patient/PatientProfile').then((m) => ({ default: m.PatientProfile })));
+const PatientFoodCheck = lazy(() => import('./pages/patient/PatientFoodCheck').then((m) => ({ default: m.PatientFoodCheck })));
 const PatientOnboarding = lazy(() => import('./pages/patient/PatientOnboarding').then((m) => ({ default: m.PatientOnboarding })));
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 const AdminPortal = lazy(() => import('./pages/admin/AdminPortal').then((m) => ({ default: m.AdminPortal })));
@@ -81,6 +82,7 @@ export const App: React.FC = () => {
           <Route path="reports" element={<PatientMyReports />} />
           <Route path="reports/:reportId" element={<PatientReportDetail />} />
           <Route path="medicines" element={<PatientMedicines />} />
+          <Route path="food-check" element={<PatientFoodCheck />} />
           <Route path="appointments" element={<PatientAppointments />} />
           <Route path="ask-doctor" element={<PatientAskDoctor />} />
           <Route path="doctors" element={<PatientDoctors />} />
