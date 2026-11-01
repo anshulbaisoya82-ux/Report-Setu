@@ -3,12 +3,19 @@
  * Connects frontend directly to Express/MongoDB backend at http://localhost:5000/api/v1
  */
 
-const getApiBase = () => {
+export const getApiBase = (): string => {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
-  const host = typeof window !== 'undefined' && window.location.hostname === '127.0.0.1' ? '127.0.0.1' : 'localhost';
-  return `http://${host}:5000/api/v1`;
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    // On production domain behind Nginx (e.g. reportsetu.kryptonhost.in or any domain)
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return `${window.location.origin}/api/v1`;
+    }
+    return `http://${hostname}:5000/api/v1`;
+  }
+  return 'http://localhost:5000/api/v1';
 };
 
 const API_BASE = getApiBase();

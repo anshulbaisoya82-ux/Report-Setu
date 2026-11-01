@@ -274,21 +274,19 @@ export const PatientDoctors: React.FC<PatientDoctorsProps> = ({ embedded = false
       <div className="flex items-center gap-2">
         <button
           onClick={() => setActiveTab('connected')}
-          className={`px-3.5 py-1.5 rounded-[3px] text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'connected'
+          className={`px-3.5 py-1.5 rounded-[3px] text-xs font-semibold transition-all cursor-pointer ${activeTab === 'connected'
               ? 'bg-[#0E382F] text-white shadow-2xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-stone-100'
-          }`}
+            }`}
         >
           Connected Clinicians ({activeClinicians.length})
         </button>
         <button
           onClick={() => setActiveTab('requests')}
-          className={`px-3.5 py-1.5 rounded-[3px] text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'requests'
+          className={`px-3.5 py-1.5 rounded-[3px] text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'requests'
               ? 'bg-[#0E382F] text-white shadow-2xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-stone-100'
-          }`}
+            }`}
         >
           <span>Pending Requests</span>
           {pendingRequests.length > 0 && (
@@ -299,11 +297,10 @@ export const PatientDoctors: React.FC<PatientDoctorsProps> = ({ embedded = false
         </button>
         <button
           onClick={() => setActiveTab('quick_code')}
-          className={`px-3.5 py-1.5 rounded-[3px] text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === 'quick_code'
+          className={`px-3.5 py-1.5 rounded-[3px] text-xs font-semibold transition-all cursor-pointer ${activeTab === 'quick_code'
               ? 'bg-[#0E382F] text-white shadow-2xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-stone-100'
-          }`}
+            }`}
         >
           Temporary 2-Min Code
         </button>
@@ -333,81 +330,81 @@ export const PatientDoctors: React.FC<PatientDoctorsProps> = ({ embedded = false
             </div>
           ) : (
             activeClinicians.map((doc) => (
-            <div
-              key={doc.id}
-              className="bg-white rounded-[3px] border border-stone-200/90 p-4 shadow-2xs space-y-3"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[3px] bg-[#0E382F] text-white font-bold text-xs flex items-center justify-center shadow-2xs shrink-0">
-                    DR
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <h3 className="text-xs font-bold text-slate-900">{doc.name || 'Consulting Physician'}</h3>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+              <div
+                key={doc.id}
+                className="bg-white rounded-[3px] border border-stone-200/90 p-4 shadow-2xs space-y-3"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-[3px] bg-[#0E382F] text-white font-bold text-xs flex items-center justify-center shadow-2xs shrink-0">
+                      DR
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{doc.specialty || 'General Physician'}</p>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="text-xs font-bold text-slate-900">{doc.name || 'Consulting Physician'}</h3>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5">{doc.specialty || 'General Physician'}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[3px] bg-[#EAF6F0] text-[#0E382F] text-[10.5px] font-semibold border border-emerald-200/50">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                      Active Access
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[3px] bg-[#EAF6F0] text-[#0E382F] text-[10.5px] font-semibold border border-emerald-200/50">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                    Active Access
+                {/* Clinic details */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 pt-1">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{doc.hospital || 'City Care Health Clinic, Delhi NCR'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>Mon-Sat, 10:00 AM – 07:00 PM</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>Reg: NMC-294018 Verified</span>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex items-center justify-between pt-2 border-t border-stone-100 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => navigate('/patient/appointments')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0E382F] text-white rounded-[3px] text-xs font-semibold hover:bg-[#092720] shadow-2xs cursor-pointer"
+                    >
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>Book Appointment</span>
+                    </button>
+                    <button
+                      onClick={() => navigate('/patient/ask-doctor')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-stone-200 text-slate-700 rounded-[3px] text-xs font-medium hover:bg-stone-50 shadow-2xs cursor-pointer"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Ask Doctor</span>
+                    </button>
+                    <button
+                      onClick={() => handleRevokeConnection(doc.doctorId || doc.id, doc.name)}
+                      disabled={actionLoading === (doc.doctorId || doc.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-rose-200 text-rose-700 hover:bg-rose-50 rounded-[3px] text-xs font-medium shadow-2xs cursor-pointer transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Revoke Consent</span>
+                    </button>
+                  </div>
+
+                  <span className="text-[10px] text-slate-400">
+                    Connected since {doc.connectedAt || '31 Oct 2026'}
                   </span>
                 </div>
               </div>
-
-              {/* Clinic details */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-slate-600 pt-1">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span className="truncate">{doc.hospital || 'City Care Health Clinic, Delhi NCR'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>Mon-Sat, 10:00 AM – 07:00 PM</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span>Reg: NMC-294018 Verified</span>
-                </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex items-center justify-between pt-2 border-t border-stone-100 flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => navigate('/patient/appointments')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0E382F] text-white rounded-[3px] text-xs font-semibold hover:bg-[#092720] shadow-2xs cursor-pointer"
-                  >
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>Book Appointment</span>
-                  </button>
-                  <button
-                    onClick={() => navigate('/patient/ask-doctor')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-stone-200 text-slate-700 rounded-[3px] text-xs font-medium hover:bg-stone-50 shadow-2xs cursor-pointer"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Ask Doctor</span>
-                  </button>
-                  <button
-                    onClick={() => handleRevokeConnection(doc.doctorId || doc.id, doc.name)}
-                    disabled={actionLoading === (doc.doctorId || doc.id)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-rose-200 text-rose-700 hover:bg-rose-50 rounded-[3px] text-xs font-medium shadow-2xs cursor-pointer transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                    <span>Revoke Consent</span>
-                  </button>
-                </div>
-
-                <span className="text-[10px] text-slate-400">
-                  Connected since {doc.connectedAt || '31 Oct 2026'}
-                </span>
-              </div>
-            </div>
-          )))}
+            )))}
         </div>
       )}
 

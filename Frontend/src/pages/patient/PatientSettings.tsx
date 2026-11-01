@@ -50,12 +50,12 @@ export const PatientSettings: React.FC = () => {
 
   // Profile Edit State
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [name, setName] = useState(currentUser?.name || 'Rishabh Sharma');
-  const [rsId, setRsId] = useState((currentUser as any)?.rsId || 'RS-FTPE4');
-  const [phone, setPhone] = useState(currentUser?.phone || '+91 98765 43210');
-  const [email, setEmail] = useState(currentUser?.email || 'rishabh@example.com');
+  const [name, setName] = useState(currentUser?.name || '');
+  const [rsId, setRsId] = useState((currentUser as any)?.rsId || '');
+  const [phone, setPhone] = useState(currentUser?.phone || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
   const [location, setLocation] = useState(
-    (currentUser as any)?.address || (currentUser as any)?.location || 'Ghaziabad, Uttar Pradesh'
+    (currentUser as any)?.address || (currentUser as any)?.location || ''
   );
 
   useEffect(() => {
@@ -67,9 +67,10 @@ export const PatientSettings: React.FC = () => {
         if (p.phone) setPhone(p.phone);
         if (p.email) setEmail(p.email);
         if (p.location) setLocation(p.location);
+        setCurrentUser({ ...currentUser, ...p });
       }
     }).catch(() => {});
-  }, [currentUser]);
+  }, []);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -125,24 +126,15 @@ export const PatientSettings: React.FC = () => {
         email,
         location,
       });
-      if (res && res.data) {
-        setCurrentUser({
-          ...currentUser,
-          ...res.data,
-          name,
-          phone,
-          email,
-          location,
-        });
-      } else {
-        setCurrentUser({
-          ...currentUser,
-          name,
-          phone,
-          email,
-          location,
-        });
-      }
+      const p = res?.data || res;
+      setCurrentUser({
+        ...currentUser,
+        ...p,
+        name,
+        phone,
+        email,
+        location,
+      });
       setIsEditingProfile(false);
       showToast('Profile information saved and synced in real-time!');
     } catch (err: any) {
