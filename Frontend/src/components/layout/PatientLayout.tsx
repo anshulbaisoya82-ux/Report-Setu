@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
@@ -15,7 +15,11 @@ import { useStore } from '../../store/useStore';
 export const PatientLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useStore();
+  const { logout, fetchCurrentUserProfile } = useStore();
+
+  useEffect(() => {
+    void fetchCurrentUserProfile();
+  }, [fetchCurrentUserProfile]);
 
   const navItems = [
     { name: 'Home', path: '/patient', icon: Home, exact: true },

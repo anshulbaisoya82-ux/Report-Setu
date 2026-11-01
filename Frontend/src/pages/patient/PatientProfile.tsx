@@ -18,21 +18,21 @@ export const PatientProfile: React.FC = () => {
   const [showQrModal, setShowQrModal] = useState(false);
   const [newConditionInput, setNewConditionInput] = useState('');
 
-  // Form State
+  // Form State initialized dynamically from currentUser
   const [formData, setFormData] = useState({
-    name: 'Rishabh Sharma',
-    rsId: 'RS-FTPE4',
-    abdmId: 'ABHA-98-7654-3210',
-    phone: '+91 98765 43210',
-    email: 'rishabh@example.com',
-    age: 25,
-    gender: 'Male',
-    bloodGroup: 'O+',
-    location: 'Ghaziabad, Uttar Pradesh',
-    conditions: [] as string[],
-    emergencyName: 'Suman Sharma',
-    emergencyRelation: 'Mother',
-    emergencyPhone: '+91 98765 43210',
+    name: currentUser?.name || '',
+    rsId: (currentUser as any)?.rsId || '',
+    abdmId: (currentUser as any)?.abdmId || ((currentUser as any)?.rsId ? `ABHA-${(currentUser as any).rsId}` : ''),
+    phone: currentUser?.phone || '',
+    email: currentUser?.email || '',
+    age: (currentUser as any)?.age || 25,
+    gender: (currentUser as any)?.gender || 'Male',
+    bloodGroup: (currentUser as any)?.bloodGroup || 'O+',
+    location: (currentUser as any)?.location || '',
+    conditions: ((currentUser as any)?.conditions || []) as string[],
+    emergencyName: (currentUser as any)?.emergencyContact?.name || '',
+    emergencyRelation: (currentUser as any)?.emergencyContact?.relation || '',
+    emergencyPhone: (currentUser as any)?.emergencyContact?.phone || '',
   });
 
   const [stats, setStats] = useState({
@@ -66,6 +66,10 @@ export const PatientProfile: React.FC = () => {
             emergencyRelation: p.emergencyContact?.relation || prev.emergencyRelation,
             emergencyPhone: p.emergencyContact?.phone || prev.emergencyPhone,
           }));
+          setCurrentUser({
+            ...currentUser,
+            ...p,
+          });
           if (p.stats) {
             setStats(p.stats);
           }
@@ -95,7 +99,7 @@ export const PatientProfile: React.FC = () => {
   }, [currentUser]);
 
   const handleCopyRsId = () => {
-    const idToCopy = formData.rsId || 'RS-FTPE4';
+    const idToCopy = formData.rsId || (currentUser as any)?.rsId || '';
     navigator.clipboard.writeText(idToCopy);
     setCopiedRsId(true);
     setToastMsg(`RS-ID (${idToCopy}) copied to clipboard!`);
@@ -147,10 +151,19 @@ export const PatientProfile: React.FC = () => {
 
       if (res && res.data) {
         const p = res.data;
-        setCurrentUser({
+        const merged = {
           ...currentUser,
           ...p,
-        });
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          location: formData.location,
+          conditions: formData.conditions,
+          age: Number(formData.age),
+          gender: formData.gender,
+          bloodGroup: formData.bloodGroup,
+        };
+        setCurrentUser(merged);
         setFormData((prev) => ({
           ...prev,
           name: p.name || prev.name,

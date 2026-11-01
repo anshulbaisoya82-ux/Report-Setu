@@ -19,6 +19,10 @@ import {
   getStoredUser,
   getAccessToken,
   clearAccessToken,
+  setStoredRole,
+  setStoredUser,
+  patientProfileApi,
+  doctorProfileApi,
 } from '../api/client';
 
 export interface AppState {
@@ -26,6 +30,7 @@ export interface AppState {
   setRole: (role: 'doctor' | 'patient' | 'admin') => void;
   currentUser: any | null;
   setCurrentUser: (user: any | null) => void;
+  fetchCurrentUserProfile: () => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -111,9 +116,42 @@ const hasToken = !!getAccessToken();
 
 export const useStore = create<AppState>((set, get) => ({
   currentRole: savedRole,
-  setRole: (role) => set({ currentRole: role }),
+  setRole: (role) => {
+    setStoredRole(role);
+    set({ currentRole: role });
+  },
   currentUser: savedUser,
-  setCurrentUser: (user) => set({ currentUser: user, isAuthenticated: !!user }),
+  setCurrentUser: (user) => {
+    if (user) {
+      setStoredUser(user);
+    } else {
+      localStorage.removeItem('reportsetu_user');
+    }
+    set({ currentUser: user, isAuthenticated: !!user });
+  },
+  fetchCurrentUserProfile: async () => {
+    if (!getAccessToken()) return;
+    const role = get().currentRole;
+    try {
+      if (role === 'patient') {
+        const res = await patientProfileApi.get();
+        const p = res?.data || res;
+        if (p && (p.name || p.id)) {
+          const merged = { ...get().currentUser, ...p };
+          get().setCurrentUser(merged);
+        }
+      } else if (role === 'doctor') {
+        const res = await doctorProfileApi.get();
+        const d = res?.data || res;
+        if (d && (d.name || d.id)) {
+          const merged = { ...get().currentUser, ...d };
+          get().setCurrentUser(merged);
+        }
+      }
+    } catch (err: any) {
+      console.warn('Failed to refresh user profile from backend:', err?.message);
+    }
+  },
   isAuthenticated: hasToken,
   isLoading: false,
   error: null,
