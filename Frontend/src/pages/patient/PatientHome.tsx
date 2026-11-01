@@ -41,7 +41,8 @@ export const PatientHome: React.FC = () => {
 
   // Clean Patient Name: Strip out any "Dr." or "Dr " prefix if present on patient account
   const rawPatientName = currentUser?.name?.trim() || '';
-  const cleanPatientName = rawPatientName.replace(/^Dr\.?\s*/i, '').trim() || rawPatientName || 'Patient';
+  const strippedName = rawPatientName.replace(/^Dr\.?\s*/i, '').trim();
+  const cleanPatientName = strippedName || (rawPatientName.toLowerCase().startsWith('dr') ? 'Patient' : rawPatientName) || 'Patient';
   const patientFirstName = cleanPatientName.split(' ')[0] || 'Patient';
   const patientInitial = (patientFirstName.charAt(0) || 'P').toUpperCase();
 

@@ -42,8 +42,7 @@ const PatientSignUp: React.FC = () => {
       const result = await authApi.sendPatientOtp(phone);
       setOtpSent(true);
       setDevCode(result.devCode || null);
-      if (result.devCode) setOtp(result.devCode);
-    } catch (err: any) {
+          } catch (err: any) {
       setErrorMessage(err.message || 'Unable to send verification code.');
     } finally {
       setIsLoading(false);
@@ -91,7 +90,7 @@ const PatientSignUp: React.FC = () => {
           <form onSubmit={completeRegistration} className="space-y-4">
             <p className="text-sm text-stone-600">Enter the 6-digit code sent to {phone}.</p>
             {devCode && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">Development code: {devCode}</p>}
-            <input value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required inputMode="numeric" pattern="\d{6}" maxLength={6} className="w-full rounded-xl border border-stone-200 px-4 py-3 text-center text-lg tracking-[0.4em]" placeholder="000000" />
+            <input value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required inputMode="numeric" pattern="\d{6}" maxLength={6} className="w-full rounded-xl border border-stone-200 px-4 py-3 text-center text-lg tracking-[0.4em]" placeholder="" />
             <button disabled={isLoading} className="w-full rounded-xl bg-[#1E3F35] py-3 text-sm font-semibold text-white disabled:opacity-60">
               {isLoading ? 'Creating account...' : 'Verify and create account'}
             </button>
@@ -324,7 +323,7 @@ export const SignUp: React.FC = () => {
                     value={formData.mobile}
                     onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                     required
-                    placeholder="+91 98765 43210"
+                    placeholder="+91 Mobile number"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
                   />
                 </div>

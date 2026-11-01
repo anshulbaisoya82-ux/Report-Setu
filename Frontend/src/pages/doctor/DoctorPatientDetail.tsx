@@ -60,7 +60,8 @@ const formatDateTimeFriendly = (dateStr: string | undefined): string => {
 };
 
 export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initialTab }) => {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id?: string; patientId?: string }>();
+  const effectivePatientId = params.patientId || params.id || '';
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -91,9 +92,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
 
   const patient =
-    patients.find((p) => p.id === id || p.rsId === id) ||
-    patients.find((p) => (p as any)._id === id) ||
-    patients.find((p) => (p as any).userId === id);
+    patients.find((p) => p.id === effectivePatientId || p.rsId === effectivePatientId) || patients.find((p) => (p as any)._id === effectivePatientId) || patients.find((p) => (p as any).userId === effectivePatientId);
 
   useEffect(() => {
     if (patient?.id) {
@@ -265,6 +264,17 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
   // Compute SVG chart coordinates and bezier curve
   const chartGeometry = useMemo(() => {
+    if (!trendPoints || trendPoints.length === 0 || !activeParam) {
+      return {
+        refTopY: 0,
+        refBottomY: 0,
+        refHeight: 0,
+        pointsWithCoords: [],
+        path: '',
+        yTicks: [],
+      };
+    }
+
     const vals = trendPoints.map((p) => p.value);
     const allVals = [...vals, parsedRef.min, parsedRef.max];
     const minVal = Math.min(...allVals);
@@ -291,19 +301,18 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
     // Smooth Bezier path generator
     let path = '';
-    if (pointsWithCoords.length === 1) {
+    if (pointsWithCoords.length === 0) {
+      path = '';
+    } else if (pointsWithCoords.length === 1) {
       path = `M ${pointsWithCoords[0].x} ${pointsWithCoords[0].y}`;
     } else if (pointsWithCoords.length === 2) {
       path = `M ${pointsWithCoords[0].x} ${pointsWithCoords[0].y} L ${pointsWithCoords[1].x} ${pointsWithCoords[1].y}`;
     } else if (pointsWithCoords.length === 3) {
-      // Quadratic curve for 3 points
       const p0 = pointsWithCoords[0];
       const p1 = pointsWithCoords[1];
       const p2 = pointsWithCoords[2];
-      // Peak curve control
       path = `M ${p0.x} ${p0.y} Q ${p1.x} ${p1.y * 0.85} ${p2.x} ${p2.y}`;
     } else {
-      // General spline for 4+ points
       path = `M ${pointsWithCoords[0].x} ${pointsWithCoords[0].y}`;
       for (let i = 0; i < pointsWithCoords.length - 1; i++) {
         const p0 = pointsWithCoords[i === 0 ? i : i - 1];
@@ -559,15 +568,24 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
   };
 
   if (!patient) {
+    if (patients.length === 0) {
+      return (
+        <div className="min-h-[400px] flex flex-col items-center justify-center p-8 text-stone-500">
+          <div className="w-8 h-8 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-xs font-semibold text-slate-700">Loading patient records...</p>
+        </div>
+      );
+    }
+
     return (
       <div className="p-8 max-w-lg mx-auto text-center space-y-4 font-sans text-stone-800 my-16 bg-white rounded-[3px] border border-stone-200/90 shadow-2xs">
         <div className="w-12 h-12 rounded-[3px] bg-rose-50 text-rose-600 flex items-center justify-center mx-auto border border-rose-200">
           <Shield className="w-6 h-6 text-rose-600" />
         </div>
         <div>
-          <h2 className="text-base font-bold text-slate-900">Access Restricted / Consent Not Active</h2>
+          <h2 className="text-base font-bold text-slate-900">Patient Record Not Located</h2>
           <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
-            Under the Digital Personal Data Protection (DPDP) Act, patient health records, lab reports, and consultations are confidential and accessible only when active consent is authorized by the patient.
+            The requested patient could not be located in your patient registry. Please return to the directory.
           </p>
         </div>
         <button
@@ -578,7 +596,9 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
         </button>
       </div>
     );
-  }
+  };
+
+  
 
   return (
     <div className="p-6 lg:p-7 max-w-[1400px] w-full mx-auto space-y-4 text-slate-800">
@@ -1396,7 +1416,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   New Prescription
                 </h2>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  {patient.name} • {patient.rsId || 'RS-10482'}
+                  {patient.name}{patient.rsId ? ` • ${patient.rsId}` : ''}
                 </p>
               </div>
               <button

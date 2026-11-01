@@ -546,7 +546,7 @@ export const DoctorAppointments: React.FC = () => {
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-slate-900 text-sm">{apt.patientName}</span>
                                 <span className="bg-slate-100 text-slate-500 font-medium text-[11px] px-1.5 py-0.5 rounded-[3px]">
-                                  {apt.patientRsId || 'RS-FTPE4'}
+                                  {apt.patientRsId || ''}
                                 </span>
                               </div>
 
@@ -802,7 +802,7 @@ export const DoctorAppointments: React.FC = () => {
                     >
                       {availablePatients.map((p) => (
                         <option key={p.id} value={p.id}>
-                          {p.name} ({p.rsId || 'RS-FTPE4'})
+                          {p.name}{p.rsId ? ` (${p.rsId})` : ''}
                         </option>
                       ))}
                     </select>

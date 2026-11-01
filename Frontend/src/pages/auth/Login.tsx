@@ -72,8 +72,7 @@ export const Login: React.FC = () => {
       setOtpSent(true);
       if (res.devCode) {
         setDispatchedDevCode(res.devCode);
-        setOtp(res.devCode);
-      }
+              }
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to dispatch verification code.');
     } finally {
@@ -342,7 +341,7 @@ export const Login: React.FC = () => {
                           required
                           pattern="[0-9]{10}"
                           maxLength={10}
-                          placeholder="98765 43210"
+                          placeholder="Enter mobile number"
                           className="w-full pl-20 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25]"
                         />
                       </div>
@@ -407,7 +406,7 @@ export const Login: React.FC = () => {
                         onChange={(e) => setOtp(e.target.value)}
                         required
                         maxLength={6}
-                        placeholder="123456"
+                        placeholder=""
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#1E3F35]/20 focus:border-[#1E3F35] text-sm text-[#172B25] tracking-widest font-mono text-center font-bold"
                       />
                     </div>

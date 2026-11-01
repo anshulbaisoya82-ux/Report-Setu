@@ -29,7 +29,7 @@ export const DoctorAddPatient: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<'request' | 'verify'>('request');
 
   // Input states
-  const [rsId, setRsId] = useState('RS-10475');
+  const [rsId, setRsId] = useState('');
   const [codeInputs, setCodeInputs] = useState<string[]>(['', '', '', '', '', '']);
 
   // Loading & error states

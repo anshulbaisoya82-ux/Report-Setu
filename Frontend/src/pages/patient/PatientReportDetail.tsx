@@ -305,7 +305,7 @@ export const PatientReportDetail: React.FC = () => {
             Verified Medical Record
           </span>
           <span className="text-[11px] font-mono text-slate-500 bg-white border border-stone-200 px-2 py-0.5 rounded-[3px]">
-            RS-74891
+            {currentReport?.patientRsId || (currentUser as any)?.rsId || 'Verified'}
           </span>
         </div>
       </div>

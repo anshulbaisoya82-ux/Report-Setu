@@ -422,7 +422,7 @@ export const PatientDoctors: React.FC<PatientDoctorsProps> = ({ embedded = false
             <div className="p-8 text-center text-xs text-slate-400 space-y-1">
               <p className="font-semibold text-slate-600">No pending requests</p>
               <p className="text-[11px] text-slate-400">
-                When a clinic or doctor requests access using your ReportSetu ID ({currentPatient?.rsId || 'RS-FTPE4'}), their request will appear here for your approval.
+                When a clinic or doctor requests access using your ReportSetu ID ({currentPatient?.rsId || 'Your RS-ID'}), their request will appear here for your approval.
               </p>
             </div>
           ) : (
@@ -497,7 +497,7 @@ export const PatientDoctors: React.FC<PatientDoctorsProps> = ({ embedded = false
           <div className="p-2.5 rounded-[3px] bg-[#F5F8F6] border border-stone-200/90 max-w-xs mx-auto flex items-center justify-between text-xs">
             <span className="text-slate-500 font-medium">Your ReportSetu ID:</span>
             <span className="font-mono font-bold text-[#0E382F] bg-white px-2.5 py-0.5 rounded-[2px] border border-stone-200">
-              {currentPatient?.rsId || 'RS-FTPE4'}
+              {currentPatient?.rsId || 'Not assigned'}
             </span>
           </div>
 

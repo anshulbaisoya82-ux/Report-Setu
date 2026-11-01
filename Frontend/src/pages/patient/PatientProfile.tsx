@@ -25,9 +25,9 @@ export const PatientProfile: React.FC = () => {
     abdmId: (currentUser as any)?.abdmId || ((currentUser as any)?.rsId ? `ABHA-${(currentUser as any).rsId}` : ''),
     phone: currentUser?.phone || '',
     email: currentUser?.email || '',
-    age: (currentUser as any)?.age || 25,
-    gender: (currentUser as any)?.gender || 'Male',
-    bloodGroup: (currentUser as any)?.bloodGroup || 'O+',
+    age: (currentUser as any)?.age || '',
+    gender: (currentUser as any)?.gender || '',
+    bloodGroup: (currentUser as any)?.bloodGroup || '',
     location: (currentUser as any)?.location || '',
     conditions: ((currentUser as any)?.conditions || []) as string[],
     emergencyName: (currentUser as any)?.emergencyContact?.name || '',
@@ -282,7 +282,7 @@ export const PatientProfile: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-500 mt-0.5">
-                {formData.age} years <span className="mx-1">·</span> {formData.gender}
+                {formData.age ? `${formData.age} years` : 'Age not recorded'}{formData.gender ? ` · ${formData.gender}` : ''}
               </p>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#FDF2F0] text-[#D92D20] text-[10px] font-semibold rounded-[3px] border border-red-200/50">

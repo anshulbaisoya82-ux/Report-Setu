@@ -395,7 +395,7 @@ export const DoctorPatientQuestions: React.FC = () => {
                         {selectedThread.patientName}
                       </h3>
                       <span className="bg-slate-100 text-slate-500 font-medium text-[10px] px-1.5 py-0.5 rounded-[2px]">
-                        {selectedThread.patientRsId || 'RS-FTPE4'}
+                        {selectedThread.patientRsId || ''}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-400 font-normal mt-0.5">

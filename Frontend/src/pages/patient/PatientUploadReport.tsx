@@ -14,7 +14,7 @@ type StepNumber = 1 | 2 | 3 | 4;
 export const PatientUploadReport: React.FC = () => {
   const navigate = useNavigate();
   const { patients, addReport, currentUser, fetchReports } = useStore();
-  const currentPatient = currentUser || patients[0] || { id: 'p-1', name: 'Patient', avatar: 'PT', rsId: 'RS-FTPE4' };
+  const currentPatient = currentUser || patients[0] || null;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);

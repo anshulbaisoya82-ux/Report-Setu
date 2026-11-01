@@ -352,7 +352,7 @@ export const DoctorPatientMedicines: React.FC = () => {
           <div className="pb-3 border-b border-stone-200">
             <h3 className="font-bold text-base text-slate-900 leading-tight">New Prescription</h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              {patient.name} • {patient.rsId || 'RS-10482'}
+              {patient.name}{patient.rsId ? ` • ${patient.rsId}` : ''}
             </p>
           </div>
 
