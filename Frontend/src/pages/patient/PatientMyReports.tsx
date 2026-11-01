@@ -17,81 +17,7 @@ export const PatientMyReports: React.FC = () => {
     fetchReports();
   }, []);
 
-  // Standard verified default reports matching the exact image
-  const defaultReports: LabReport[] = [
-    {
-      id: 'rep-cbc-1',
-      name: 'Complete Blood Count (CBC)',
-      category: 'CBC',
-      patientId: currentUser?.id || 'p-1',
-      patientName: currentUser?.name || 'Rishabh Sharma',
-      patientAvatar: 'R',
-      labName: 'Labsmart Software',
-      collectionDate: '2026-10-31',
-      reportedDate: '31 Oct 2026, 10:41 AM',
-      status: 'Normal',
-      reviewed: true,
-      parameters: [
-        { id: 'p-1', name: 'Hemoglobin', value: 15.0, unit: 'g/dL', referenceRange: '13.0 - 17.0', status: 'Normal' },
-        { id: 'p-2', name: 'Platelet Count', value: 3.5, unit: 'lakhs/cumm', referenceRange: '1.5 - 4.1', status: 'Normal' },
-        { id: 'p-3', name: 'Total Leukocyte Count', value: 5100, unit: 'cumm', referenceRange: '4,800 - 10,800', status: 'Normal' },
-      ],
-      aiOverview: {
-        summary: 'CBC readings within normal reference parameters.',
-        pointsToConsider: ['Normal baseline'],
-        keyFindings: [],
-        generatedAt: '31 Oct 2026',
-      },
-    },
-    {
-      id: 'rep-cbc-2',
-      name: 'Complete Blood Count (CBC)',
-      category: 'CBC',
-      patientId: currentUser?.id || 'p-1',
-      patientName: currentUser?.name || 'Rishabh Sharma',
-      patientAvatar: 'R',
-      labName: 'Dr Lal PathLabs',
-      collectionDate: '2026-10-31',
-      reportedDate: '31 Oct 2026',
-      status: 'Normal',
-      reviewed: true,
-      parameters: [
-        { id: 'p-1', name: 'Hemoglobin', value: 14.8, unit: 'g/dL', referenceRange: '13.0 - 17.0', status: 'Normal' },
-        { id: 'p-2', name: 'Platelet Count', value: 3.4, unit: 'lakhs/cumm', referenceRange: '1.5 - 4.1', status: 'Normal' },
-      ],
-      aiOverview: {
-        summary: 'CBC readings within normal reference parameters.',
-        pointsToConsider: ['Normal baseline'],
-        keyFindings: [],
-        generatedAt: '31 Oct 2026',
-      },
-    },
-    {
-      id: 'rep-cbc-3',
-      name: 'Complete Blood Count (CBC)',
-      category: 'CBC',
-      patientId: currentUser?.id || 'p-1',
-      patientName: currentUser?.name || 'Rishabh Sharma',
-      patientAvatar: 'R',
-      labName: 'Adarsh Pathology Center',
-      collectionDate: '2026-10-30',
-      reportedDate: '30 Oct 2026',
-      status: 'Normal',
-      reviewed: true,
-      parameters: [
-        { id: 'p-1', name: 'Hemoglobin', value: 14.5, unit: 'g/dL', referenceRange: '13.0 - 17.0', status: 'Normal' },
-        { id: 'p-2', name: 'Platelet Count', value: 1.85, unit: 'lakhs/cumm', referenceRange: '1.5 - 4.1', status: 'Normal' },
-      ],
-      aiOverview: {
-        summary: 'CBC readings within normal reference parameters.',
-        pointsToConsider: ['Normal baseline'],
-        keyFindings: [],
-        generatedAt: '31 Oct 2026',
-      },
-    },
-  ];
-
-  const activeReports = reports.length > 0 ? reports : defaultReports;
+  const activeReports = reports || [];
 
   const filteredReports = activeReports.filter((rep) => {
     const q = searchTerm.toLowerCase();
@@ -207,8 +133,28 @@ export const PatientMyReports: React.FC = () => {
       {/* Reports List */}
       <div className="bg-white rounded-[3px] border border-stone-200/90 shadow-2xs divide-y divide-stone-100">
         {filteredReports.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-400">
-            No lab reports found matching "{searchTerm}".
+          <div className="p-10 text-center space-y-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-800 flex items-center justify-center mx-auto">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-800">
+                {searchTerm ? `No lab reports matching "${searchTerm}"` : 'No Lab Reports Found'}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                {searchTerm
+                  ? 'Try searching with another keyword or lab name.'
+                  : 'Upload your diagnostic reports to view parameters, trend analytics, and doctor reviews.'}
+              </p>
+            </div>
+            {!searchTerm && (
+              <Link
+                to="/patient/upload"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0E382F] hover:bg-[#092720] text-white text-xs font-semibold rounded-[3px] shadow-2xs transition-colors cursor-pointer"
+              >
+                <span>Upload Report</span>
+              </Link>
+            )}
           </div>
         ) : (
           filteredReports.map((report) => (

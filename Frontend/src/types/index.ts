@@ -106,6 +106,14 @@ export interface Prescription {
   status: 'Active' | 'Ended';
   doctorName: string;
   advice: string[];
+  medicines?: {
+    name: string;
+    dose?: string;
+    timing?: string;
+    frequency?: string;
+    instructions?: string;
+    duration?: string;
+  }[];
 }
 
 export interface Appointment {

@@ -55,47 +55,7 @@ export const PatientAppointments: React.FC = () => {
     fetchConnections();
   }, []);
 
-  // Filter default mock visits if store is empty
-  const defaultVisits: Appointment[] = [
-    {
-      id: 'apt-1',
-      patientId: currentUser?.id || 'p-1',
-      patientName: currentUser?.name || 'Rishabh Sharma',
-      patientRsId: currentUser?.rsId || 'RS-FTPE4',
-      doctorName: 'Dr. Rishabh',
-      date: '2026-11-01',
-      time: '11:30 AM',
-      type: 'In-person',
-      reason: 'Follow-up CBC report review',
-      status: 'Confirmed',
-    },
-    {
-      id: 'apt-2',
-      patientId: currentUser?.id || 'p-1',
-      patientName: currentUser?.name || 'Rishabh Sharma',
-      patientRsId: currentUser?.rsId || 'RS-FTPE4',
-      doctorName: 'Dr. Rishabh',
-      date: '2026-10-31',
-      time: '10:30 AM',
-      type: 'In-person',
-      reason: 'Follow-up CBC report review',
-      status: 'Completed',
-    },
-    {
-      id: 'apt-3',
-      patientId: currentUser?.id || 'p-1',
-      patientName: currentUser?.name || 'Rishabh Sharma',
-      patientRsId: currentUser?.rsId || 'RS-FTPE4',
-      doctorName: 'Dr. Rishabh',
-      date: '2026-10-15',
-      time: '10:30 AM',
-      type: 'In-person',
-      reason: 'Follow-up CBC report review',
-      status: 'Completed',
-    },
-  ];
-
-  const allList = appointments.length > 0 ? appointments : defaultVisits;
+  const allList = appointments || [];
 
   const filteredAppointments = allList.filter((a) => {
     if (activeTab === 'upcoming') {
@@ -113,12 +73,12 @@ export const PatientAppointments: React.FC = () => {
 
     try {
       setIsSubmitting(true);
-      const docName = connectedDoctors[0]?.name || connectedDoctors[0]?.doctorName || 'Dr. Rishabh';
+      const docName = connectedDoctors[0]?.name || connectedDoctors[0]?.doctorName || 'Consulting Physician';
 
       await requestAppointment({
-        patientId: currentUser?.id || 'p-1',
-        patientName: currentUser?.name || 'Rishabh Sharma',
-        patientRsId: currentUser?.rsId || 'RS-FTPE4',
+        patientId: currentUser?.id || '',
+        patientName: currentUser?.name || 'Patient',
+        patientRsId: currentUser?.rsId || '',
         doctorName: docName,
         date: selectedDate,
         time: selectedTime,
@@ -288,7 +248,7 @@ export const PatientAppointments: React.FC = () => {
                           {apt.reason || 'Follow-up consultation'}
                         </h3>
                         <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                          <span>{apt.doctorName || 'Dr. Rishabh'}</span>
+                          <span>{apt.doctorName || 'Consulting Physician'}</span>
                           <span>·</span>
                           <span className="flex items-center gap-0.5 text-slate-500">
                             <MapPin className="w-2.5 h-2.5" />
@@ -559,7 +519,7 @@ export const PatientAppointments: React.FC = () => {
 
             <form onSubmit={handleRescheduleSubmit} className="space-y-3 text-xs">
               <p className="text-slate-500 text-[11px]">
-                Request a new time slot with {showRescheduleModal.doctorName || 'Dr. Rishabh'}.
+                Request a new time slot with {showRescheduleModal.doctorName || 'your consulting doctor'}.
               </p>
 
               <div className="grid grid-cols-2 gap-2">
@@ -615,7 +575,7 @@ export const PatientAppointments: React.FC = () => {
           <div className="bg-white rounded-[3px] max-w-xs w-full p-4 space-y-3 shadow-xl border border-stone-200 animate-in zoom-in-95 duration-150">
             <h3 className="text-xs font-bold text-slate-900">Cancel Appointment?</h3>
             <p className="text-[11px] text-slate-500 leading-normal">
-              Are you sure you want to cancel your appointment with {showCancelModal.doctorName || 'Dr. Rishabh'}?
+              Are you sure you want to cancel your appointment with {showCancelModal.doctorName || 'your consulting doctor'}?
             </p>
             <div className="pt-2 flex justify-end gap-2">
               <button

@@ -1,31 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import {
   Pill,
   Calendar,
   MessageSquare,
   Activity,
-  Zap,
-  Layers,
   UploadCloud,
   Bell,
   Clock,
   Check,
+  Plus,
+  Layers,
   BarChart2,
   FileText,
   Phone,
-  Info,
 } from 'lucide-react';
-
-interface MedicineItem {
-  id: string;
-  name: string;
-  instruction: string;
-  time: string;
-  status: 'Taken' | 'Pending';
-  type: 'capsule-blue' | 'capsule-yellow' | 'tablet-white';
-}
 
 export const PatientHome: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +25,9 @@ export const PatientHome: React.FC = () => {
     fetchReports,
     fetchAppointments,
     fetchPrescriptions,
+    medicineSchedule,
+    fetchMedicineSchedule,
+    toggleMedicineSchedule,
   } = useStore();
 
   const [showNotification, setShowNotification] = useState(false);
@@ -43,68 +36,50 @@ export const PatientHome: React.FC = () => {
     void fetchReports();
     void fetchAppointments();
     void fetchPrescriptions();
-  }, [fetchReports, fetchAppointments, fetchPrescriptions]);
+    void fetchMedicineSchedule();
+  }, [fetchReports, fetchAppointments, fetchPrescriptions, fetchMedicineSchedule]);
 
-  const patientName = currentUser?.name || 'Rishabh';
-  const patientFirstName = patientName.split(' ')[0] || 'Rishabh';
-  const patientInitial = (patientFirstName.charAt(0) || 'R').toUpperCase();
+  // Clean Patient Name: Strip out any "Dr." or "Dr " prefix if present on patient account
+  const rawPatientName = currentUser?.name?.trim() || '';
+  const cleanPatientName = rawPatientName.replace(/^Dr\.?\s*/i, '').trim() || rawPatientName || 'Patient';
+  const patientFirstName = cleanPatientName.split(' ')[0] || 'Patient';
+  const patientInitial = (patientFirstName.charAt(0) || 'P').toUpperCase();
 
-  // Medicines matching exact reference image
-  const [medsList, setMedsList] = useState<MedicineItem[]>([
-    {
-      id: 'm-1',
-      name: 'Metformin 500 mg',
-      instruction: 'After breakfast and dinner',
-      time: '08:00 AM',
-      status: 'Taken',
-      type: 'capsule-blue',
-    },
-    {
-      id: 'm-2',
-      name: 'Vitamin D3 60,000 IU',
-      instruction: 'Once weekly after breakfast',
-      time: '08:00 AM',
-      status: 'Taken',
-      type: 'capsule-yellow',
-    },
-    {
-      id: 'm-3',
-      name: 'Paracetamol 3 Tablet',
-      instruction: 'With meals',
-      time: '08:00 AM',
-      status: 'Taken',
-      type: 'tablet-white',
-    },
-  ]);
+  // Real-time Medicine Schedule statistics from PostgreSQL database
+  const totalMedsCount = (medicineSchedule || []).length;
+  const takenCount = (medicineSchedule || []).filter((m) => m.state === 'taken').length;
+  const progressPercentage = totalMedsCount > 0 ? (takenCount / totalMedsCount) * 100 : 0;
 
-  const totalMedsCount = 6;
-  const takenCount = 6;
-  const progressPercentage = (takenCount / totalMedsCount) * 100;
+  // Upcoming appointment resolution from real database state
+  const upcomingList = (appointments || []).filter(
+    (a) => a.status === 'Confirmed' || a.status === 'Pending'
+  );
+  const upcomingAppointmentsCount = upcomingList.length;
+  const nextApt = upcomingList[0] || null;
 
-  // Upcoming appointment resolution matching reference image
-  const nextApt = appointments && appointments.length > 0
-    ? appointments.find((a) => a.status === 'Confirmed' || a.status === 'Pending') || appointments[0]
-    : null;
-
-  const aptDay = nextApt?.date ? nextApt.date.split('-')[2] || '06' : '06';
-  const aptMonth = 'NOV';
-  const aptReason = nextApt?.reason || 'Follow-up Consultation';
-  const aptDoctor = nextApt?.doctorName
-    ? `${nextApt.doctorName} • General Physician`
-    : 'Dr. Rishabh • General Physician';
-  const aptTime = nextApt?.time || '10:30 AM';
-  const aptType = nextApt?.type || 'In-person';
-  const upcomingAppointmentsCount = appointments && appointments.length > 0 ? appointments.length : 1;
-
-  const handleToggleMed = (id: string) => {
-    setMedsList((prev) =>
-      prev.map((m) =>
-        m.id === id ? { ...m, status: m.status === 'Taken' ? 'Pending' : 'Taken' } : m
-      )
-    );
+  const formatAptDate = (dateStr?: string) => {
+    if (!dateStr) return { day: '—', month: '—' };
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      const mIdx = parseInt(parts[1], 10) - 1;
+      return {
+        day: parts[2].padStart(2, '0'),
+        month: monthNames[mIdx] || 'NOV',
+      };
+    }
+    return { day: '—', month: '—' };
   };
 
-  const renderMedicineIcon = (type: MedicineItem['type']) => {
+  const { day: aptDay, month: aptMonth } = formatAptDate(nextApt?.date);
+  const aptReason = nextApt?.reason || 'Clinical Consultation';
+  const aptDoctor = nextApt?.doctorName
+    ? `${nextApt.doctorName} • Consulting Physician`
+    : 'Consulting Physician';
+  const aptTime = nextApt?.time || '10:30 AM';
+  const aptType = nextApt?.type || 'In-person';
+
+  const renderMedicineIcon = (type: 'capsule-blue' | 'capsule-yellow' | 'tablet-white') => {
     if (type === 'capsule-blue') {
       return (
         <svg width="26" height="26" viewBox="0 0 28 28" fill="none" className="shrink-0 -rotate-45">
@@ -155,21 +130,32 @@ export const PatientHome: React.FC = () => {
               className="w-9 h-9 rounded-[6px] bg-white border border-stone-200/90 shadow-2xs flex items-center justify-center text-slate-600 hover:bg-stone-50 transition-colors cursor-pointer"
             >
               <Bell className="w-4 h-4 text-slate-600" />
-              <span className="w-2 h-2 rounded-full bg-rose-500 absolute top-2 right-2 ring-2 ring-white" />
+              {upcomingAppointmentsCount > 0 && (
+                <span className="w-2 h-2 rounded-full bg-rose-500 absolute top-2 right-2 ring-2 ring-white" />
+              )}
             </button>
 
             {showNotification && (
               <div className="absolute right-0 mt-2 w-72 bg-white rounded-[6px] shadow-lg border border-stone-200 p-3 z-50 text-xs animate-in fade-in duration-150">
                 <p className="font-bold text-slate-900 mb-2">Notifications</p>
                 <div className="space-y-1.5">
-                  <div className="p-2 bg-[#F0FDF4] rounded-[4px] text-emerald-800">
-                    <p className="font-semibold text-[11px]">All doses completed</p>
-                    <p className="text-[10px] text-emerald-600 mt-0.5">6 of 6 medicines taken for today.</p>
-                  </div>
-                  <div className="p-2 bg-stone-50 rounded-[4px] text-slate-700">
-                    <p className="font-semibold text-[11px]">Upcoming Visit</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Follow-up Consultation on 06 Nov.</p>
-                  </div>
+                  {totalMedsCount > 0 ? (
+                    <div className="p-2 bg-[#F0FDF4] rounded-[4px] text-emerald-800">
+                      <p className="font-semibold text-[11px]">Medication Schedule</p>
+                      <p className="text-[10px] text-emerald-600 mt-0.5">{takenCount} of {totalMedsCount} doses taken today.</p>
+                    </div>
+                  ) : (
+                    <div className="p-2 bg-stone-50 rounded-[4px] text-slate-700">
+                      <p className="font-semibold text-[11px]">No Active Reminders</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5">Your prescription notifications will appear here.</p>
+                    </div>
+                  )}
+                  {nextApt && (
+                    <div className="p-2 bg-blue-50 rounded-[4px] text-blue-900">
+                      <p className="font-semibold text-[11px]">Upcoming Visit</p>
+                      <p className="text-[10px] text-blue-700 mt-0.5">{aptReason} on {nextApt.date} at {aptTime}.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -211,7 +197,7 @@ export const PatientHome: React.FC = () => {
             </div>
             <div>
               <h3 className="text-xl font-extrabold text-slate-900 tracking-tight leading-none">
-                {takenCount} / {totalMedsCount}
+                {totalMedsCount > 0 ? `${takenCount} / ${totalMedsCount}` : '0'}
               </h3>
               <p className="text-xs text-slate-500 mt-1 font-medium">Medicines Today</p>
             </div>
@@ -258,22 +244,19 @@ export const PatientHome: React.FC = () => {
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-[17px] font-extrabold text-[#16A36A] leading-tight">Normal</h3>
-              <div className="text-xs text-slate-500 mt-0.5 font-medium flex items-center gap-1">
-                <span>Overall Health</span>
-                <Info className="w-3 h-3 text-slate-400" />
-              </div>
+              <h3 className="text-[14px] font-extrabold text-slate-900 leading-tight">Normal</h3>
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">Overall Health ⓘ</p>
             </div>
           </div>
         </div>
 
-        {/* RIGHT: Quick Actions & Upcoming Features */}
-        <div className="lg:col-span-6 flex flex-col justify-between gap-3">
+        {/* RIGHT: Quick Actions + Upcoming Features */}
+        <div className="lg:col-span-6 flex flex-col justify-between space-y-3">
           {/* Quick Actions Card */}
           <div className="bg-white border border-stone-200/90 rounded-[6px] p-3 sm:p-3.5 shadow-2xs space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-slate-900" />
+                <span className="text-[#16A36A] font-bold text-sm">⚡</span>
                 <h3 className="text-sm font-bold text-slate-900 leading-tight">Quick Actions</h3>
               </div>
               <span className="text-[11px] text-slate-400">Common tasks, one click away.</span>
@@ -283,7 +266,7 @@ export const PatientHome: React.FC = () => {
               {/* Action 1: Upload Report */}
               <button
                 onClick={() => navigate('/patient/upload')}
-                className="bg-[#F0FDF4] border border-[#DCFCE7] rounded-[6px] py-2 px-1 text-center flex flex-col items-center justify-center space-y-1 hover:bg-[#DCFCE7]/70 transition-colors cursor-pointer"
+                className="bg-[#EAF6F0] border border-[#C6EAD8] rounded-[6px] py-2 px-1 text-center flex flex-col items-center justify-center space-y-1 hover:bg-[#D5F0E2] transition-colors cursor-pointer"
               >
                 <UploadCloud className="w-4 h-4 text-[#16A36A]" />
                 <span className="text-[10.5px] sm:text-[11px] font-semibold text-slate-800 leading-tight text-center">
@@ -396,43 +379,64 @@ export const PatientHome: React.FC = () => {
             </div>
 
             {/* List of Medications */}
-            <div className="divide-y divide-stone-100">
-              {medsList.map((med) => (
-                <div
-                  key={med.id}
-                  className="py-2.5 flex items-center justify-between gap-3 hover:bg-stone-50/60 rounded-[4px] px-1 transition-colors"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {/* SVG Medication Visual */}
-                    {renderMedicineIcon(med.type)}
-
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-slate-900 leading-tight">
-                        {med.name}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-                        {med.instruction}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{med.time}</span>
-                    </div>
-
-                    <button
-                      onClick={() => handleToggleMed(med.id)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-[#EAF6F0] text-[#16A36A] text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer"
-                    >
-                      <Check className="w-3 h-3 stroke-[3]" />
-                      <span>{med.status}</span>
-                    </button>
-                  </div>
+            {totalMedsCount === 0 ? (
+              <div className="py-7 text-center space-y-2 bg-[#FAFBFB] rounded-lg border border-dashed border-stone-200 my-2">
+                <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto">
+                  <Pill className="w-4 h-4 -rotate-45" />
                 </div>
-              ))}
-            </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800">No Medicines Scheduled Today</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5 max-w-sm mx-auto">
+                    Your daily medicines will appear here once prescribed by your consulting doctor.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="divide-y divide-stone-100">
+                {medicineSchedule.slice(0, 4).map((med, idx) => {
+                  const isTaken = med.state === 'taken';
+                  const iconType = idx % 3 === 0 ? 'capsule-blue' : idx % 3 === 1 ? 'capsule-yellow' : 'tablet-white';
+
+                  return (
+                    <div
+                      key={med.id || idx}
+                      className="py-2.5 flex items-center justify-between gap-3 hover:bg-stone-50/60 rounded-[4px] px-1 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {renderMedicineIcon(iconType)}
+                        <div className="min-w-0">
+                          <h4 className="text-xs font-bold text-slate-900 leading-tight truncate">
+                            {med.name}
+                          </h4>
+                          <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                            {med.dose} · {med.instructions || med.timing}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{med.scheduledTime || '08:00 AM'}</span>
+                        </div>
+
+                        <button
+                          onClick={() => void toggleMedicineSchedule(med.id, isTaken ? 'due' : 'taken')}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] text-xs font-semibold cursor-pointer transition-colors ${
+                            isTaken
+                              ? 'bg-[#EAF6F0] text-[#16A36A] hover:bg-emerald-100'
+                              : 'bg-[#FEF3C7] text-[#D97706] hover:bg-amber-100'
+                          }`}
+                        >
+                          {isTaken && <Check className="w-3 h-3 stroke-[3]" />}
+                          <span>{isTaken ? 'Taken' : 'Pending'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* View Full Schedule Link */}
@@ -456,30 +460,42 @@ export const PatientHome: React.FC = () => {
               <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">Upcoming Appointment</h3>
             </div>
 
-            {/* Appointment Box */}
-            <div className="border border-stone-200/80 rounded-[6px] p-3 flex items-center gap-3 bg-white shadow-2xs">
-              {/* Date Badge */}
-              <div className="w-12 h-12 rounded-[6px] bg-[#EAF6F0] flex flex-col items-center justify-center text-[#16A36A] shrink-0 font-sans">
-                <span className="text-lg font-extrabold leading-none">{aptDay}</span>
-                <span className="text-[9.5px] font-bold tracking-wider uppercase mt-0.5">{aptMonth}</span>
-              </div>
-
-              {/* Appointment Content */}
-              <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-bold text-slate-900 leading-tight truncate">
-                  {aptReason}
-                </h4>
-                <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-                  {aptDoctor}
-                </p>
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-600 mt-1 font-medium">
-                  <Clock className="w-3 h-3 text-slate-400" />
-                  <span>{aptTime}</span>
-                  <span>•</span>
-                  <span>{aptType}</span>
+            {/* Appointment Box or Empty State */}
+            {!nextApt ? (
+              <div className="py-7 text-center space-y-2.5 bg-[#FAFBFB] rounded-lg border border-dashed border-stone-200">
+                <div className="w-9 h-9 rounded-full bg-stone-100 text-slate-500 flex items-center justify-center mx-auto">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800">No Upcoming Appointments</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">You have no pending or scheduled consultations.</p>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="border border-stone-200/80 rounded-[6px] p-3 flex items-center gap-3 bg-white shadow-2xs">
+                {/* Date Badge */}
+                <div className="w-12 h-12 rounded-[6px] bg-[#EAF6F0] flex flex-col items-center justify-center text-[#16A36A] shrink-0 font-sans">
+                  <span className="text-lg font-extrabold leading-none">{aptDay}</span>
+                  <span className="text-[9.5px] font-bold tracking-wider uppercase mt-0.5">{aptMonth}</span>
+                </div>
+
+                {/* Appointment Content */}
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-xs font-bold text-slate-900 leading-tight truncate">
+                    {aptReason}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                    {aptDoctor}
+                  </p>
+                  <div className="flex items-center gap-1.5 text-[11px] text-slate-600 mt-1 font-medium">
+                    <Clock className="w-3 h-3 text-slate-400" />
+                    <span>{aptTime}</span>
+                    <span>•</span>
+                    <span>{aptType}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Book New Appointment Button */}
@@ -487,7 +503,7 @@ export const PatientHome: React.FC = () => {
             onClick={() => navigate('/patient/appointments')}
             className="w-full h-9 bg-[#0E382F] hover:bg-[#092720] text-white text-xs font-semibold rounded-[6px] flex items-center justify-center gap-2 shadow-2xs transition-colors cursor-pointer"
           >
-            <Calendar className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5" />
             <span>Book New Appointment</span>
           </button>
         </div>

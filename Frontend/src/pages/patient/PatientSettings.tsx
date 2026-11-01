@@ -94,16 +94,7 @@ export const PatientSettings: React.FC = () => {
   const [connectCode, setConnectCode] = useState<string>('582 914');
   const [codeTimer, setCodeTimer] = useState(120);
   const [copiedCode, setCopiedCode] = useState(false);
-  const [connectedDoctors, setConnectedDoctors] = useState<any[]>([
-    {
-      id: 'doc-1',
-      name: 'Dr. Rishabh',
-      specialty: 'General Physician · Connected Care',
-      clinic: 'City Care Health Clinic, Delhi NCR',
-      timings: 'Mon-Sat, 10:00 AM – 07:00 PM',
-      regNo: 'NMC-294018 Verified',
-    },
-  ]);
+  const [connectedDoctors, setConnectedDoctors] = useState<any[]>([]);
 
   // Language State
   const [selectedLanguage, setSelectedLanguage] = useState<'English' | 'Hindi'>('English');
@@ -113,11 +104,9 @@ export const PatientSettings: React.FC = () => {
     connectionsApi
       .getMyConnections()
       .then((res) => {
-        if (res && res.connections && res.connections.length > 0) {
-          setConnectedDoctors(res.connections);
-        }
+        setConnectedDoctors(res?.connections || []);
       })
-      .catch(() => {});
+      .catch(() => setConnectedDoctors([]));
 
     connectionsApi
       .generatePatientCode()
@@ -663,7 +652,7 @@ export const PatientSettings: React.FC = () => {
                 <div className="flex items-center justify-between p-3 rounded-[3px] border border-stone-100 bg-[#F9FAF9]">
                   <div>
                     <h4 className="text-xs font-bold text-slate-800">Clinician Review Notices</h4>
-                    <p className="text-[11px] text-slate-500">Notify immediately when Dr. Rishabh signs off on a diagnostic report.</p>
+                    <p className="text-[11px] text-slate-500">Notify immediately when your consulting doctor signs off on a diagnostic report.</p>
                   </div>
                   <input type="checkbox" defaultChecked className="w-4 h-4 accent-[#10B981] cursor-pointer" />
                 </div>

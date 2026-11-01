@@ -23,7 +23,7 @@ export const PatientUploadReport: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<StepNumber>(1);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [connectedDoctorName, setConnectedDoctorName] = useState<string>('Dr. Rishabh');
+  const [connectedDoctorName, setConnectedDoctorName] = useState<string>('your consulting doctor');
 
   useEffect(() => {
     import('../../api').then(({ connectionsApi }) => {
