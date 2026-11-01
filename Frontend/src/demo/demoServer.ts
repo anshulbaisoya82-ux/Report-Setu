@@ -19,6 +19,13 @@ import { demoSearchMedicines } from './demoMedicineSearch';
 
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 
+// Synthetic in-app notifications for the bell (demo only).
+const demoNotifications = [
+  { id: 'ntf-1', type: 'doctor_reply', title: 'Doctor reviewed your report', message: 'Your HbA1c report has a summary from your doctor.', isRead: false, createdAt: new Date(Date.now() - 2 * 3600e3).toISOString() },
+  { id: 'ntf-2', type: 'medicine_reminder', title: 'Evening dose', message: 'Time for your 8:00 PM medicine.', isRead: false, createdAt: new Date(Date.now() - 26 * 3600e3).toISOString() },
+  { id: 'ntf-3', type: 'appointment_update', title: 'Appointment confirmed', message: 'Your follow-up visit is confirmed.', isRead: true, createdAt: new Date(Date.now() - 3 * 86400e3).toISOString() },
+];
+
 const db = {
   patients: clone(DEMO_PATIENTS),
   reports: clone(DEMO_REPORTS) as any[],
@@ -71,7 +78,12 @@ const routes: [string, RegExp, Handler][] = [
   ['GET', /^\/doctor\/profile$/, () => okProfile({ ...DEMO_DOCTOR, stats: { activePatientsCount: db.patients.length, appointmentsCount: db.appointments.length, prescriptionsIssuedCount: db.prescriptions.length, reportsReviewedCount: db.reports.filter((r) => r.reviewed).length, pendingQuestionsCount: db.threads.filter((t) => t.unreadCount).length } })],
   ['PUT', /^\/doctor\/profile$/, (_m, b) => { Object.assign(DEMO_DOCTOR, b); return okProfile(DEMO_DOCTOR); }],
   ['GET', /^\/patient\/profile$/, () => okProfile({ ...DEMO_PATIENT_SELF, email: 'rohan.verma@demo.reportsetu.in', primaryDoctor: { id: DEMO_DOCTOR.id, name: DEMO_DOCTOR.name, specialty: DEMO_DOCTOR.specialty, clinic: DEMO_DOCTOR.clinic }, stats: { reportsCount: patientReports(DEMO_PATIENT_SELF.id).length, prescriptionsCount: db.prescriptions.length, appointmentsCount: db.appointments.filter((a) => a.patientId === DEMO_PATIENT_SELF.id).length, connectedDoctorsCount: 1 } })],
-  ['PUT', /^\/patient\/profile$/, (_m, b) => { Object.assign(DEMO_PATIENT_SELF, b); return okProfile(DEMO_PATIENT_SELF); }],
+  ['PUT', /^\/patient\/profile$/, (_m, b) => {
+    const { notificationPreferences, ...rest } = (b || {}) as any;
+    Object.assign(DEMO_PATIENT_SELF, rest);
+    if (notificationPreferences) (DEMO_PATIENT_SELF as any).notificationPreferences = { ...((DEMO_PATIENT_SELF as any).notificationPreferences || {}), ...notificationPreferences };
+    return okProfile(DEMO_PATIENT_SELF);
+  }],
 
   // ── Doctor ──────────────────────────────────────────────────────────────
   ['GET', /^\/doctor\/patients$/, (_m, _b, u) => {
@@ -188,8 +200,9 @@ const routes: [string, RegExp, Handler][] = [
   ['POST', /^\/connections\/doctor\/revoke\/([^/]+)$/, () => ok({ message: 'Connection revoked/cancelled successfully.' })],
 
   // ── Notifications / privacy ─────────────────────────────────────────────
-  ['GET', /^\/notifications$/, () => ok({ notifications: [], unreadCount: 0, total: 0 })],
-  ['PUT', /^\/notifications\/.*$/, () => ok({})],
+  ['GET', /^\/notifications$/, () => ok({ notifications: demoNotifications, unreadCount: demoNotifications.filter((n) => !n.isRead).length, total: demoNotifications.length })],
+  ['PUT', /^\/notifications\/read-all$/, () => { demoNotifications.forEach((n) => { n.isRead = true; }); return ok({}); }],
+  ['PUT', /^\/notifications\/([^/]+)\/read$/, (m) => { const id = decodeURIComponent(m[1]); const n = demoNotifications.find((x) => x.id === id); if (n) n.isRead = true; return ok(n || {}); }],
   ['GET', /^\/patient\/privacy\/export$/, () => ok({ profile: DEMO_PATIENT_SELF, reports: patientReports(DEMO_PATIENT_SELF.id), note: 'Demo export — synthetic data' })],
   ['DELETE', /^\/patient\/privacy\/account$/, () => fail('Account deletion is disabled in demo mode.', 403)],
 
@@ -221,6 +234,7 @@ const routes: [string, RegExp, Handler][] = [
   }],
 
   // ── Admin ───────────────────────────────────────────────────────────────
+  ['POST', /^\/auth\/admin\/login$/, (_m, b) => (String(b.adminKey || '').trim() ? ok({ accessToken: 'demo-token-admin', user: { id: 'system_admin', role: 'admin', name: 'Administrator' } }) : fail('Enter the admin key', 422))],
   ['GET', /^\/admin\/stats$/, () => ok({
     totalDoctors: db.adminDoctors.length,
     pendingDoctors: db.adminDoctors.filter((d) => d.verificationStatus === 'pending').length,

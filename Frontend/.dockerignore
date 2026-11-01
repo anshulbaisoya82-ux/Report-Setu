@@ -1,0 +1,7 @@
+node_modules
+dist
+dist-demo
+public/ocr
+.env
+.env.*
+!.env.example

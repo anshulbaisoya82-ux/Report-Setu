@@ -24,6 +24,8 @@ export const envSchema = z.object({
   SMS_DEV_CODE: z.string().default('123456'),
   ML_SERVICE_URL: z.string().default('http://127.0.0.1:8001'),
   GEMINI_API_KEY: z.string().optional(),
+  // Admin portal login key. Keep it secret, at least 24 characters. Unset = admin login disabled.
+  ADMIN_KEY: z.preprocess((v) => (v === '' ? undefined : v), z.string().min(24, 'ADMIN_KEY must be at least 24 characters').optional()),
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
 });

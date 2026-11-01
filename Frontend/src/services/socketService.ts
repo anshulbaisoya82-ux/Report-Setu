@@ -96,6 +96,8 @@ export const initSocketClient = (): Socket | null => {
     if (notif?.type === 'medicine_reminder') {
       useStore.getState().fetchMedicineSchedule();
     }
+    // Lets the notification bell refresh straight away.
+    window.dispatchEvent(new CustomEvent('reportsetu:notification', { detail: notif }));
   });
 
   return socket;

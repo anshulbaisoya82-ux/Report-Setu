@@ -19,6 +19,17 @@ const profileUpdateSchema = z.object({
       phone: z.string().optional(),
     })
     .optional(),
+  // Which in-app notifications the patient wants. Read by notificationService / reminderScheduler.
+  notificationPreferences: z
+    .object({
+      medicineReminders: z.boolean().optional(),
+      testDueReminders: z.boolean().optional(),
+      doctorReplies: z.boolean().optional(),
+      criticalAlerts: z.boolean().optional(),
+      language: z.enum(['en', 'hi']).optional(),
+    })
+    .strict()
+    .optional(),
 });
 
 /**
@@ -117,12 +128,19 @@ export async function updatePatientProfile(req: Request, res: Response, next: Ne
       });
     }
 
-    const { email, ...patientData } = input;
+    const { email, notificationPreferences, ...patientData } = input;
+
+    // Merge with stored preferences so a partial update never wipes the other switches.
+    const storedPrefs =
+      profile.notificationPreferences && typeof profile.notificationPreferences === 'object' && !Array.isArray(profile.notificationPreferences)
+        ? (profile.notificationPreferences as Record<string, unknown>)
+        : {};
 
     const updated = await prisma.patientProfile.update({
       where: { userId },
       data: {
         ...patientData,
+        ...(notificationPreferences ? { notificationPreferences: { ...storedPrefs, ...notificationPreferences } } : {}),
         updatedAt: new Date(),
       },
     });

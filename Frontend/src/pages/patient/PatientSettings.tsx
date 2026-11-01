@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
-import { connectionsApi } from '../../api';
-import { 
-  ShieldCheck, Copy, Check, RefreshCw, QrCode, 
-  Trash2, Bell, Globe, CheckCircle
+import { connectionsApi, patientProfileApi, privacyApi, type NotificationPreferences } from '../../api';
+import {
+  ShieldCheck, Copy, Check, RefreshCw,
+  Trash2, Bell, Globe, CheckCircle, Download, AlertTriangle, Loader2
 } from 'lucide-react';
+
+const DEFAULT_PREFS: NotificationPreferences = {
+  medicineReminders: true,
+  testDueReminders: true,
+  doctorReplies: true,
+  criticalAlerts: true,
+  language: 'en',
+};
+
+/** The in-app notifications the server actually sends and can mute (see notificationService). */
+const PREF_ROWS: { key: Exclude<keyof NotificationPreferences, 'language'>; title: string; detail: string }[] = [
+  { key: 'medicineReminders', title: 'Medicine reminders', detail: 'A reminder at each dose time from your prescriptions' },
+  { key: 'testDueReminders', title: 'Test due reminders', detail: 'When your doctor\'s next-test date comes up' },
+  { key: 'doctorReplies', title: 'Doctor replies', detail: 'When your doctor answers a question or reviews a report' },
+  { key: 'criticalAlerts', title: 'Important result alerts', detail: 'When a report has a value your doctor should look at soon' },
+];
 
 export const PatientSettings: React.FC = () => {
   const { currentUser, patients } = useStore();
@@ -12,12 +29,20 @@ export const PatientSettings: React.FC = () => {
   const [copiedId, setCopiedId] = useState(false);
   const [connectCode, setConnectCode] = useState<string | null>(null);
   const [codeTimer, setCodeTimer] = useState(0);
-  const [language, setLanguage] = useState<'en' | 'hi'>('en');
+  const navigate = useNavigate();
+  const logout = useStore((s) => s.logout);
 
-  // Notification toggles
-  const [waAlerts, setWaAlerts] = useState(true);
-  const [smsAlerts, setSmsAlerts] = useState(true);
-  const [medReminders, setMedReminders] = useState(true);
+  // Saved on the patient profile (PUT /patient/profile → notificationPreferences)
+  const [prefs, setPrefs] = useState<NotificationPreferences>(DEFAULT_PREFS);
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+  const [savingKey, setSavingKey] = useState<string | null>(null);
+
+  // Privacy actions
+  const [exporting, setExporting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   // Connected Doctors List
   const [connectedDoctors, setConnectedDoctors] = useState<any[]>([]);
@@ -42,6 +67,72 @@ export const PatientSettings: React.FC = () => {
       })
       .catch((error) => setToastMsg(error instanceof Error ? error.message : 'Unable to load connection settings.'));
   }, []);
+
+  useEffect(() => {
+    patientProfileApi.get()
+      .then((res: any) => {
+        const p = res?.data ?? res;
+        const stored = p?.notificationPreferences;
+        if (stored && typeof stored === 'object') setPrefs({ ...DEFAULT_PREFS, ...stored });
+      })
+      .catch(() => { /* keep defaults; saving still works */ })
+      .finally(() => setPrefsLoaded(true));
+  }, []);
+
+  const flash = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 3000);
+  };
+
+  const savePref = async <K extends keyof NotificationPreferences>(key: K, value: NotificationPreferences[K]) => {
+    const previous = prefs;
+    setPrefs({ ...prefs, [key]: value });
+    setSavingKey(key);
+    try {
+      await patientProfileApi.update({ notificationPreferences: { [key]: value } as Partial<NotificationPreferences> });
+      flash('Saved.');
+    } catch (error) {
+      setPrefs(previous);
+      flash(error instanceof Error ? error.message : 'Could not save. Please try again.');
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const data = await privacyApi.exportMyData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reportsetu-my-data-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      flash('Your data was downloaded.');
+    } catch (error) {
+      flash(error instanceof Error ? error.message : 'Could not export your data.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await privacyApi.deleteMyAccount();
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : 'Could not delete the account.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -92,7 +183,7 @@ export const PatientSettings: React.FC = () => {
       <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">Account & Security Settings</h1>
         <p className="text-xs text-slate-500 mt-1">
-          Control your Universal Health ID, clinic pairing codes, consent permissions, and notifications
+          Your health ID, clinic pairing code, doctor access, notifications and your data
         </p>
       </div>
 
@@ -129,12 +220,6 @@ export const PatientSettings: React.FC = () => {
               {copiedId ? 'Copied ID' : 'Copy Health ID'}
             </button>
 
-            <button
-              onClick={() => setToastMsg('QR code generation is not available yet. Use the Health ID copy action.')}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-forest-900 bg-forest-50 border border-forest-200 rounded-xl hover:bg-forest-100"
-            >
-              <QrCode className="w-3.5 h-3.5 text-forest-800" /> View QR Code
-            </button>
           </div>
         </div>
 
@@ -178,7 +263,8 @@ export const PatientSettings: React.FC = () => {
             </p>
           </div>
           <button
-            onClick={() => window.location.href = '/patient/doctors'}
+            type="button"
+            onClick={() => navigate('/patient/doctors')}
             className="text-xs font-bold text-forest-900 hover:underline"
           >
             Manage in My Doctors →
@@ -227,7 +313,7 @@ export const PatientSettings: React.FC = () => {
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <h3 className="text-sm font-bold text-slate-900 font-serif">Language / भाषा</h3>
-            <p className="text-xs text-slate-500">Choose the language for AI report explanations and notifications</p>
+            <p className="text-xs text-slate-500">Saved to your profile. Reports offer "Listen in Hindi" whenever your doctor adds a Hindi summary.</p>
           </div>
           <Globe className="w-5 h-5 text-slate-400" />
         </div>
@@ -235,9 +321,11 @@ export const PatientSettings: React.FC = () => {
         <div className="grid grid-cols-2 gap-3 max-w-sm">
           <button
             type="button"
-            onClick={() => setLanguage('en')}
+            onClick={() => savePref('language', 'en')}
+            disabled={!prefsLoaded || savingKey === 'language'}
+            aria-pressed={prefs.language === 'en'}
             className={`p-3 rounded-xl border text-left transition-all ${
-              language === 'en'
+              prefs.language === 'en'
                 ? 'bg-forest-900 text-white border-forest-900 shadow-xs'
                 : 'bg-slate-50 text-slate-700 border-slate-200'
             }`}
@@ -248,9 +336,11 @@ export const PatientSettings: React.FC = () => {
 
           <button
             type="button"
-            onClick={() => setLanguage('hi')}
+            onClick={() => savePref('language', 'hi')}
+            disabled={!prefsLoaded || savingKey === 'language'}
+            aria-pressed={prefs.language === 'hi'}
             className={`p-3 rounded-xl border text-left transition-all ${
-              language === 'hi'
+              prefs.language === 'hi'
                 ? 'bg-forest-900 text-white border-forest-900 shadow-xs'
                 : 'bg-slate-50 text-slate-700 border-slate-200'
             }`}
@@ -271,48 +361,96 @@ export const PatientSettings: React.FC = () => {
           <Bell className="w-5 h-5 text-slate-400" />
         </div>
 
+        <p className="text-xs text-slate-500">These are in-app notifications (the bell). Text-message and WhatsApp alerts are not available yet.</p>
         <div className="space-y-3">
-          <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 opacity-60 cursor-not-allowed">
-            <div>
-              <span className="text-xs font-bold text-slate-900 block">WhatsApp updates <span className="font-medium text-slate-500">· not available yet</span></span>
-              <span className="text-xs text-slate-500">Doctor summaries are delivered in the app and by SMS today</span>
-            </div>
-            <input
-              type="checkbox"
-              disabled
-              checked={false && waAlerts}
-              onChange={(e) => setWaAlerts(e.target.checked)}
-              className="w-4 h-4 text-forest-700 rounded focus:ring-forest-600"
-            />
-          </label>
-
-          <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
-            <div>
-              <span className="text-xs font-bold text-slate-900 block">SMS Critical Lab Alerts</span>
-              <span className="text-xs text-slate-500">Immediate SMS alerts for out-of-range parameters (e.g. low platelets)</span>
-            </div>
-            <input
-              type="checkbox"
-              checked={smsAlerts}
-              onChange={(e) => setSmsAlerts(e.target.checked)}
-              className="w-4 h-4 text-forest-700 rounded focus:ring-forest-600"
-            />
-          </label>
-
-          <label className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
-            <div>
-              <span className="text-xs font-bold text-slate-900 block">Daily Medication Dosage Reminders</span>
-              <span className="text-xs text-slate-500">Morning, afternoon and bedtime alerts to maintain adherence streak</span>
-            </div>
-            <input
-              type="checkbox"
-              checked={medReminders}
-              onChange={(e) => setMedReminders(e.target.checked)}
-              className="w-4 h-4 text-forest-700 rounded focus:ring-forest-600"
-            />
-          </label>
+          {PREF_ROWS.map((row) => (
+            <label key={row.key} className="flex items-center justify-between gap-4 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer">
+              <div>
+                <span className="text-xs font-bold text-slate-900 block">{row.title}</span>
+                <span className="text-xs text-slate-500">{row.detail}</span>
+              </div>
+              {savingKey === row.key ? (
+                <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+              ) : (
+                <input
+                  type="checkbox"
+                  checked={prefs[row.key]}
+                  disabled={!prefsLoaded || savingKey !== null}
+                  onChange={(e) => savePref(row.key, e.target.checked)}
+                  className="w-4 h-4 text-forest-700 rounded focus:ring-forest-600"
+                />
+              )}
+            </label>
+          ))}
         </div>
       </div>
+
+      {/* Your data */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 space-y-4">
+        <div className="border-b border-slate-100 pb-3">
+          <h3 className="text-sm font-bold text-slate-900 font-serif">Your data</h3>
+          <p className="text-xs text-slate-500">Download a copy of everything ReportSetu stores about you, or delete your account.</p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={exporting}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-slate-800 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 disabled:opacity-60"
+          >
+            {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+            Download my data
+          </button>
+          <button
+            type="button"
+            onClick={() => { setDeleteOpen(true); setDeleteConfirm(''); setDeleteError(''); }}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100"
+          >
+            <Trash2 className="w-3.5 h-3.5" /> Delete my account
+          </button>
+        </div>
+      </div>
+
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+          <div className="w-full max-w-md space-y-4 rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+              <div>
+                <h2 id="delete-title" className="text-base font-semibold text-ink">Delete your account?</h2>
+                <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                  This permanently erases your profile, reports, prescriptions, medicine records, messages and appointments, and ends your doctor connections. It cannot be undone.
+                  Download your data first if you want a copy.
+                </p>
+              </div>
+            </div>
+            <label className="block text-xs font-semibold text-slate-700">
+              Type DELETE to confirm
+              <input
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                autoFocus
+                className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono focus:border-red-500 focus:outline-none"
+              />
+            </label>
+            {deleteError && <p className="text-xs font-medium text-red-700" role="alert">{deleteError}</p>}
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setDeleteOpen(false)} disabled={deleting} className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleteConfirm !== 'DELETE' || deleting}
+                className="flex items-center gap-1.5 rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Delete permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

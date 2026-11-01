@@ -62,6 +62,9 @@ from ml import (
     forecast_hba1c,
     triage,
     extract_report,
+    get_drug_indication,
+    get_drug_info,
+    suggest_medicine_names,
 )
 from ml.language.copilot_tools import find_patients_by_trend, find_critical_patients
 from ml.data.demo_patients import get_demo_patients
@@ -154,6 +157,24 @@ class CopilotCriticalRequest(BaseModel):
     patients_data: List[Dict[str, Any]] = Field(
         ..., description="List of patient dicts with priority and insights"
     )
+
+
+class DrugIndicationRequest(BaseModel):
+    medicine_name: str = Field(..., example="Paracetamol", description="Name of the medicine (brand or generic)")
+
+
+class DrugIndicationResponse(BaseModel):
+    indication: Optional[str] = Field(None, description="Clinical indication text for the medicine")
+
+
+class DrugSuggestRequest(BaseModel):
+    query: str = Field(..., example="para", description="Medicine name search prefix or keyword")
+    limit: int = Field(default=10, ge=1, le=50, description="Maximum suggestions to return")
+
+
+class DrugSuggestResponse(BaseModel):
+    query: str
+    suggestions: List[str] = Field(..., description="Clean medicine and brand names without company names")
 
 
 # ============================================================================
@@ -460,6 +481,45 @@ def get_single_demo_patient(patient_id: int):
     raise HTTPException(status_code=404, detail=f"Demo patient {patient_id} not found")
 
 
+@router.post("/drug/indication", response_model=DrugIndicationResponse, summary="Get Drug Indication (POST)")
+def post_drug_indication(req: DrugIndicationRequest):
+    """
+    Queries the Drug Information Service (HealthPilot.ai / drugdb.in) to retrieve
+    the clinical indication for a given medicine. Resolves multiple duplicate
+    manufacturer and dosage records, returning only the indication text.
+    """
+    indication = get_drug_indication(req.medicine_name)
+    return DrugIndicationResponse(indication=indication)
+
+
+@router.get("/drug/indication", response_model=DrugIndicationResponse, summary="Get Drug Indication (GET)")
+def get_drug_indication_endpoint(medicine: str):
+    """
+    GET variant: takes ?medicine=Paracetamol and returns only the indication part.
+    """
+    indication = get_drug_indication(medicine)
+    return DrugIndicationResponse(indication=indication)
+
+
+@router.post("/drug/suggest", response_model=DrugSuggestResponse, summary="Suggest Medicine Names (POST)")
+def post_drug_suggest(req: DrugSuggestRequest):
+    """
+    Suggests clean medicine names (brands and active substances) matching the query.
+    Company and manufacturer names are discarded.
+    """
+    suggestions = suggest_medicine_names(req.query, limit=req.limit)
+    return DrugSuggestResponse(query=req.query, suggestions=suggestions)
+
+
+@router.get("/drug/suggest", response_model=DrugSuggestResponse, summary="Suggest Medicine Names (GET)")
+def get_drug_suggest(q: str, limit: int = 10):
+    """
+    GET variant: takes query 'q' and returns clean medicine name suggestions without company names.
+    """
+    suggestions = suggest_medicine_names(q, limit=limit)
+    return DrugSuggestResponse(query=q, suggestions=suggestions)
+
+
 # ============================================================================
 # FastAPI App Instance (For Standalone Running)
 # ============================================================================
@@ -503,7 +563,11 @@ def root():
             "POST /pipeline/process",
             "POST /copilot/trend-search",
             "POST /copilot/critical-patients",
-            "GET /demo/patients"
+            "GET /demo/patients",
+            "GET /drug/indication",
+            "POST /drug/indication",
+            "GET /drug/suggest",
+            "POST /drug/suggest"
         ]
     }
 

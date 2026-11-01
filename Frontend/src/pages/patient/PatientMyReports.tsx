@@ -5,6 +5,7 @@ import {
   FileText, Volume2, ArrowUpRight, Check, Info, ChevronDown
 } from 'lucide-react';
 import { formatDate } from '../../utils/format';
+import { speakHindi, stopSpeaking } from '../../utils/speech';
 
 export const PatientMyReports: React.FC = () => {
   const { reports, currentUser, fetchReports } = useStore();
@@ -13,6 +14,7 @@ export const PatientMyReports: React.FC = () => {
 
   React.useEffect(() => {
     fetchReports();
+    return () => stopSpeaking();
   }, []);
 
   const patientReports = reports.filter(r => 
@@ -28,18 +30,16 @@ export const PatientMyReports: React.FC = () => {
     return true;
   });
 
+  // Reads the doctor's own Hindi summary aloud; the button only appears when one exists.
+  const latestHindi = patientReports[0]?.doctorSummary?.hindiText;
   const handleListenHindi = () => {
-    setIsPlayingHindi(true);
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(
-        patientReports[0]?.doctorSummary?.text ?? 'आपकी रिपोर्ट की समीक्षा आपके डॉक्टर ने की है।'
-      );
-      utterance.lang = 'hi-IN';
-      utterance.onend = () => setIsPlayingHindi(false);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      setTimeout(() => setIsPlayingHindi(false), 3000);
+    if (isPlayingHindi) {
+      stopSpeaking();
+      setIsPlayingHindi(false);
+      return;
     }
+    if (!latestHindi) return;
+    if (speakHindi(latestHindi, () => setIsPlayingHindi(false))) setIsPlayingHindi(true);
   };
 
   return (
@@ -77,8 +77,10 @@ export const PatientMyReports: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 pt-1">
-          <button
+          {latestHindi && <button
+            type="button"
             onClick={handleListenHindi}
+            aria-pressed={isPlayingHindi}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl border transition-all ${
               isPlayingHindi
                 ? 'bg-forest-50 border-forest-800 text-forest-800'
@@ -86,8 +88,8 @@ export const PatientMyReports: React.FC = () => {
             }`}
           >
             <Volume2 className="w-4 h-4 text-forest-900" />
-            {isPlayingHindi ? 'Playing Hindi Audio...' : 'Listen in Hindi'}
-          </button>
+            {isPlayingHindi ? 'Stop' : 'Listen in Hindi'}
+          </button>}
 
           <Link
             to={`/patient/reports/${patientReports[0].id}`}

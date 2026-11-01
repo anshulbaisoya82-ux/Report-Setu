@@ -213,6 +213,15 @@ export const authApi = {
   },
 };
 
+/** In-app notification switches stored on the patient profile (all default to on). */
+export interface NotificationPreferences {
+  medicineReminders: boolean;
+  testDueReminders: boolean;
+  doctorReplies: boolean;
+  criticalAlerts: boolean;
+  language: 'en' | 'hi';
+}
+
 export const patientProfileApi = {
   get: async () => apiFetch<any>('/patient/profile'),
   update: async (profile: {
@@ -225,6 +234,7 @@ export const patientProfileApi = {
     avatar?: string;
     email?: string;
     emergencyContact?: { name?: string; relation?: string; phone?: string };
+    notificationPreferences?: Partial<NotificationPreferences>;
   }) => apiFetch<any>('/patient/profile', {
     method: 'PUT',
     body: JSON.stringify(profile),
@@ -581,22 +591,63 @@ export const connectionsApi = {
 /* =======================================================================
  * Notifications API
  * ======================================================================= */
+export interface AppNotification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  data?: Record<string, unknown>;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export const notificationsApi = {
-  getNotifications: async () => {
-    return await apiFetch<any[]>('/notifications');
+  /** GET /notifications → newest first, with the unread count. */
+  getNotifications: async (params: { limit?: number; unreadOnly?: boolean } = {}) => {
+    const q = new URLSearchParams();
+    if (params.limit) q.set('limit', String(params.limit));
+    if (params.unreadOnly) q.set('unreadOnly', 'true');
+    const qs = q.toString();
+    return await apiFetch<{ notifications: AppNotification[]; unreadCount: number; total: number }>(`/notifications${qs ? `?${qs}` : ''}`);
   },
 
   markAsRead: async (id: string) => {
-    return await apiFetch(`/notifications/${id}/read`, {
+    return await apiFetch(`/notifications/${encodeURIComponent(id)}/read`, {
       method: 'PUT',
     });
   },
+
+  markAllAsRead: async () => {
+    return await apiFetch('/notifications/read-all', { method: 'PUT' });
+  },
+};
+
+/* =======================================================================
+ * Privacy API (patient)
+ * ======================================================================= */
+export const privacyApi = {
+  /** GET /patient/privacy/export → everything stored about the signed-in patient. */
+  exportMyData: async () => apiFetch<Record<string, unknown>>('/patient/privacy/export'),
+  /** DELETE /patient/privacy/account → permanently erases the account. */
+  deleteMyAccount: async () => apiFetch<unknown>('/patient/privacy/account', { method: 'DELETE' }),
 };
 
 /* =======================================================================
  * Admin API
  * ======================================================================= */
 export const adminApi = {
+  /** Sign in to the admin portal with the server's ADMIN_KEY. Stores a short-lived admin token. */
+  login: async (adminKey: string) => {
+    const data = await apiFetch<{ accessToken: string; user: any }>('/auth/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ adminKey }),
+    });
+    setAccessToken(data.accessToken);
+    setStoredUser(data.user);
+    setStoredRole('admin');
+    return data;
+  },
+
   getStats: async () => {
     return await apiFetch<{
       totalDoctors: number;
@@ -605,41 +656,33 @@ export const adminApi = {
       rejectedDoctors: number;
       totalPatients: number;
       totalReports: number;
-    }>('/admin/stats?adminKey=reportsetu_admin_secret_key_12345', {
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
-    });
+    }>('/admin/stats');
   },
 
   getDoctors: async (params: { status?: string; search?: string } = {}) => {
     const query = new URLSearchParams();
-    query.append('adminKey', 'reportsetu_admin_secret_key_12345');
     if (params.status && params.status !== 'all') query.append('status', params.status);
     if (params.search) query.append('search', params.search);
 
-    return await apiFetch<{ doctors: any[]; total: number }>(`/admin/doctors?${query.toString()}`, {
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
-    });
+    return await apiFetch<{ doctors: any[]; total: number }>(`/admin/doctors?${query.toString()}`);
   },
 
   verifyDoctor: async (doctorId: string) => {
-    return await apiFetch<{ doctor: any; message: string }>(`/admin/doctors/${doctorId}/verify?adminKey=reportsetu_admin_secret_key_12345`, {
+    return await apiFetch<{ doctor: any; message: string }>(`/admin/doctors/${doctorId}/verify`, {
       method: 'POST',
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
     });
   },
 
   rejectDoctor: async (doctorId: string, reason?: string) => {
-    return await apiFetch<{ doctor: any; message: string }>(`/admin/doctors/${doctorId}/reject?adminKey=reportsetu_admin_secret_key_12345`, {
+    return await apiFetch<{ doctor: any; message: string }>(`/admin/doctors/${doctorId}/reject`, {
       method: 'POST',
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
       body: JSON.stringify({ reason }),
     });
   },
 
   verifyAllDoctors: async () => {
-    return await apiFetch<{ message: string; count: number }>('/admin/doctors/verify-all?adminKey=reportsetu_admin_secret_key_12345', {
+    return await apiFetch<{ message: string; count: number }>('/admin/doctors/verify-all', {
       method: 'POST',
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
     });
   },
 };

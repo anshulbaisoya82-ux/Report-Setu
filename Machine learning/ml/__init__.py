@@ -10,6 +10,7 @@ Conforms strictly to Section 5 Contracts:
 - analyze_patient(measurements) -> [Insight]
 - forecast_hba1c(measurements) -> Forecast
 - triage(patient_id, insights) -> TriageResult
+- suggest_medicine_names(query, limit) -> [str]; get_drug_info(name); get_drug_indication(name)
 """
 
 from .extraction import extract_report
@@ -17,6 +18,7 @@ from .language import draft_summary, patient_chat
 from .analysis import analyze_patient
 from .forecast import forecast_hba1c
 from .agents import triage
+from .drugs import suggest_medicine_names, get_drug_info, get_drug_indication
 
 __all__ = [
     "extract_report",
@@ -25,4 +27,7 @@ __all__ = [
     "analyze_patient",
     "forecast_hba1c",
     "triage",
+    "suggest_medicine_names",
+    "get_drug_info",
+    "get_drug_indication",
 ]

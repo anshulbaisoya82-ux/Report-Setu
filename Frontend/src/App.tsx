@@ -86,7 +86,7 @@ export const App: React.FC = () => {
           <Route path="appointments" element={<PatientAppointments />} />
           <Route path="ask-doctor" element={<PatientAskDoctor />} />
           <Route path="doctors" element={<PatientDoctors />} />
-          <Route path="requests" element={<PatientDoctors />} />
+          <Route path="requests" element={<Navigate to="/patient/doctors" replace />} />
           <Route path="profile" element={<PatientProfile />} />
           <Route path="settings" element={<PatientSettings />} />
         </Route>

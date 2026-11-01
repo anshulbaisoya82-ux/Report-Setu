@@ -10,7 +10,7 @@ import { authenticate, requireAdmin } from '../middlewares/auth';
 
 const router = Router();
 
-// Middleware chain for all admin routes: requires authenticated admin or dev admin key
+// Every admin route needs an admin Bearer token (from POST /api/v1/auth/admin/login)
 router.use(authenticate, requireAdmin);
 
 /**

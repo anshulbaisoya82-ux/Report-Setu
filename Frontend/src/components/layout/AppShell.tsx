@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut, Menu, Settings, ShieldCheck, X, type LucideIcon } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { useStore } from '../../store/useStore';
+import { NotificationBell } from '../notifications/NotificationBell';
 
 export interface NavItem {
   name: string;
@@ -66,6 +67,7 @@ export const AppShell: React.FC<AppShellProps> = ({ items, settingsPath, privacy
     <div className="flex h-full flex-col gap-6 p-4">
       <div className="flex items-center justify-between px-2 pt-1.5">
         <Logo size="md" theme="dark" />
+        <span className="hidden lg:block"><NotificationBell placement="sidebar" /></span>
         <button type="button" aria-label="Close menu" className="rounded-lg p-1.5 text-stone-500 hover:bg-stone-100 lg:hidden" onClick={() => setDrawerOpen(false)}>
           <X className="h-5 w-5" />
         </button>
@@ -131,6 +133,7 @@ export const AppShell: React.FC<AppShellProps> = ({ items, settingsPath, privacy
         </button>
         <Logo size="sm" theme="dark" />
         <span className="ml-auto truncate text-sm font-medium text-stone-500">{current?.name}</span>
+        <NotificationBell />
       </header>
 
       <div className={`fixed inset-0 z-50 lg:hidden ${drawerOpen ? '' : 'pointer-events-none'}`} aria-hidden={!drawerOpen}>

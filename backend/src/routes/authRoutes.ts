@@ -10,6 +10,7 @@ import {
 } from '../controllers/authController';
 import { authenticate } from '../middlewares/auth';
 import { otpRateLimiter, authRateLimiter } from '../middlewares/security';
+import { handleAdminLogin } from '../controllers/adminAuthController';
 
 const router = Router();
 
@@ -157,6 +158,9 @@ router.post('/doctor/signup', authRateLimiter, handleDoctorSignup);
  *         description: Invalid credentials or account temporarily locked
  */
 router.post('/doctor/login', authRateLimiter, handleDoctorLogin);
+
+// Admin portal sign-in with the ADMIN_KEY from the server environment
+router.post('/admin/login', authRateLimiter, handleAdminLogin);
 
 /**
  * @openapi

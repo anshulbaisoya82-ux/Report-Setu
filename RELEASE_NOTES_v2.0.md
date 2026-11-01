@@ -22,7 +22,30 @@
 - The patient's recorded conditions are fetched from the database and shown as label facts to discuss with the doctor (e.g. sugar per 100 g for diabetes). The app gives no verdict without doctor rules.
 - Routes: `GET /api/v1/food-rules/me`, `GET|PUT /api/v1/food-rules/patient/:patientId`, `POST /api/v1/food-rules/read-label`.
 
-## After pulling this branch
+**Patient settings, notifications and privacy**
+- Notification switches (medicine reminders, test-due reminders, doctor replies, important result alerts) and language are saved to the profile (`PUT /api/v1/patient/profile` → `notificationPreferences`, merged with what is stored). The server already mutes muted types.
+- Notification bell in the sidebar and phone top bar: `GET /notifications`, mark one read, mark all read; refreshes every minute and on socket events.
+- Settings → Your data: download everything (`GET /patient/privacy/export`) and delete the account (`DELETE /patient/privacy/account`, type DELETE to confirm).
+- "Listen in Hindi" on My reports reads the doctor's Hindi summary and only appears when one exists.
+- Removed placeholders that did nothing (fake QR code buttons, SMS alert switch). `/patient/requests` now redirects to My doctors.
+
+**Admin sign-in (security fix)**
+- The admin key that was hard-coded in the frontend and backend is gone. Set `ADMIN_KEY` (24+ characters) in `.env`; the admin page asks for it and `POST /api/v1/auth/admin/login` returns a short-lived admin token. With no `ADMIN_KEY` the admin portal is switched off.
+
+**ML service**
+- `/drug/suggest` and `/drug/indication` (GET and POST) now work: the `ml/drugs` package searches the same Indian medicine catalogue. `/drug/indication` returns "no data" instead of inventing indications, since no indication source is bundled.
+
+**Docker**
+- `docker compose up --build` starts Postgres, Mongo, Redis, the API, the ML service and the web app (http://localhost:5173). The API generates the Prisma client at build time and applies migrations on every start.
+
+## Quick start with Docker
+
+```bash
+cp .env.example .env      # then fill in the secrets (see comments in the file)
+docker compose up --build
+```
+
+## After pulling this branch (without Docker)
 
 ```bash
 # Backend
@@ -44,6 +67,7 @@ uvicorn api:app --reload --port 8001
 ```
 
 ## Known open items
-- The ML `/drug/suggest` and `/drug/indication` endpoints need the updated `ml` package (not in this repository yet).
-- Admin login still uses a fixed key; move to a proper admin account.
-- Patient settings are not saved yet; the notification bell is not connected.
+- Text-message and WhatsApp alerts are not built; notifications are in-app only.
+- On-device OCR is tested on generated label photos, not yet on a range of real phone photos.
+- Medicine indications have no data source yet.
+- The full backend route tests need a database (`npm test` in `backend/` with Postgres and Mongo running).

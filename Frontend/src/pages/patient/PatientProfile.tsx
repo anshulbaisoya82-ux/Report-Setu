@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  User, ShieldCheck, Copy, Check, QrCode, Phone, Mail, 
+  User, ShieldCheck, Copy, Check, Phone, Mail, 
   MapPin, Heart, AlertCircle, Save, CheckCircle, 
   FileText, Pill, Calendar, UserCheck, Stethoscope, Sparkles, Plus, X
 } from 'lucide-react';
@@ -13,7 +13,6 @@ export const PatientProfile: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
-  const [showQrModal, setShowQrModal] = useState(false);
   const [newConditionInput, setNewConditionInput] = useState('');
 
   // Form State
@@ -175,42 +174,6 @@ export const PatientProfile: React.FC = () => {
         </div>
       )}
 
-      {/* QR Code Modal */}
-      {showQrModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-slate-200 duration-200">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <span className="text-xs font-bold text-forest-950 font-serif">Universal Health QR</span>
-              <button
-                onClick={() => setShowQrModal(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            
-            <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col items-center">
-              <div className="w-44 h-44 bg-white rounded-xl border border-slate-200 p-3 shadow-xs flex items-center justify-center">
-                <QrCode className="w-36 h-36 text-forest-950" />
-              </div>
-              <span className="text-xs font-bold font-mono text-forest-900 mt-3">{formData.rsId}</span>
-              <span className="text-xs text-slate-500">{formData.name} · {formData.bloodGroup}</span>
-            </div>
-
-            <p className="text-xs text-slate-500 leading-relaxed">
-              Scan during clinic registration to securely link lab reports with Dr. verified consent.
-            </p>
-
-            <button
-              onClick={() => setShowQrModal(false)}
-              className="w-full py-2.5 bg-forest-900 text-accent-teal rounded-xl text-xs font-bold hover:bg-forest-800 transition-colors"
-            >
-              Close QR Code
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Hero Profile Overview Card */}
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         {/* Banner with emerald healthcare gradient */}
@@ -266,10 +229,11 @@ export const PatientProfile: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               <button
                 type="button"
-                onClick={() => setShowQrModal(true)}
+                onClick={handleCopyId}
                 className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition-colors shadow-2xs cursor-pointer"
               >
-                <QrCode className="w-4 h-4 text-slate-600" /> Digital Card
+                {copiedId ? <Check className="w-4 h-4 text-accent-teal" /> : <Copy className="w-4 h-4 text-slate-600" />}
+                {copiedId ? 'Copied' : 'Copy health ID'}
               </button>
             </div>
           </div>

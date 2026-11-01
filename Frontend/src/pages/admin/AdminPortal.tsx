@@ -1,7 +1,8 @@
 import { Logo } from '../../components/common/Logo';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { adminApi, authApi, setAccessToken, setStoredUser, setStoredRole } from '../../api';
+import { adminApi, authApi, setAccessToken, setStoredUser, setStoredRole, getAccessToken, getStoredRole, clearAccessToken } from '../../api';
+import { isDemoMode } from '../../demo/flags';
 import { useStore } from '../../store/useStore';
 import {
   ShieldCheck,
@@ -58,7 +59,7 @@ interface AdminStats {
   totalReports: number;
 }
 
-export const AdminPortal: React.FC = () => {
+const AdminDashboard: React.FC<{ onSignOut: () => void }> = ({ onSignOut }) => {
   const navigate = useNavigate();
   const { currentUser, setRole, setCurrentUser } = useStore();
 
@@ -106,6 +107,7 @@ export const AdminPortal: React.FC = () => {
         setDoctors(docsData.doctors);
       }
     } catch (err: any) {
+      if (/401|403|authenticat|unauthori|privileges|token/i.test(err?.message || '')) return onSignOut();
       setFeedbackMessage({ type: 'error', text: err.message || 'Failed to load administrator data' });
     } finally {
       setIsLoading(false);
@@ -209,12 +211,13 @@ export const AdminPortal: React.FC = () => {
               <p className="hidden sm:block text-xs text-white/60 truncate">Check registration details before a doctor can connect with patients</p>
             </div>
           </div>
-          <Link
-            to="/login"
+          <button
+            type="button"
+            onClick={onSignOut}
             className="shrink-0 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white border border-white/10"
           >
-            Exit admin
-          </Link>
+            Sign out
+          </button>
         </div>
       </header>
 
@@ -631,4 +634,63 @@ export const AdminPortal: React.FC = () => {
       </main>
     </div>
   );
+};
+
+/** Admin sign-in: the key is checked by the server against its ADMIN_KEY setting. */
+const AdminLogin: React.FC<{ onDone: () => void }> = ({ onDone }) => {
+  const [key, setKey] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!key.trim()) return setError('Enter the admin key.');
+    setBusy(true);
+    setError(null);
+    try {
+      await adminApi.login(key.trim());
+      onDone();
+    } catch (err: any) {
+      setError(err?.message || 'Could not sign in.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-2xl border border-line bg-white p-7">
+        <div className="flex items-center gap-3">
+          <Logo size="md" />
+        </div>
+        <div>
+          <h1 className="text-xl font-semibold text-ink">Admin sign in</h1>
+          <p className="mt-1 text-sm text-stone-500">For verifying doctor accounts. Use the admin key set on the server.</p>
+        </div>
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-ink">Admin key</span>
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:border-forest-900 focus:outline-none focus:ring-2 focus:ring-forest-900/15"
+          />
+        </label>
+        {isDemoMode && <p className="text-xs text-stone-500">Demo: any key works.</p>}
+        {error && <p className="text-sm text-red-700" role="alert">{error}</p>}
+        <button type="submit" disabled={busy} className="w-full rounded-xl bg-forest-900 py-2.5 text-sm font-semibold text-white hover:bg-forest-850 disabled:opacity-60">
+          {busy ? 'Signing in…' : 'Sign in'}
+        </button>
+        <Link to="/login" className="block text-center text-sm text-stone-500 hover:text-ink">Back to ReportSetu</Link>
+      </form>
+    </div>
+  );
+};
+
+export const AdminPortal: React.FC = () => {
+  const [signedIn, setSignedIn] = useState(() => getStoredRole() === 'admin' && !!getAccessToken());
+  const signOut = () => {
+    clearAccessToken();
+    setSignedIn(false);
+  };
+  return signedIn ? <AdminDashboard onSignOut={signOut} /> : <AdminLogin onDone={() => setSignedIn(true)} />;
 };

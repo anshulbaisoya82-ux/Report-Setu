@@ -22,17 +22,6 @@ export const authenticate = async (
   _res: Response,
   next: NextFunction
 ): Promise<void> => {
-  // Allow test / dev admin secret key bypass
-  const adminKey = req.headers['x-admin-key'] || req.query.adminKey;
-  if (adminKey && adminKey === 'reportsetu_admin_secret_key_12345') {
-    req.user = {
-      userId: 'system_admin',
-      role: 'admin',
-      isVerified: true,
-    };
-    return next();
-  }
-
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -144,19 +133,8 @@ export const requireAdmin = (
   _res: Response,
   next: NextFunction
 ): void => {
-  // Allow test / dev admin token bypass or role check
+  // Admins sign in through POST /auth/admin/login and send the issued Bearer token.
   if (req.user && req.user.role === 'admin') {
-    return next();
-  }
-
-  // Optional header for testing/dev admin actions
-  const adminKey = req.headers['x-admin-key'] || req.query.adminKey;
-  if (adminKey && adminKey === 'reportsetu_admin_secret_key_12345') {
-    req.user = {
-      userId: 'system_admin',
-      role: 'admin',
-      isVerified: true,
-    };
     return next();
   }
 
