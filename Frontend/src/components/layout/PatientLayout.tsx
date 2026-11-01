@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
@@ -8,63 +8,44 @@ import {
   Calendar,
   MessageSquare,
   Settings,
-  ShieldCheck,
   LogOut,
-  UserCheck,
-  User,
 } from 'lucide-react';
-import { Logo } from '../common/Logo';
-import { connectionsApi } from '../../api';
-
 import { useStore } from '../../store/useStore';
 
 export const PatientLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useStore();
-  const [pendingCount, setPendingCount] = useState<number>(0);
-
-  useEffect(() => {
-    connectionsApi
-      .getPendingRequests()
-      .then((res) => {
-        setPendingCount(res?.requests?.length || 0);
-      })
-      .catch(() => {});
-  }, [location.pathname]);
 
   const navItems = [
     { name: 'Home', path: '/patient', icon: Home, exact: true },
-    { name: 'My reports', path: '/patient/reports', icon: FileText },
-    { name: 'Upload report', path: '/patient/upload', icon: UploadCloud },
     { name: 'Medicines', path: '/patient/medicines', icon: Pill },
     { name: 'Appointments', path: '/patient/appointments', icon: Calendar },
-    { name: 'Ask doctor', path: '/patient/ask-doctor', icon: MessageSquare },
-    {
-      name: 'My Doctors',
-      path: '/patient/doctors',
-      icon: UserCheck,
-      badge: pendingCount > 0 ? pendingCount : undefined,
-    },
-    { name: 'My Profile', path: '/patient/profile', icon: User },
+    { name: 'Ask Doctor', path: '/patient/ask-doctor', icon: MessageSquare },
+    { name: 'Upload Report', path: '/patient/upload', icon: UploadCloud },
   ];
 
   return (
-    <div className="min-h-screen bg-[#ECF2ED] flex">
+    <div className="min-h-screen bg-[#F6F9F7] flex text-slate-800">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1E3F35] text-white flex flex-col justify-between p-6 flex-shrink-0 min-h-screen sticky top-0 h-screen overflow-y-auto">
-        <div className="space-y-8">
+      <aside className="w-56 bg-[#0E382F] text-white flex flex-col justify-between p-4 flex-shrink-0 min-h-screen sticky top-0 h-screen overflow-y-auto">
+        <div className="space-y-5">
           {/* Logo */}
-          <div className="pt-2">
-            <Logo size="md" />
+          <div className="pt-1 flex items-center gap-2 px-1.5">
+            <div className="w-7 h-7 rounded-[3px] bg-[#10B981] flex items-center justify-center text-white font-bold text-base shadow-xs">
+              +
+            </div>
+            <span className="font-extrabold text-base tracking-tight text-white font-sans">
+              ReportSetu
+            </span>
           </div>
 
           {/* Navigation Links */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-white/50 tracking-wider uppercase px-3">
-              MENU
+          <div className="space-y-1 pt-1">
+            <p className="text-[9.5px] font-bold text-white/40 tracking-wider uppercase px-2.5 pb-1">
+              PATIENT PORTAL
             </p>
-            <nav className="space-y-1.5">
+            <nav className="space-y-0.5">
               {navItems.map((item) => {
                 const isActive = item.exact
                   ? location.pathname === item.path
@@ -75,21 +56,16 @@ export const PatientLayout: React.FC = () => {
                   <NavLink
                     key={item.name}
                     to={item.path}
-                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    className={`flex items-center justify-between px-3 py-2 rounded-[3px] text-xs transition-all ${
                       isActive
-                        ? 'bg-white text-[#1E3F35] shadow-sm font-semibold'
-                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                        ? 'bg-white text-[#0E382F] shadow-xs font-bold'
+                        : 'text-white/75 hover:text-white hover:bg-white/10 font-medium'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#1E3F35]' : 'text-white/70'}`} />
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#0E382F]' : 'text-white/70'}`} />
                       <span>{item.name}</span>
                     </div>
-                    {item.badge ? (
-                      <span className="w-5 h-5 rounded-full bg-[#B53629] text-white text-[10px] font-bold flex items-center justify-center">
-                        {item.badge}
-                      </span>
-                    ) : null}
                   </NavLink>
                 );
               })}
@@ -98,31 +74,24 @@ export const PatientLayout: React.FC = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="space-y-4 pt-6">
-          {/* Trust Badge */}
-          <div className="bg-black/15 border border-white/10 rounded-2xl p-3.5 text-xs text-white/80">
-            <div className="flex items-center gap-2 font-medium text-white mb-1">
-              <ShieldCheck className="w-4 h-4 text-[#52B788]" />
-              <span>Private by design</span>
-            </div>
-            <p className="text-[11px] text-white/60 leading-relaxed">
-              Your reports are visible only to you and the doctors you connect.
-            </p>
-          </div>
-
+        <div className="space-y-1 pt-3 border-t border-white/10">
           {/* Settings */}
           <NavLink
             to="/patient/settings"
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              `flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs transition-all ${
                 isActive
-                  ? 'bg-white text-[#1E3F35] font-semibold'
-                  : 'text-white/80 hover:text-white hover:bg-white/10'
+                  ? 'bg-white text-[#0E382F] shadow-xs font-bold'
+                  : 'text-white/75 hover:text-white hover:bg-white/10 font-medium'
               }`
             }
           >
-            <Settings className="w-4 h-4 text-white/70" />
-            <span>Settings</span>
+            {({ isActive }) => (
+              <>
+                <Settings className={`w-3.5 h-3.5 ${isActive ? 'text-[#0E382F]' : 'text-white/70'}`} />
+                <span>Settings</span>
+              </>
+            )}
           </NavLink>
 
           {/* Log Out */}
@@ -131,25 +100,17 @@ export const PatientLayout: React.FC = () => {
               await logout();
               navigate('/login');
             }}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-white/80 hover:text-red-300 hover:bg-white/10 transition-all text-left cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs font-medium text-white/75 hover:text-red-300 hover:bg-white/10 transition-all text-left cursor-pointer"
           >
-            <LogOut className="w-4 h-4 text-white/70" />
+            <LogOut className="w-3.5 h-3.5 text-white/70" />
             <span>Log out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {location.pathname.startsWith('/patient/ask-doctor') ? (
-          <div className="w-full h-full flex flex-col flex-1 overflow-hidden">
-            <Outlet />
-          </div>
-        ) : (
-          <div className="p-8 max-w-[1400px] w-full mx-auto flex-1 overflow-y-auto">
-            <Outlet />
-          </div>
-        )}
+      <main className="flex-1 overflow-y-auto min-h-screen">
+        <Outlet />
       </main>
     </div>
   );

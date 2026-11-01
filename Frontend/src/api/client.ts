@@ -212,6 +212,7 @@ export const patientProfileApi = {
   get: async () => apiFetch<any>('/patient/profile'),
   update: async (profile: {
     name?: string;
+    phone?: string;
     age?: number;
     gender?: string;
     bloodGroup?: string;
@@ -413,6 +414,17 @@ export const medicationsApi = {
   getAdherence: async () => {
     return await apiFetch<any>('/medicines/adherence');
   },
+
+  searchMedicines: async (query: string, limit: number = 8) => {
+    if (!query || query.trim().length < 2) return [];
+    const res = await apiFetch<any>(`/medicines/search?q=${encodeURIComponent(query.trim())}&limit=${limit}`);
+    return res?.medicines || res?.data?.medicines || [];
+  },
+
+  getMedicineDetails: async (id: string) => {
+    const res = await apiFetch<any>(`/medicines/detail/${encodeURIComponent(id)}`);
+    return res?.medicine || res?.data?.medicine || null;
+  },
 };
 
 export const prescriptionsApi = {
@@ -440,6 +452,13 @@ export const prescriptionsApi = {
     return await apiFetch('/prescriptions', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  },
+
+  revokePrescription: async (prescriptionId: string, reason?: string) => {
+    return await apiFetch<any>(`/prescriptions/${prescriptionId}/revoke`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
     });
   },
 };
@@ -578,9 +597,76 @@ export const notificationsApi = {
 };
 
 /* =======================================================================
- * Admin API
+ * Admin API & High-Security Vault Gateway
  * ======================================================================= */
+export const getAdminToken = (): string | null => {
+  return localStorage.getItem('reportsetu_admin_token');
+};
+
+export const setAdminToken = (token: string): void => {
+  localStorage.setItem('reportsetu_admin_token', token);
+};
+
+export const getAdminSession = (): any | null => {
+  try {
+    const raw = localStorage.getItem('reportsetu_admin_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    return null;
+  }
+};
+
+export const setAdminSession = (admin: any): void => {
+  localStorage.setItem('reportsetu_admin_user', JSON.stringify(admin));
+};
+
+export const clearAdminSession = (): void => {
+  localStorage.removeItem('reportsetu_admin_token');
+  localStorage.removeItem('reportsetu_admin_user');
+};
+
+const getAdminHeaders = (): Record<string, string> => {
+  const token = getAdminToken();
+  const headers: Record<string, string> = {
+    'x-admin-key': 'reportsetu_admin_secret_key_12345',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 export const adminApi = {
+  login: async (credentials: { adminId: string; passkey: string }) => {
+    const res = await apiFetch<{
+      token: string;
+      admin: {
+        id: string;
+        name: string;
+        role: string;
+        clearanceLevel: string;
+        terminalId: string;
+        sessionFingerprint: string;
+        authenticatedAt: string;
+      };
+      message: string;
+    }>('/admin/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+    if (res?.token) {
+      setAdminToken(res.token);
+      setAdminSession(res.admin);
+    }
+    return res;
+  },
+
+  verifySession: async () => {
+    return await apiFetch<{ valid: boolean; admin: any }>('/admin/auth/verify', {
+      headers: getAdminHeaders(),
+    });
+  },
+
   getStats: async () => {
     return await apiFetch<{
       totalDoctors: number;
@@ -589,8 +675,39 @@ export const adminApi = {
       rejectedDoctors: number;
       totalPatients: number;
       totalReports: number;
+      totalMedicines?: number;
+      totalPrescriptions?: number;
+      totalAppointments?: number;
+      totalConnections?: number;
     }>('/admin/stats?adminKey=reportsetu_admin_secret_key_12345', {
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
+      headers: getAdminHeaders(),
+    });
+  },
+
+  getTelemetry: async () => {
+    return await apiFetch<{
+      timestamp: string;
+      uptimeSeconds: number;
+      nodeVersion: string;
+      platform: string;
+      cpuCores: number;
+      memory: {
+        processRssMb: number;
+        processHeapUsedMb: number;
+        systemTotalGb: number;
+        systemUsedGb: number;
+        systemFreeGb: number;
+        systemUsagePercent: number;
+      };
+      services: {
+        apiServer: { name: string; port: number; status: string; latencyMs: number };
+        database: { name: string; port: number; status: string; latencyMs: number; recordsIndexed: number };
+        mlEngine: { name: string; port: number; status: string; latencyMs: number; modules: Record<string, string> };
+        cloudAiGateway: { name: string; status: string };
+      };
+      cache: { size: number; ttlMinutes: number };
+    }>('/admin/telemetry?adminKey=reportsetu_admin_secret_key_12345', {
+      headers: getAdminHeaders(),
     });
   },
 
@@ -601,21 +718,21 @@ export const adminApi = {
     if (params.search) query.append('search', params.search);
 
     return await apiFetch<{ doctors: any[]; total: number }>(`/admin/doctors?${query.toString()}`, {
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
+      headers: getAdminHeaders(),
     });
   },
 
   verifyDoctor: async (doctorId: string) => {
     return await apiFetch<{ doctor: any; message: string }>(`/admin/doctors/${doctorId}/verify?adminKey=reportsetu_admin_secret_key_12345`, {
       method: 'POST',
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
+      headers: getAdminHeaders(),
     });
   },
 
   rejectDoctor: async (doctorId: string, reason?: string) => {
     return await apiFetch<{ doctor: any; message: string }>(`/admin/doctors/${doctorId}/reject?adminKey=reportsetu_admin_secret_key_12345`, {
       method: 'POST',
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
+      headers: getAdminHeaders(),
       body: JSON.stringify({ reason }),
     });
   },
@@ -623,7 +740,73 @@ export const adminApi = {
   verifyAllDoctors: async () => {
     return await apiFetch<{ message: string; count: number }>('/admin/doctors/verify-all?adminKey=reportsetu_admin_secret_key_12345', {
       method: 'POST',
-      headers: { 'x-admin-key': 'reportsetu_admin_secret_key_12345' },
+      headers: getAdminHeaders(),
+    });
+  },
+
+  getPatients: async (params: { status?: string; search?: string } = {}) => {
+    const query = new URLSearchParams();
+    query.append('adminKey', 'reportsetu_admin_secret_key_12345');
+    if (params.status && params.status !== 'all') query.append('status', params.status);
+    if (params.search) query.append('search', params.search);
+
+    return await apiFetch<{ patients: any[]; total: number }>(`/admin/patients?${query.toString()}`, {
+      headers: getAdminHeaders(),
+    });
+  },
+
+  togglePatientStatus: async (patientId: string) => {
+    return await apiFetch<{ patient: any; message: string }>(`/admin/patients/${patientId}/toggle-status?adminKey=reportsetu_admin_secret_key_12345`, {
+      method: 'POST',
+      headers: getAdminHeaders(),
+    });
+  },
+
+  getMedicineStats: async () => {
+    return await apiFetch<{
+      totalMedicines: number;
+      cacheStats: { size: number; ttlMinutes: number };
+      primaryDataset: string;
+      externalProvider: string;
+      secondaryGateway: string;
+      supportedDosageForms: string[];
+    }>('/admin/medicines/stats?adminKey=reportsetu_admin_secret_key_12345', {
+      headers: getAdminHeaders(),
+    });
+  },
+
+  clearMedicineCache: async () => {
+    return await apiFetch<{ purgedCount: number; message: string }>('/admin/medicines/clear-cache?adminKey=reportsetu_admin_secret_key_12345', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+    });
+  },
+
+  createCustomMedicine: async (data: any) => {
+    return await apiFetch<{ medicine: any; message: string }>('/admin/medicines/custom?adminKey=reportsetu_admin_secret_key_12345', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: JSON.stringify(data),
+    });
+  },
+
+  getAuditLogs: async () => {
+    return await apiFetch<{ logs: any[]; total: number }>('/admin/audit-logs?adminKey=reportsetu_admin_secret_key_12345', {
+      headers: getAdminHeaders(),
+    });
+  },
+
+  getConfig: async () => {
+    return await apiFetch<{ config: any }>('/admin/config?adminKey=reportsetu_admin_secret_key_12345', {
+      headers: getAdminHeaders(),
+    });
+  },
+
+  updateConfig: async (updates: any) => {
+    return await apiFetch<{ config: any; message: string }>('/admin/config?adminKey=reportsetu_admin_secret_key_12345', {
+      method: 'POST',
+      headers: getAdminHeaders(),
+      body: JSON.stringify(updates),
     });
   },
 };

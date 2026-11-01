@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createPrescription, getPrescriptions } from '../services/prescriptionService';
+import { createPrescription, getPrescriptions, revokePrescription } from '../services/prescriptionService';
 import { sendCreated, sendSuccess } from '../utils/apiResponse';
 import { UnauthorizedError } from '../utils/errors';
 
@@ -105,6 +105,29 @@ export const handleGetPrescriptions = async (
     });
 
     sendSuccess(res, { prescriptions: list, total: list.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Controller: Doctor revokes an active prescription in between the prescribed time period.
+ */
+export const handleRevokePrescription = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    if (!req.user || req.user.role !== 'doctor') {
+      throw new UnauthorizedError('Doctor authorization required to revoke prescriptions');
+    }
+
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const result = await revokePrescription(req.user.userId, id, reason);
+    sendSuccess(res, { prescription: result, message: 'Prescription revoked successfully' });
   } catch (err) {
     next(err);
   }

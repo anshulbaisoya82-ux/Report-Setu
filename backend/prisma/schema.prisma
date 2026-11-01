@@ -357,3 +357,26 @@ model AuditLog {
   @@index([userId, createdAt])
   @@index([patientId, createdAt])
 }
+
+model Medicine {
+  id             String   @id @default(uuid())
+  name           String
+  brandName      String?
+  genericName    String?
+  composition    String?
+  strength       String?
+  dosageForm     String?
+  manufacturer   String?
+  price          Float?
+  packSize       String?
+  isDiscontinued Boolean  @default(false)
+  source         String   @default("indian_medicine_dataset")
+  sourceId       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([name])
+  @@index([brandName])
+  @@index([genericName])
+  @@index([source])
+}

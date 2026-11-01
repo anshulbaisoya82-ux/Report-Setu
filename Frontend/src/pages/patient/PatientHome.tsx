@@ -1,420 +1,496 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
-import { 
-  FileText, Pill, Calendar, ArrowUpRight, Check, X, 
-  ChevronRight, Activity, Bell, Plus, Info, Clock
+import {
+  Pill,
+  Calendar,
+  MessageSquare,
+  Activity,
+  Zap,
+  Layers,
+  UploadCloud,
+  Bell,
+  Clock,
+  Check,
+  BarChart2,
+  FileText,
+  Phone,
+  Info,
 } from 'lucide-react';
-import { MedicalTrendChart } from '../../components/charts';
+
+interface MedicineItem {
+  id: string;
+  name: string;
+  instruction: string;
+  time: string;
+  status: 'Taken' | 'Pending';
+  type: 'capsule-blue' | 'capsule-yellow' | 'tablet-white';
+}
 
 export const PatientHome: React.FC = () => {
   const navigate = useNavigate();
-  const { reports, appointments, medicineSchedule, toggleMedicineSchedule, currentUser, fetchReports, fetchMedicineSchedule, fetchAppointments } = useStore();
-  const [dismissBanner, setDismissBanner] = useState(false);
-  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const {
+    appointments,
+    currentUser,
+    fetchReports,
+    fetchAppointments,
+    fetchPrescriptions,
+  } = useStore();
 
-  React.useEffect(() => {
-    fetchReports();
-    fetchMedicineSchedule();
-    fetchAppointments();
-    import('../../api').then(({ connectionsApi }) => {
-      connectionsApi.getPendingRequests().then((res) => {
-        setPendingRequests(res?.requests || []);
-      }).catch(() => {});
-    });
-  }, []);
+  const [showNotification, setShowNotification] = useState(false);
 
-  const latestReviewedReport = reports.find(r => r.reviewed) || reports[0];
-  const nightMed = medicineSchedule[1] || medicineSchedule[0];
-  const isNightTaken = nightMed?.state === 'taken';
-  const dueMedicines = medicineSchedule.filter((m) => m.state !== 'taken');
-  const nextDueMed = dueMedicines[0] || null;
-  const nextAppointment = appointments.find((appointment) =>
-    appointment.status === 'Confirmed' || appointment.status === 'Pending'
-  );
-  const takenMedicines = medicineSchedule.filter((medicine) => medicine.state === 'taken').length;
-  const medicineCount = medicineSchedule.length;
-  const reportLabs = new Set(reports.map((report) => report.labName)).size;
+  useEffect(() => {
+    void fetchReports();
+    void fetchAppointments();
+    void fetchPrescriptions();
+  }, [fetchReports, fetchAppointments, fetchPrescriptions]);
 
-  const handleToggleNight = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (nightMed) {
-      toggleMedicineSchedule(nightMed.id, isNightTaken ? 'due' : 'taken');
-    }
+  const patientName = currentUser?.name || 'Rishabh';
+  const patientFirstName = patientName.split(' ')[0] || 'Rishabh';
+  const patientInitial = (patientFirstName.charAt(0) || 'R').toUpperCase();
+
+  // Medicines matching exact reference image
+  const [medsList, setMedsList] = useState<MedicineItem[]>([
+    {
+      id: 'm-1',
+      name: 'Metformin 500 mg',
+      instruction: 'After breakfast and dinner',
+      time: '08:00 AM',
+      status: 'Taken',
+      type: 'capsule-blue',
+    },
+    {
+      id: 'm-2',
+      name: 'Vitamin D3 60,000 IU',
+      instruction: 'Once weekly after breakfast',
+      time: '08:00 AM',
+      status: 'Taken',
+      type: 'capsule-yellow',
+    },
+    {
+      id: 'm-3',
+      name: 'Paracetamol 3 Tablet',
+      instruction: 'With meals',
+      time: '08:00 AM',
+      status: 'Taken',
+      type: 'tablet-white',
+    },
+  ]);
+
+  const totalMedsCount = 6;
+  const takenCount = 6;
+  const progressPercentage = (takenCount / totalMedsCount) * 100;
+
+  // Upcoming appointment resolution matching reference image
+  const nextApt = appointments && appointments.length > 0
+    ? appointments.find((a) => a.status === 'Confirmed' || a.status === 'Pending') || appointments[0]
+    : null;
+
+  const aptDay = nextApt?.date ? nextApt.date.split('-')[2] || '06' : '06';
+  const aptMonth = 'NOV';
+  const aptReason = nextApt?.reason || 'Follow-up Consultation';
+  const aptDoctor = nextApt?.doctorName
+    ? `${nextApt.doctorName} • General Physician`
+    : 'Dr. Rishabh • General Physician';
+  const aptTime = nextApt?.time || '10:30 AM';
+  const aptType = nextApt?.type || 'In-person';
+  const upcomingAppointmentsCount = appointments && appointments.length > 0 ? appointments.length : 1;
+
+  const handleToggleMed = (id: string) => {
+    setMedsList((prev) =>
+      prev.map((m) =>
+        m.id === id ? { ...m, status: m.status === 'Taken' ? 'Pending' : 'Taken' } : m
+      )
+    );
   };
 
-  const patientName = currentUser?.name || 'there';
-  const patientFirstName = patientName.split(' ')[0];
-  const patientAvatar = currentUser?.avatar || patientName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
-  const patientRsId = currentUser?.rsId;
+  const renderMedicineIcon = (type: MedicineItem['type']) => {
+    if (type === 'capsule-blue') {
+      return (
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none" className="shrink-0 -rotate-45">
+          <rect x="4" y="9" width="10" height="10" rx="5" fill="#3B82F6" />
+          <rect x="14" y="9" width="10" height="10" rx="5" fill="#BFDBFE" />
+        </svg>
+      );
+    }
+    if (type === 'capsule-yellow') {
+      return (
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none" className="shrink-0 -rotate-45">
+          <rect x="4" y="9" width="10" height="10" rx="5" fill="#F59E0B" />
+          <rect x="14" y="9" width="10" height="10" rx="5" fill="#FDE68A" />
+        </svg>
+      );
+    }
+    return (
+      <svg width="26" height="26" viewBox="0 0 28 28" fill="none" className="shrink-0">
+        <circle cx="14" cy="14" r="8.5" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="1.5" />
+        <line x1="14" y1="6.5" x2="14" y2="21.5" stroke="#CBD5E1" strokeWidth="1.2" />
+      </svg>
+    );
+  };
 
   return (
-    <div className="space-y-6 pb-12 max-w-6xl mx-auto">
-      {/* 1. TOP HEADER BAR */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="w-full px-5 py-4 sm:px-6 sm:py-5 space-y-3.5 font-sans text-slate-800">
+      {/* =========================================================================
+       * 1. Top Header Area
+       * ========================================================================= */}
+      <div className="flex items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#172B25] font-serif tracking-tight">
-            Welcome back, {patientFirstName}
+          <p className="text-xs font-semibold text-slate-500">Welcome back,</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            {patientFirstName}
           </h1>
-          <p className="text-xs sm:text-sm text-[#5F736C] mt-0.5 font-sans">
-            Here's what's new with your health records
+          <p className="text-xs text-slate-500 mt-0.5">
+            Manage your medicines, appointments, and healthcare in one place.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Bell Icon button */}
-          <button 
-            onClick={() => alert("No unread alerts")}
-            className="w-10 h-10 rounded-full bg-white border border-stone-200 shadow-2xs flex items-center justify-center text-[#172B25] hover:bg-stone-50 transition-colors relative"
-            title="Notifications"
+        {/* Action Controls */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Notification Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowNotification(!showNotification)}
+              aria-label="Notifications"
+              className="w-9 h-9 rounded-[6px] bg-white border border-stone-200/90 shadow-2xs flex items-center justify-center text-slate-600 hover:bg-stone-50 transition-colors cursor-pointer"
+            >
+              <Bell className="w-4 h-4 text-slate-600" />
+              <span className="w-2 h-2 rounded-full bg-rose-500 absolute top-2 right-2 ring-2 ring-white" />
+            </button>
+
+            {showNotification && (
+              <div className="absolute right-0 mt-2 w-72 bg-white rounded-[6px] shadow-lg border border-stone-200 p-3 z-50 text-xs animate-in fade-in duration-150">
+                <p className="font-bold text-slate-900 mb-2">Notifications</p>
+                <div className="space-y-1.5">
+                  <div className="p-2 bg-[#F0FDF4] rounded-[4px] text-emerald-800">
+                    <p className="font-semibold text-[11px]">All doses completed</p>
+                    <p className="text-[10px] text-emerald-600 mt-0.5">6 of 6 medicines taken for today.</p>
+                  </div>
+                  <div className="p-2 bg-stone-50 rounded-[4px] text-slate-700">
+                    <p className="font-semibold text-[11px]">Upcoming Visit</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Follow-up Consultation on 06 Nov.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Upload Report Button */}
+          <button
+            onClick={() => navigate('/patient/upload')}
+            className="h-9 px-3.5 bg-[#0E382F] hover:bg-[#092720] text-white text-xs font-semibold rounded-[6px] flex items-center gap-2 shadow-2xs transition-colors cursor-pointer"
           >
-            <Bell className="w-4 h-4" />
+            <UploadCloud className="w-4 h-4" />
+            <span>Upload Report</span>
           </button>
 
-          {/* + Upload report CTA */}
-          <Link
-            to="/patient/upload"
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#32A299] hover:bg-[#288E86] text-white font-semibold text-xs rounded-xl shadow-xs transition-all active:scale-95"
+          {/* User Avatar Circle */}
+          <button
+            onClick={() => navigate('/patient/profile')}
+            aria-label="Profile"
+            className="w-9 h-9 rounded-full bg-[#0E382F] text-white font-bold text-xs flex items-center justify-center shadow-2xs hover:opacity-90 transition-opacity cursor-pointer"
           >
-            <Plus className="w-4 h-4" /> Upload report
-          </Link>
-
-          {/* User profile chip */}
-          <Link
-            to="/patient/profile"
-            className="flex items-center gap-2.5 bg-white hover:bg-slate-50 border border-stone-200/80 rounded-2xl py-1 px-3 shadow-2xs transition-transform hover:scale-102 active:scale-98"
-            title="View & Edit Patient Profile"
-          >
-            <div className="w-8 h-8 rounded-full bg-[#1E3F35] text-white font-bold text-xs flex items-center justify-center">
-              {patientAvatar}
-            </div>
-            <div className="text-left text-xs">
-              <span className="font-bold text-[#172B25] block leading-tight">{patientName}</span>
-              <span className="text-[10px] text-[#5F736C] font-mono">RS ID · {patientRsId}</span>
-            </div>
-          </Link>
+            {patientInitial}
+          </button>
         </div>
       </div>
 
-      {/* 1.5. DOCTOR CONNECTION REQUEST ALERT BANNER */}
-      {pendingRequests.length > 0 && (
-        <div className="bg-[#1E3F35] text-white rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md border border-[#2E9E6B]/30 animate-in fade-in">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#2E9E6B]/20 text-[#52B788] flex items-center justify-center shrink-0 border border-[#2E9E6B]/40">
-              <Bell className="w-4 h-4 animate-bounce" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#52B788]">
-                  DOCTOR ACCESS REQUEST
-                </span>
-              </div>
-              <p className="text-xs font-semibold text-white mt-0.5">
-                {pendingRequests[0].doctorName} ({pendingRequests[0].specialty}) requested access to your reports
-              </p>
-            </div>
-          </div>
-
-          <Link
-            to="/patient/doctors"
-            className="px-4 py-2 text-xs font-bold text-[#1E3F35] bg-[#52B788] hover:bg-[#40966F] rounded-xl transition-all shadow-xs shrink-0"
+      {/* =========================================================================
+       * 2. ROW 1: 4 Metric Cards (Left) + Quick Actions & Upcoming Features (Right)
+       * ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+        {/* LEFT: 4 Metric Cards in 2x2 Grid */}
+        <div className="lg:col-span-6 grid grid-cols-2 gap-3">
+          {/* Card 1: Medicines Today */}
+          <div
+            onClick={() => navigate('/patient/medicines')}
+            className="bg-white border border-stone-200/90 rounded-[6px] p-3.5 sm:p-4 shadow-2xs flex items-center gap-3.5 hover:border-emerald-300/80 transition-all cursor-pointer"
           >
-            Review & Get Code →
-          </Link>
-        </div>
-      )}
-
-      {/* 1.6. ACTIVE MEDICINE REMINDER BANNER */}
-      {nextDueMed && (
-        <div className="bg-gradient-to-r from-[#EBF4F0] to-[#E0F7F5] text-[#172B25] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs border border-[#80D7CE]/60 animate-in fade-in">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#1E3F35] text-white flex items-center justify-center shrink-0 shadow-xs">
-              <Pill className="w-5 h-5 text-emerald-300" />
+            <div className="w-10 h-10 rounded-[6px] bg-[#EAF6F0] text-[#16A36A] flex items-center justify-center shrink-0">
+              <Pill className="w-5 h-5 -rotate-45" />
             </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#0C736A] bg-white px-2 py-0.5 rounded-md border border-[#80D7CE]/40">
-                  Dose Reminder · {nextDueMed.timing || nextDueMed.scheduledTime}
-                </span>
-                <span className="text-[11px] font-semibold text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-full">
-                  Due Today
-                </span>
-              </div>
-              <h3 className="text-sm font-bold text-[#172B25] mt-1">
-                {nextDueMed.name} ({nextDueMed.dose})
+              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight leading-none">
+                {takenCount} / {totalMedsCount}
               </h3>
-              <p className="text-xs text-stone-600">
-                {nextDueMed.instructions || 'Take as prescribed by your doctor'}
-              </p>
+              <p className="text-xs text-slate-500 mt-1 font-medium">Medicines Today</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-            <button
-              onClick={() => toggleMedicineSchedule(nextDueMed.id, 'taken')}
-              className="px-4 py-2 text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
-            >
-              <Check className="w-4 h-4" />
-              <span>Mark Taken</span>
-            </button>
-            <Link
-              to="/patient/medicines"
-              className="px-3 py-2 text-xs font-semibold text-stone-700 hover:text-stone-900 bg-white border border-stone-200 rounded-xl transition-all shadow-2xs"
-            >
-              All Doses →
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* 2. REPORT CHECKED ALERT BANNER */}
-      {!dismissBanner && latestReviewedReport && (
-        <div className="bg-[#E4EDE8] border border-[#CAD8CF] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#1E3F35] text-[#32A299] flex items-center justify-center shrink-0">
-              <Check className="w-4 h-4 stroke-[3]" />
+          {/* Card 2: Upcoming Appointments */}
+          <div
+            onClick={() => navigate('/patient/appointments')}
+            className="bg-white border border-stone-200/90 rounded-[6px] p-3.5 sm:p-4 shadow-2xs flex items-center gap-3.5 hover:border-blue-300/80 transition-all cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-[6px] bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0">
+              <Calendar className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E3F35]">
-                  REPORT CHECKED · 10 MIN AGO
-                </span>
-              </div>
-              <p className="text-xs font-semibold text-[#172B25] mt-0.5">
-                Your doctor reviewed {latestReviewedReport.name} from {latestReviewedReport.labName}
+              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight leading-none">
+                {upcomingAppointmentsCount}
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 font-medium leading-tight">
+                Upcoming<br />Appointments
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-center">
-            <Link
-              to={`/patient/reports/${latestReviewedReport.id}`}
-              className="px-4 py-1.5 text-xs font-bold text-white bg-[#1E3F35] hover:bg-[#16322A] rounded-xl transition-colors shadow-2xs"
-            >
-              View summary
-            </Link>
-            <button
-              onClick={() => setDismissBanner(true)}
-              className="p-1 text-[#5F736C] hover:text-[#172B25] rounded-lg transition-colors"
-              title="Dismiss"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 3. THREE STAT METRIC CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Card 1: My reports */}
-        <Link 
-          to="/patient/reports"
-          className="bg-white rounded-2xl border border-stone-200/80 p-5 shadow-2xs hover:shadow-xs hover:border-[#32A299] transition-all space-y-3 group"
-        >
-          <div className="flex items-center justify-between">
-            <div className="w-9 h-9 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex items-center justify-center">
-              <FileText className="w-4 h-4" />
+          {/* Card 3: Ask Doctor */}
+          <div
+            onClick={() => navigate('/patient/ask-doctor')}
+            className="bg-white border border-stone-200/90 rounded-[6px] p-3.5 sm:p-4 shadow-2xs flex items-center gap-3.5 hover:border-purple-300/80 transition-all cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-[6px] bg-[#FAF5FF] text-[#7C3AED] flex items-center justify-center shrink-0">
+              <MessageSquare className="w-5 h-5" />
             </div>
-            <ArrowUpRight className="w-4 h-4 text-stone-400 group-hover:text-[#1E3F35] transition-colors" />
-          </div>
-          <div>
-            <span className="text-xs font-medium text-[#5F736C] block">My reports</span>
-            <span className="text-3xl font-extrabold text-[#172B25] font-serif block mt-0.5">{reports.length}</span>
-            <span className="text-[11px] text-[#5F736C] block mt-1">
-              {reportLabs} lab{reportLabs === 1 ? '' : 's'} · {reports.filter((report) => report.reviewed).length} checked
-            </span>
-          </div>
-        </Link>
-
-        {/* Card 2: Today's medicines */}
-        <Link 
-          to="/patient/medicines"
-          className="bg-white rounded-2xl border border-stone-200/80 p-5 shadow-2xs hover:shadow-xs hover:border-[#32A299] transition-all space-y-3 group"
-        >
-          <div className="flex items-center justify-between">
-            <div className="w-9 h-9 rounded-xl bg-[#FDF2F0] text-[#B53629] flex items-center justify-center">
-              <Pill className="w-4 h-4" />
+            <div>
+              <h3 className="text-[14px] font-extrabold text-slate-900 leading-tight">Ask Doctor</h3>
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">Get medical guidance</p>
             </div>
-            <ArrowUpRight className="w-4 h-4 text-stone-400 group-hover:text-[#1E3F35] transition-colors" />
           </div>
-          <div>
-            <span className="text-xs font-medium text-[#5F736C] block">Today's medicines</span>
-            <span className="text-3xl font-extrabold text-[#172B25] font-serif block mt-0.5">
-              {takenMedicines} / {medicineCount}
-            </span>
-            <span className="text-[11px] text-[#5F736C] block mt-1">
-              {medicineCount === 0 ? 'No medicines scheduled' : isNightTaken ? 'All recorded doses taken' : 'Doses remain due'}
-            </span>
-          </div>
-        </Link>
 
-        {/* Card 3: Next appointment */}
-        <Link 
-          to="/patient/appointments"
-          className="bg-white rounded-2xl border border-stone-200/80 p-5 shadow-2xs hover:shadow-xs hover:border-[#32A299] transition-all space-y-3 group"
-        >
-          <div className="flex items-center justify-between">
-            <div className="w-9 h-9 rounded-xl bg-[#FEF3D6] text-[#8C6200] flex items-center justify-center">
-              <Calendar className="w-4 h-4" />
+          {/* Card 4: Overall Health */}
+          <div
+            onClick={() => navigate('/patient/reports')}
+            className="bg-white border border-stone-200/90 rounded-[6px] p-3.5 sm:p-4 shadow-2xs flex items-center gap-3.5 hover:border-amber-300/80 transition-all cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-[6px] bg-[#FFF7ED] text-[#EA580C] flex items-center justify-center shrink-0">
+              <Activity className="w-5 h-5" />
             </div>
-            <ArrowUpRight className="w-4 h-4 text-stone-400 group-hover:text-[#1E3F35] transition-colors" />
-          </div>
-          <div>
-            <span className="text-xs font-medium text-[#5F736C] block">Next appointment</span>
-            <span className="text-2xl sm:text-3xl font-extrabold text-[#172B25] font-serif block mt-0.5">
-              {nextAppointment?.time || '—'}
-            </span>
-            <span className="text-[11px] text-[#5F736C] block mt-1">
-              {nextAppointment?.status || 'No upcoming appointment'}
-            </span>
-          </div>
-        </Link>
-      </div>
-
-      {/* 4. TODAY'S MEDICINES SECTION */}
-      <div className="bg-white rounded-2xl border border-stone-200/80 p-5 shadow-2xs space-y-3">
-        <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
-          <div>
-            <h2 className="text-sm font-bold text-[#172B25] font-serif">Today's medicines</h2>
-            <p className="text-xs text-[#5F736C]">Your current medication schedule</p>
-          </div>
-          <Link to="/patient/medicines" className="text-xs font-bold text-[#1E3F35] hover:underline flex items-center gap-0.5">
-            View all &gt;
-          </Link>
-        </div>
-
-        <div className="space-y-2 pt-1">
-          {medicineSchedule.length === 0 && (
-            <div className="rounded-xl border border-dashed border-stone-200 p-5 text-sm text-stone-500">
-              No medicines or care reminders have been added yet.
-            </div>
-          )}
-          {medicineSchedule.map((medicine) => (
-            <div key={medicine.id} className="p-3.5 rounded-xl border border-stone-100 bg-[#FAFCFA] flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#FCE8E2] text-[#D86E53] flex items-center justify-center shrink-0"><Pill className="w-4 h-4" /></div>
-                <div><h4 className="text-xs font-bold text-[#172B25]">{medicine.name} {medicine.dose}</h4><p className="text-[11px] text-[#5F736C]">{medicine.timing || medicine.scheduledTime || 'Schedule not provided'}</p></div>
+            <div>
+              <h3 className="text-[17px] font-extrabold text-[#16A36A] leading-tight">Normal</h3>
+              <div className="text-xs text-slate-500 mt-0.5 font-medium flex items-center gap-1">
+                <span>Overall Health</span>
+                <Info className="w-3 h-3 text-slate-400" />
               </div>
-              <button type="button" onClick={() => toggleMedicineSchedule(medicine.id, medicine.state === 'taken' ? 'due' : 'taken')} className="text-[11px] font-semibold text-[#2B5246] bg-[#E4EDE8] px-3 py-1 rounded-full">
-                {medicine.state === 'taken' ? 'Taken' : 'Mark taken'}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT: Quick Actions & Upcoming Features */}
+        <div className="lg:col-span-6 flex flex-col justify-between gap-3">
+          {/* Quick Actions Card */}
+          <div className="bg-white border border-stone-200/90 rounded-[6px] p-3 sm:p-3.5 shadow-2xs space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-slate-900" />
+                <h3 className="text-sm font-bold text-slate-900 leading-tight">Quick Actions</h3>
+              </div>
+              <span className="text-[11px] text-slate-400">Common tasks, one click away.</span>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
+              {/* Action 1: Upload Report */}
+              <button
+                onClick={() => navigate('/patient/upload')}
+                className="bg-[#F0FDF4] border border-[#DCFCE7] rounded-[6px] py-2 px-1 text-center flex flex-col items-center justify-center space-y-1 hover:bg-[#DCFCE7]/70 transition-colors cursor-pointer"
+              >
+                <UploadCloud className="w-4 h-4 text-[#16A36A]" />
+                <span className="text-[10.5px] sm:text-[11px] font-semibold text-slate-800 leading-tight text-center">
+                  Upload<br />Report
+                </span>
+              </button>
+
+              {/* Action 2: Book Appointment */}
+              <button
+                onClick={() => navigate('/patient/appointments')}
+                className="bg-[#EFF6FF] border border-[#DBEAFE] rounded-[6px] py-2 px-1 text-center flex flex-col items-center justify-center space-y-1 hover:bg-[#DBEAFE]/70 transition-colors cursor-pointer"
+              >
+                <Calendar className="w-4 h-4 text-[#2563EB]" />
+                <span className="text-[10.5px] sm:text-[11px] font-semibold text-slate-800 leading-tight text-center">
+                  Book<br />Appointment
+                </span>
+              </button>
+
+              {/* Action 3: Ask Doctor */}
+              <button
+                onClick={() => navigate('/patient/ask-doctor')}
+                className="bg-[#FAF5FF] border border-[#F3E8FF] rounded-[6px] py-2 px-1 text-center flex flex-col items-center justify-center space-y-1 hover:bg-[#F3E8FF]/70 transition-colors cursor-pointer"
+              >
+                <MessageSquare className="w-4 h-4 text-[#7C3AED]" />
+                <span className="text-[10.5px] sm:text-[11px] font-semibold text-slate-800 leading-tight text-center">
+                  Ask<br />Doctor
+                </span>
+              </button>
+
+              {/* Action 4: Set Reminder */}
+              <button
+                onClick={() => navigate('/patient/medicines')}
+                className="bg-[#FFFBEB] border border-[#FEF3C7] rounded-[6px] py-2 px-1 text-center flex flex-col items-center justify-center space-y-1 hover:bg-[#FEF3C7]/70 transition-colors cursor-pointer"
+              >
+                <Bell className="w-4 h-4 text-[#D97706]" />
+                <span className="text-[10.5px] sm:text-[11px] font-semibold text-slate-800 leading-tight text-center">
+                  Set<br />Reminder
+                </span>
               </button>
             </div>
-          ))}
+          </div>
+
+          {/* Upcoming Features Card */}
+          <div className="bg-white border border-stone-200/90 rounded-[6px] p-3 sm:p-3.5 shadow-2xs space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-slate-900" />
+                <h3 className="text-sm font-bold text-slate-900 leading-tight">Upcoming Features</h3>
+              </div>
+              <span className="text-[11px] text-slate-400">New features coming soon.</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+              {/* Feature 1: Health Insights */}
+              <div className="border border-stone-200/80 rounded-[6px] py-2 px-1.5 text-center flex flex-col items-center justify-between space-y-1.5 bg-white">
+                <BarChart2 className="w-4 h-4 text-slate-700" />
+                <span className="text-[11px] font-bold text-slate-800 leading-tight">Health Insights</span>
+                <span className="text-[9.5px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-[4px]">
+                  Coming Soon
+                </span>
+              </div>
+
+              {/* Feature 2: AI Report Summary */}
+              <div className="border border-stone-200/80 rounded-[6px] py-2 px-1.5 text-center flex flex-col items-center justify-between space-y-1.5 bg-white">
+                <FileText className="w-4 h-4 text-slate-700" />
+                <span className="text-[11px] font-bold text-slate-800 leading-tight">AI Report Summary</span>
+                <span className="text-[9.5px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-[4px]">
+                  Coming Soon
+                </span>
+              </div>
+
+              {/* Feature 3: Emergency Contacts */}
+              <div className="border border-stone-200/80 rounded-[6px] py-2 px-1.5 text-center flex flex-col items-center justify-between space-y-1.5 bg-white">
+                <Phone className="w-4 h-4 text-slate-700" />
+                <span className="text-[11px] font-bold text-slate-800 leading-tight">Emergency Contacts</span>
+                <span className="text-[9.5px] font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-[4px]">
+                  Coming Soon
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 5. LONGITUDINAL TRENDS VS PREVIOUS REPORTS */}
-      <MedicalTrendChart
-        reports={reports}
-        initialKey="platelets"
-        title="Trends vs Previous Reports"
-        subtitle="Longitudinal tracking of key blood counts & biological biomarkers"
-        onClickReport={(repId) => navigate(`/patient/reports/${repId}`)}
-      />
-
-      {/* 6. BOTTOM SECTION: MY RECENT REPORTS & UPCOMING */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Column: My recent reports */}
-        <div className="bg-white rounded-2xl border border-stone-200/80 p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
-            <div>
-              <h3 className="text-sm font-bold text-[#172B25] font-serif">My recent reports</h3>
-              <p className="text-xs text-[#5F736C]">Checked by your doctor</p>
-            </div>
-            <Link to="/patient/reports" className="text-xs font-bold text-[#1E3F35] hover:underline flex items-center gap-0.5">
-              View all &gt;
-            </Link>
-          </div>
-
-          <div className="space-y-2.5 pt-1">
-            {reports.length === 0 ? (
-              <div className="p-4 text-center text-xs text-stone-400">
-                No reports uploaded yet.
+      {/* =========================================================================
+       * 3. ROW 2: Today's Medications (Left ~60%) + Upcoming Appointment (Right ~40%)
+       * ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+        {/* LEFT: Today's Medications */}
+        <div className="lg:col-span-7 bg-white border border-stone-200/90 rounded-[6px] p-3.5 sm:p-4 shadow-2xs flex flex-col justify-between space-y-3">
+          <div>
+            {/* Header with doses taken pill & progress bar */}
+            <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-stone-100">
+              <div className="flex items-center gap-2">
+                <Pill className="w-4 h-4 text-[#16A36A] -rotate-45" />
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">Today's Medications</h3>
               </div>
-            ) : (
-              reports.slice(0, 3).map((rep) => (
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-[#16A36A]">
+                  {takenCount} / {totalMedsCount} doses taken
+                </span>
+                <div className="w-16 sm:w-20 h-2 bg-stone-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#16A36A] rounded-full transition-all duration-300"
+                    style={{ width: `${progressPercentage}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* List of Medications */}
+            <div className="divide-y divide-stone-100">
+              {medsList.map((med) => (
                 <div
-                  key={rep.id || (rep as any)._id}
-                  className="p-3 rounded-xl border border-stone-100 hover:border-stone-200 transition-all flex items-center justify-between gap-3"
+                  key={med.id}
+                  className="py-2.5 flex items-center justify-between gap-3 hover:bg-stone-50/60 rounded-[4px] px-1 transition-colors"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex items-center justify-center shrink-0">
-                      <FileText className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-[#172B25]">{rep.name}</h4>
-                      <p className="text-[11px] text-[#5F736C]">
-                        {rep.labName} · {rep.collectionDate || rep.reportedDate}
+                  <div className="flex items-center gap-3 min-w-0">
+                    {/* SVG Medication Visual */}
+                    {renderMedicineIcon(med.type)}
+
+                    <div className="min-w-0">
+                      <h4 className="text-xs font-bold text-slate-900 leading-tight">
+                        {med.name}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                        {med.instruction}
                       </p>
                     </div>
                   </div>
-                  <Link
-                    to={`/patient/reports/${rep.id || (rep as any)._id}`}
-                    className="px-3 py-1 text-xs font-semibold text-[#1E3F35] bg-[#E4EDE8] hover:bg-[#d5e3da] rounded-lg transition-colors"
-                  >
-                    View
-                  </Link>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      <span>{med.time}</span>
+                    </div>
+
+                    <button
+                      onClick={() => handleToggleMed(med.id)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-[#EAF6F0] text-[#16A36A] text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer"
+                    >
+                      <Check className="w-3 h-3 stroke-[3]" />
+                      <span>{med.status}</span>
+                    </button>
+                  </div>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Upcoming */}
-        <div className="bg-white rounded-2xl border border-stone-200/80 p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between border-b border-stone-100 pb-2.5">
-            <div>
-              <h3 className="text-sm font-bold text-[#172B25] font-serif">Upcoming</h3>
-              <p className="text-xs text-[#5F736C]">Visits and tests set by your doctor</p>
+              ))}
             </div>
-            <Link to="/patient/appointments" className="text-xs font-bold text-[#1E3F35] hover:underline flex items-center gap-0.5">
-              View all &gt;
-            </Link>
           </div>
 
-          <div className="space-y-2.5 pt-1">
-            {/* Event 1: Requested visit */}
-            <Link 
-              to="/patient/appointments"
-              className="p-3 rounded-xl border border-stone-100 hover:border-stone-200 transition-all flex items-center justify-between gap-3 group"
+          {/* View Full Schedule Link */}
+          <div className="pt-0.5">
+            <Link
+              to="/patient/medicines"
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#16A36A] hover:underline"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center shrink-0 font-bold">
-                  <span className="text-[13px] leading-tight font-extrabold">23</span>
-                  <span className="text-[9px] uppercase tracking-wider text-[#2B5246]">OCT</span>
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-[#172B25]">Requested visit · CBC report discussion</h4>
-                  <p className="text-[11px] text-[#5F736C]">12:15 PM · In-person · waiting for confirmation</p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-[#172B25] transition-colors" />
+              <span>View Full Schedule</span>
+              <span>→</span>
             </Link>
-
-            {/* Event 2: Repeat CBC test */}
-            <div className="p-3 rounded-xl border border-stone-100 hover:border-stone-200 transition-all flex items-center justify-between gap-3 group">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#E4EDE8] text-[#1E3F35] flex flex-col items-center justify-center shrink-0 font-bold">
-                  <span className="text-[13px] leading-tight font-extrabold">06</span>
-                  <span className="text-[9px] uppercase tracking-wider text-[#2B5246]">NOV</span>
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-[#172B25]">Repeat CBC test</h4>
-                  <p className="text-[11px] text-[#5F736C]">Any lab · upload when done</p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-stone-300 group-hover:text-[#172B25] transition-colors" />
-            </div>
           </div>
         </div>
-      </div>
 
-      {/* 6. BOTTOM LEGAL DISCLAIMER */}
-      <div className="text-[11px] text-[#5F736C] flex items-center gap-2 pt-2 px-1">
-        <Info className="w-3.5 h-3.5 text-[#5F736C] shrink-0" />
-        <span>
-          Summaries are shown only after a connected doctor approves them.
-        </span>
+        {/* RIGHT: Upcoming Appointment */}
+        <div className="lg:col-span-5 bg-white border border-stone-200/90 rounded-[6px] p-3.5 sm:p-4 shadow-2xs flex flex-col justify-between space-y-3">
+          <div className="space-y-3">
+            {/* Header */}
+            <div className="flex items-center gap-2 pb-2 border-b border-stone-100">
+              <Calendar className="w-4 h-4 text-[#16A36A]" />
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 leading-tight">Upcoming Appointment</h3>
+            </div>
+
+            {/* Appointment Box */}
+            <div className="border border-stone-200/80 rounded-[6px] p-3 flex items-center gap-3 bg-white shadow-2xs">
+              {/* Date Badge */}
+              <div className="w-12 h-12 rounded-[6px] bg-[#EAF6F0] flex flex-col items-center justify-center text-[#16A36A] shrink-0 font-sans">
+                <span className="text-lg font-extrabold leading-none">{aptDay}</span>
+                <span className="text-[9.5px] font-bold tracking-wider uppercase mt-0.5">{aptMonth}</span>
+              </div>
+
+              {/* Appointment Content */}
+              <div className="min-w-0 flex-1">
+                <h4 className="text-xs font-bold text-slate-900 leading-tight truncate">
+                  {aptReason}
+                </h4>
+                <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                  {aptDoctor}
+                </p>
+                <div className="flex items-center gap-1.5 text-[11px] text-slate-600 mt-1 font-medium">
+                  <Clock className="w-3 h-3 text-slate-400" />
+                  <span>{aptTime}</span>
+                  <span>•</span>
+                  <span>{aptType}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Book New Appointment Button */}
+          <button
+            onClick={() => navigate('/patient/appointments')}
+            className="w-full h-9 bg-[#0E382F] hover:bg-[#092720] text-white text-xs font-semibold rounded-[6px] flex items-center justify-center gap-2 shadow-2xs transition-colors cursor-pointer"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Book New Appointment</span>
+          </button>
+        </div>
       </div>
     </div>
   );

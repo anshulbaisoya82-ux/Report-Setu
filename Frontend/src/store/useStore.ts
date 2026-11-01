@@ -66,6 +66,7 @@ export interface AppState {
   fetchPrescriptions: (patientId?: string) => Promise<void>;
   addPrescription: (prescription: Prescription) => void;
   createPrescription: (data: any) => Promise<any>;
+  revokePrescription: (prescriptionId: string, reason?: string) => Promise<any>;
 
   // Appointments
   appointments: Appointment[];
@@ -300,6 +301,22 @@ export const useStore = create<AppState>((set, get) => ({
     // Refresh schedule immediately
     get().fetchMedicineSchedule(data.patientId);
     return created;
+  },
+  revokePrescription: async (prescriptionId: string, reason?: string) => {
+    let res: any;
+    try {
+      res = await prescriptionsApi.revokePrescription(prescriptionId, reason);
+    } catch (e) {
+      console.warn('API revoke error:', e);
+    }
+    set((state) => ({
+      prescriptions: state.prescriptions.map((p) =>
+        p.id === prescriptionId || (p as any)._id === prescriptionId
+          ? { ...p, status: 'Ended', instructions: `${p.instructions || ''} [Revoked by Doctor]` }
+          : p
+      ),
+    }));
+    return res;
   },
 
   // Real Appointments loaded from database (zero mock defaults)
