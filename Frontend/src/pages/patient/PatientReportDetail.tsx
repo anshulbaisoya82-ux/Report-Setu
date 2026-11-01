@@ -786,7 +786,7 @@ export const PatientReportDetail: React.FC = () => {
                 Repeat Complete Blood Count on 11 Nov 2026
               </h4>
               <p className="text-[11px] text-slate-500 mt-0.5">
-                Dr. Rishabh recommended re-evaluating CBC after vitamin regimen.
+                Your consulting doctor recommended re-evaluating CBC after the prescribed regimen.
               </p>
             </div>
           </div>
@@ -807,7 +807,7 @@ export const PatientReportDetail: React.FC = () => {
             </div>
             <div>
               <h4 className="text-xs font-bold text-slate-900">
-                Discuss Results with Dr. Rishabh
+                Discuss Results with Your Doctor
               </h4>
               <p className="text-[11px] text-slate-500 mt-0.5">
                 Have questions or need medication adjustments? Book a direct consultation.

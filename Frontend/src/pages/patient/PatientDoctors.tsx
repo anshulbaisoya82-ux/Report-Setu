@@ -60,7 +60,7 @@ export const PatientDoctors: React.FC<PatientDoctorsProps> = ({ embedded = false
 
   // 2-Minute Temporary Code State
   const [generatedCode, setGeneratedCode] = useState<string>('849201');
-  const [targetDoctorName, setTargetDoctorName] = useState<string>('Dr. Rishabh');
+  const [targetDoctorName, setTargetDoctorName] = useState<string>('your doctor');
   const [secondsRemaining, setSecondsRemaining] = useState<number>(115);
   const [copiedCode, setCopiedCode] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -344,7 +344,7 @@ export const PatientDoctors: React.FC<PatientDoctorsProps> = ({ embedded = false
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <h3 className="text-xs font-bold text-slate-900">{doc.name || 'Dr. Rishabh'}</h3>
+                      <h3 className="text-xs font-bold text-slate-900">{doc.name || 'Consulting Physician'}</h3>
                       <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
                     </div>
                     <p className="text-[11px] text-slate-500 mt-0.5">{doc.specialty || 'General Physician'}</p>
