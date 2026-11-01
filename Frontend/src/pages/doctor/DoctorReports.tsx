@@ -72,7 +72,8 @@ const formatReportDateTime = (dateStr?: string) => {
 
 export const DoctorReports: React.FC = () => {
   const navigate = useNavigate();
-  const { reports, patients, doctorInfo, fetchReports, fetchDoctorPatients } = useStore();
+  const { reports, patients, doctorInfo,
+    currentUser, fetchReports, fetchDoctorPatients } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'Latest' | 'Criticality' | 'Patient'>('Latest');
@@ -86,7 +87,7 @@ export const DoctorReports: React.FC = () => {
   }, [fetchReports, fetchDoctorPatients]);
 
   // Doctor display info
-  const doctorDisplayName = doctorInfo.name || 'Dr. Rishabh';
+  const doctorDisplayName = currentUser?.name || doctorInfo.name || 'Doctor';
   const doctorSpecialty = doctorInfo.specialty || 'General Physician';
   const doctorInitials = 'DR';
 
@@ -98,7 +99,7 @@ export const DoctorReports: React.FC = () => {
     const { date, time } = formatReportDateTime(r.reportedDate || r.collectionDate || r.createdAt);
     return {
       id: r.id || r._id || 'rep-1',
-      name: r.name || 'Complete Blood Count (CBC)',
+      name: r.name || 'Diagnostic Report',
       category: r.category === 'CBC' || !r.category ? 'Blood Report' : `${r.category} Report`,
       dateStr: date,
       timeStr: time,
@@ -106,8 +107,8 @@ export const DoctorReports: React.FC = () => {
       patientName: r.patientName || patient?.name || 'Patient',
       patientAvatar: patient?.avatar || r.patientAvatar || 'P',
       patientRsId: r.patientRsId || patient?.rsId || '',
-      patientGender: patient?.gender || 'Male',
-      patientAge: patient?.age || 25,
+      patientGender: patient?.gender || 'Not specified',
+      patientAge: patient?.age || '--',
       status: (r.status as any) || 'Normal',
       reviewed: Boolean(r.reviewed || r.reviewStatus === 'approved'),
       reviewStatus: r.reviewStatus,

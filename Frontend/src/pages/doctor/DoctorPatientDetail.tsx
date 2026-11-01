@@ -95,153 +95,11 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     patients.find((p) => (p as any)._id === id) ||
     patients.find((p) => (p as any).userId === id);
 
-  // Fallback reports matching reference image
-  const defaultCbcParameters = [
-    { id: 'p1', name: 'Hemoglobin', value: '15', unit: 'g/dL', referenceRange: '13 – 17', status: 'Normal' },
-    { id: 'p2', name: 'Total Leukocyte Count', value: '5100', unit: 'cumm', referenceRange: '4,800 – 10,800', status: 'Normal' },
-    { id: 'p3', name: 'Neutrophils', value: '79', unit: '%', referenceRange: '40 – 80', status: 'Normal' },
-    { id: 'p4', name: 'Lymphocyte', value: '18', unit: '%', referenceRange: '20 – 40', status: 'Low' },
-    { id: 'p5', name: 'Eosinophils', value: '1', unit: '%', referenceRange: '1 – 6', status: 'Normal' },
-    { id: 'p6', name: 'Monocytes', value: '1', unit: '%', referenceRange: '2 – 10', status: 'Critical' },
-    { id: 'p7', name: 'Basophils', value: '1', unit: '%', referenceRange: '< 2', status: 'Normal' },
-    { id: 'p8', name: 'Platelet Count', value: '3.5', unit: 'lakhs/cumm', referenceRange: '1.5 – 4.1', status: 'Normal' },
-    { id: 'p9', name: 'Total RBC Count', value: '5', unit: 'million/cumm', referenceRange: '4.5 – 5.5', status: 'Normal' },
-    { id: 'p10', name: 'Hematocrit Value, HCT', value: '42', unit: '%', referenceRange: '40 – 50', status: 'Normal' },
-    { id: 'p11', name: 'Mean Corpuscular Volume, MCV', value: '84', unit: 'fL', referenceRange: '83 – 101', status: 'Normal' },
-    { id: 'p12', name: 'Mean Cell Hemoglobin, MCH', value: '45', unit: 'Pg', referenceRange: '27 – 32', status: 'High' },
-    { id: 'p13', name: 'Mean Cell Hemoglobin Con, MCHC', value: '35.7', unit: '%', referenceRange: '31.5 – 34.5', status: 'High' },
-  ];
-
-  const defaultReports: any[] = [
-    {
-      id: 'rep-cbc-1',
-      patientId: patient?.id || '',
-      name: 'Complete Blood Count (CBC)',
-      type: 'Blood Test',
-      labName: 'Labsmar',
-      collectionDate: '31 Oct 2026',
-      reportedDate: '31 Oct 2026, 10:41 AM',
-      status: 'Critical',
-      fileUrl: '#',
-      parameters: defaultCbcParameters,
-      reviewed: true,
-      reviewStatus: 'approved',
-      doctorNotes: 'Monitor platelet count and lymphocyte percentages closely.',
-    },
-    {
-      id: 'rep-lipid-1',
-      patientId: patient?.id || '',
-      name: 'Lipid Profile',
-      type: 'Blood Test',
-      labName: 'City Labs',
-      collectionDate: '24 Oct 2026',
-      reportedDate: '24 Oct 2026, 09:30 AM',
-      status: 'Normal',
-      fileUrl: '#',
-      parameters: [
-        { id: 'lp1', name: 'Total Cholesterol', value: '185', unit: 'mg/dL', referenceRange: '125 – 200', status: 'Normal' },
-        { id: 'lp2', name: 'HDL Cholesterol', value: '48', unit: 'mg/dL', referenceRange: '> 40', status: 'Normal' },
-        { id: 'lp3', name: 'LDL Cholesterol', value: '110', unit: 'mg/dL', referenceRange: '< 100', status: 'Normal' },
-      ],
-      reviewed: true,
-      reviewStatus: 'approved',
-    },
-    {
-      id: 'rep-hba1c-1',
-      patientId: patient?.id || '',
-      name: 'HbA1c Glycated Hemoglobin',
-      type: 'Blood Test',
-      labName: 'City Labs',
-      collectionDate: '10 Oct 2026',
-      reportedDate: '10 Oct 2026, 11:15 AM',
-      status: 'Normal',
-      fileUrl: '#',
-      parameters: [
-        { id: 'hb1', name: 'HbA1c', value: '5.6', unit: '%', referenceRange: '< 5.7', status: 'Normal' },
-        { id: 'hb2', name: 'Estimated Avg Glucose', value: '114', unit: 'mg/dL', referenceRange: '90 – 120', status: 'Normal' },
-      ],
-      reviewed: true,
-      reviewStatus: 'approved',
-    },
-  ];
-
-  const defaultAppointments: any[] = [
-    {
-      id: 'app-1',
-      patientId: patient?.id || '',
-      patientName: patient?.name || '',
-      patientRsId: patient?.rsId || '',
-      doctorName: currentUser?.name || 'Dr. Rishabh',
-      date: '11 Nov 2026',
-      time: '11:30 AM',
-      type: 'In-person',
-      status: 'Confirmed',
-      reason: 'Routine follow-up & CBC review',
-    },
-    {
-      id: 'app-2',
-      patientId: patient?.id || '',
-      patientName: patient?.name || '',
-      patientRsId: patient?.rsId || '',
-      doctorName: currentUser?.name || 'Dr. Rishabh',
-      date: '31 Oct 2026',
-      time: '10:30 AM',
-      type: 'In-clinic Visit',
-      status: 'Completed',
-      reason: 'Follow-up CBC report review',
-    },
-    {
-      id: 'app-3',
-      patientId: patient?.id || '',
-      patientName: patient?.name || '',
-      patientRsId: patient?.rsId || '',
-      doctorName: currentUser?.name || 'Dr. Rishabh',
-      date: '20 Oct 2026',
-      time: '04:00 PM',
-      type: 'In-person',
-      status: 'Completed',
-      reason: 'Initial consultation & test prescription',
-    },
-  ];
-
-  const defaultPrescriptions: any[] = [
-    {
-      id: 'rx-1',
-      patientId: patient?.id || '',
-      doctorName: currentUser?.name || 'Dr. Rishabh',
-      name: 'Paracetamol',
-      dosage: '650 mg',
-      frequency: 'As needed',
-      duration: '5 days',
-      instructions: '1 tablet · As needed · After food',
-      startDate: '31 Oct 2026',
-      active: true,
-    },
-    {
-      id: 'rx-2',
-      patientId: patient?.id || '',
-      doctorName: currentUser?.name || 'Dr. Rishabh',
-      name: 'Metformin',
-      dosage: '500 mg',
-      frequency: 'Twice daily',
-      duration: '30 days',
-      instructions: '1 tablet · Morning and Night · After food',
-      startDate: '30 Oct 2026',
-      active: true,
-    },
-    {
-      id: 'rx-3',
-      patientId: patient?.id || '',
-      doctorName: currentUser?.name || 'Dr. Rishabh',
-      name: 'Pantoprazole',
-      dosage: '40 mg',
-      frequency: 'Once daily',
-      duration: '14 days',
-      instructions: '1 capsule · Morning · Before food',
-      startDate: '20 Oct 2026',
-      active: true,
-    },
-  ];
+  useEffect(() => {
+    if (patient?.id) {
+      void fetchPrescriptions(patient.id);
+    }
+  }, [patient?.id]);
 
   const patientReports: any[] = patient
     ? (reports as any[]).filter(
@@ -251,7 +109,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
           (r as any).patientId === (patient as any).userId
       )
     : [];
-  const chronologicalReports: any[] = patientReports.length > 0 ? patientReports : (patient ? defaultReports : []);
+  const chronologicalReports: any[] = patientReports;
 
   const patientAppointments = patient
     ? appointments.filter(
@@ -262,7 +120,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
           (a.patientName && patient.name && a.patientName.toLowerCase() === patient.name.toLowerCase())
       )
     : [];
-  const chronologicalAppointments = patientAppointments.length > 0 ? patientAppointments : (patient ? defaultAppointments : []);
+  const chronologicalAppointments = patientAppointments;
 
   const patientPrescriptionsList = patient
     ? prescriptions.filter(
@@ -272,10 +130,10 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
           (patient as any).userId === p.patientId
       )
     : [];
-  const patientPrescriptions: any[] = patientPrescriptionsList.length > 0 ? patientPrescriptionsList : (patient ? defaultPrescriptions : []);
+  const patientPrescriptions: any[] = patientPrescriptionsList;
 
   // Selected report
-  const latestReport = chronologicalReports[0] || defaultReports[0];
+  const latestReport = chronologicalReports[0] || null;
 
   // Available parameters extracted dynamically from reports
   const availableParameters = useMemo(() => {
@@ -302,15 +160,6 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
       }
     });
 
-    if (paramsList.length === 0) {
-      defaultCbcParameters.forEach((p) => {
-        if (!seen.has(p.name.toLowerCase())) {
-          seen.add(p.name.toLowerCase());
-          paramsList.push(p);
-        }
-      });
-    }
-
     return paramsList;
   }, [latestReport, chronologicalReports]);
 
@@ -335,21 +184,16 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
   // Active parameter details
   const activeParam = useMemo(() => {
+    if (availableParameters.length === 0) return null;
     const found = availableParameters.find(
       (p) => p.name.toLowerCase() === selectedParamName.toLowerCase()
     );
-    if (found) return found;
-    return availableParameters[0] || {
-      name: selectedParamName || 'Platelet Count',
-      value: '3.5',
-      unit: 'lakhs/cumm',
-      referenceRange: '1.5 – 4.1',
-      status: 'Normal',
-    };
+    return found || availableParameters[0];
   }, [availableParameters, selectedParamName]);
 
   // Parse reference range
   const parsedRef = useMemo(() => {
+    if (!activeParam) return { min: 0, max: 100, text: 'N/A' };
     const currentVal = parseFloat(String(activeParam.value).replace(/,/g, '')) || 10;
     const rangeStr = String(activeParam.referenceRange || '');
 
@@ -381,6 +225,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
   // Extract or synthesize dynamic trend data points
   const trendPoints = useMemo(() => {
+    if (!selectedParamName) return [];
     const realPoints: { date: string; rawDate: string; value: number; status: string }[] = [];
 
     chronologicalReports.forEach((rep) => {
@@ -391,8 +236,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
         if (p && p.value !== undefined && p.value !== null) {
           const val = parseFloat(String(p.value).replace(/,/g, ''));
           if (!isNaN(val)) {
-            const rawDate = rep.collectionDate || rep.reportedDate || '31 Oct 2026';
-            let dateLabel = '31 Oct';
+            const rawDate = rep.collectionDate || rep.reportedDate || 'Lab Report';
+            let dateLabel = 'Lab Date';
             try {
               const d = new Date(rawDate);
               if (!isNaN(d.getTime())) {
@@ -402,7 +247,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 if (parts.length >= 2) dateLabel = `${parts[0]} ${parts[1]}`;
               }
             } catch {
-              dateLabel = '31 Oct';
+              dateLabel = 'Lab Date';
             }
             realPoints.push({
               date: dateLabel,
@@ -415,40 +260,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
       }
     });
 
-    // If we have 3 or more real reports, use real history
-    if (realPoints.length >= 3) {
-      return realPoints.slice(-5);
-    }
-
-    // If 1 or 2 real reports, construct baseline trajectory matching clinical reference
-    const currentVal = parseFloat(String(activeParam.value).replace(/,/g, '')) || 3.5;
-    const isPlatelet = activeParam.name.toLowerCase().includes('platelet');
-
-    if (isPlatelet) {
-      return [
-        { date: '30 Oct', rawDate: '30 Oct 2026', value: 1.5, status: 'Normal' },
-        { date: '31 Oct', rawDate: '31 Oct 2026', value: 3.5, status: 'Normal' },
-        { date: '31 Oct', rawDate: '31 Oct 2026', value: 1.5, status: 'Critical' },
-      ];
-    }
-
-    // Realistic clinical trajectory for any selected parameter
-    const midRef = (parsedRef.min + parsedRef.max) / 2;
-    const p1Val = parseFloat((parsedRef.min * 0.95).toFixed(1));
-    const p2Val = parseFloat((midRef).toFixed(1));
-    const p3Val = currentVal;
-
-    return [
-      { date: '15 Oct', rawDate: '15 Oct 2026', value: p1Val, status: p1Val < parsedRef.min ? 'Low' : 'Normal' },
-      { date: '24 Oct', rawDate: '24 Oct 2026', value: p2Val, status: 'Normal' },
-      {
-        date: formatDateFriendly(latestReport.reportedDate || latestReport.collectionDate).slice(0, 6) || '31 Oct',
-        rawDate: latestReport.reportedDate || '31 Oct 2026',
-        value: p3Val,
-        status: activeParam.status || 'Normal',
-      },
-    ];
-  }, [chronologicalReports, selectedParamName, activeParam, parsedRef, latestReport]);
+    return realPoints;
+  }, [chronologicalReports, selectedParamName]);
 
   // Compute SVG chart coordinates and bezier curve
   const chartGeometry = useMemo(() => {
@@ -508,7 +321,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
     }
 
     // Y Axis Ticks
-    const isLakh = activeParam.unit.toLowerCase().includes('lakh') || activeParam.name.toLowerCase().includes('platelet');
+    const isLakh = (activeParam?.unit || '').toLowerCase().includes('lakh') || (activeParam?.name || '').toLowerCase().includes('platelet');
     const formatTick = (v: number) => {
       if (isLakh) return `${v.toFixed(1)}L`;
       if (v >= 1000) return `${(v / 1000).toFixed(1)}k`;
@@ -809,7 +622,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                   {patient.rsId}
                 </span>
                 <span className="bg-[#FEECEC] text-[#D92D20] font-bold text-[11px] px-2.5 py-0.5 rounded-[2px]">
-                  {patient.status || 'Critical'}
+                  {patient.status || 'Active'}
                 </span>
               </div>
 
@@ -817,16 +630,16 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               <div className="flex items-center gap-2 mt-1 text-xs text-slate-500 font-medium flex-wrap">
                 <span>{patient.gender || 'Male'}</span>
                 <span>·</span>
-                <span>{patient.age ? `${patient.age} years` : '23 years'}</span>
+                <span>{patient.age ? `${patient.age} years` : 'Age not recorded'}</span>
                 <span>·</span>
                 <span className="flex items-center gap-1">
                   <Phone className="w-3 h-3 text-slate-400" />
-                  <span>{patient.phone || '+917800689652'}</span>
+                  <span>{patient.phone || 'Phone not recorded'}</span>
                 </span>
                 <span>·</span>
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3 text-slate-400" />
-                  <span>{patient.location || 'Ghaziabad'}</span>
+                  <span>{patient.location || 'Location not recorded'}</span>
                 </span>
               </div>
 
@@ -834,7 +647,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               <div className="flex items-center gap-3 mt-2 text-xs text-slate-500 font-normal flex-wrap">
                 <div>
                   <span className="text-slate-400">Blood group: </span>
-                  <strong className="text-slate-800 font-bold">{patient.bloodGroup || 'O+'}</strong>
+                  <strong className="text-slate-800 font-bold">{patient.bloodGroup || 'Not recorded'}</strong>
                 </div>
                 <span>|</span>
                 <div>
@@ -924,7 +737,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <p className="text-xs font-bold text-slate-700">Diagnostic Reports</p>
                 <h3 className="text-2xl font-black text-slate-900 mt-0.5">{chronologicalReports.length}</h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  Latest: {formatDateFriendly(latestReport?.reportedDate || latestReport?.collectionDate)}
+                  {latestReport ? `Latest: ${formatDateFriendly(latestReport.reportedDate || latestReport.collectionDate)}` : 'None recorded'}
                 </p>
               </div>
             </div>
@@ -938,7 +751,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <p className="text-xs font-bold text-slate-700">Appointments</p>
                 <h3 className="text-2xl font-black text-slate-900 mt-0.5">{chronologicalAppointments.length}</h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  Next: {chronologicalAppointments[0]?.date ? `${formatDateFriendly(chronologicalAppointments[0].date)}, ${chronologicalAppointments[0].time}` : '11 Nov 2026, 11:30 AM'}
+                  Next: {chronologicalAppointments[0]?.date ? `${formatDateFriendly(chronologicalAppointments[0].date)}, ${chronologicalAppointments[0].time}` : 'None scheduled'}
                 </p>
               </div>
             </div>
@@ -952,7 +765,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
                 <p className="text-xs font-bold text-slate-700">Active Prescriptions</p>
                 <h3 className="text-2xl font-black text-slate-900 mt-0.5">{patientPrescriptions.length}</h3>
                 <p className="text-xs text-slate-500 mt-1 capitalize">
-                  {patientPrescriptions[0]?.name || 'Paracetamol'}
+                  {patientPrescriptions[0]?.name || 'None active'}
                 </p>
               </div>
             </div>
@@ -962,287 +775,275 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
             {/* LEFT COLUMN: Latest Lab Report Table (7 cols) */}
             <div className="lg:col-span-7 xl:col-span-8 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-5 md:p-6 space-y-4">
-              {/* Table Card Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
-                    Latest Lab Report: {latestReport.name || 'Complete Blood Count (CBC)'}
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Reported: {formatDateTimeFriendly(latestReport.reportedDate || latestReport.collectionDate)} &nbsp;|&nbsp; Lab: {latestReport.labName || 'Dr Lal PathLabs'} &nbsp;|&nbsp; Verified
-                  </p>
+              {latestReport ? (
+                <>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                        Latest Lab Report: {latestReport.name}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Reported: {formatDateTimeFriendly(latestReport.reportedDate || latestReport.collectionDate)} &nbsp;|&nbsp; Lab: {latestReport.labName || 'Diagnostic Laboratory'} &nbsp;|&nbsp; Verified
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => navigate(`/doctor/questions?patientId=${patient.id}`)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#136C4F] text-[#136C4F] hover:bg-[#EAF6F0] text-xs font-bold rounded-[2px] shadow-2xs transition-colors self-start sm:self-auto cursor-pointer"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Compose Patient Reply</span>
+                    </button>
+                  </div>
+
+                  {latestReport.parameters && latestReport.parameters.length > 0 ? (
+                    <div className="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
+                      <div className="min-w-[580px]">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="border-b border-stone-200 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                              <th className="py-2.5 font-bold">Parameter</th>
+                              <th className="py-2.5 font-bold">Value</th>
+                              <th className="py-2.5 font-bold">Unit</th>
+                              <th className="py-2.5 font-bold">Reference Range</th>
+                              <th className="py-2.5 font-bold text-right">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-stone-100">
+                            {latestReport.parameters.map((param: any) => {
+                              const isSelected = param.name.toLowerCase() === selectedParamName.toLowerCase();
+                              let badgeColor = 'bg-[#EAF6F0] text-[#136C4F]';
+                              if (param.status === 'Critical') badgeColor = 'bg-[#FEECEC] text-[#D92D20] font-bold';
+                              else if (param.status === 'Low' || param.status === 'High') badgeColor = 'bg-[#FEF0C7] text-[#B54708] font-semibold';
+
+                              return (
+                                <tr
+                                  key={param.id || param.name}
+                                  onClick={() => setSelectedParamName(param.name)}
+                                  className={`cursor-pointer transition-colors ${
+                                    isSelected ? 'bg-[#EAF6F0]' : 'hover:bg-stone-50/70'
+                                  }`}
+                                >
+                                  <td className="py-2.5 font-bold text-slate-900">{param.name}</td>
+                                  <td className="py-2.5 font-black text-slate-900">{param.value}</td>
+                                  <td className="py-2.5 text-slate-500 font-medium">{param.unit}</td>
+                                  <td className={`py-2.5 ${isSelected ? 'text-[#136C4F] font-bold' : 'text-slate-600'}`}>{param.referenceRange}</td>
+                                  <td className="py-2.5 text-right">
+                                    <span className={`inline-block px-2.5 py-0.5 rounded-[2px] text-[11px] ${badgeColor}`}>
+                                      {param.status || 'Normal'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-8 text-center text-stone-500 text-xs">
+                      No specific biomarker parameters extracted for this report.
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="py-14 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto">
+                    <FileText className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-800">No Diagnostic Reports Recorded Yet</h4>
+                    <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                      No diagnostic test reports have been submitted for {patient.name}. Uploaded lab reports (such as CBC, Metabolic Panels, or Lipid Profiles) will appear here with automated biomarker extraction and reference range validation.
+                    </p>
+                  </div>
                 </div>
-
-                <button
-                  onClick={() => navigate(`/doctor/questions?patientId=${patient.id}`)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#136C4F] text-[#136C4F] hover:bg-[#EAF6F0] text-xs font-bold rounded-[2px] shadow-2xs transition-colors self-start sm:self-auto cursor-pointer"
-                >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  <span>Compose Patient Reply</span>
-                </button>
-              </div>
-
-              {/* CBC Parameters Table */}
-              <div className="overflow-x-auto -mx-5 md:-mx-6 px-5 md:px-6">
-                <div className="min-w-[580px]">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-stone-200 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-                        <th className="py-2.5 font-bold">Parameter</th>
-                        <th className="py-2.5 font-bold">Value</th>
-                        <th className="py-2.5 font-bold">Unit</th>
-                        <th className="py-2.5 font-bold">Reference Range</th>
-                        <th className="py-2.5 font-bold text-right">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-100">
-                      {(latestReport.parameters && latestReport.parameters.length > 0
-                        ? latestReport.parameters
-                        : defaultCbcParameters
-                      ).map((param: any) => {
-                        const isSelected = param.name.toLowerCase() === selectedParamName.toLowerCase();
-
-                        let badgeColor = 'bg-[#EAF6F0] text-[#136C4F]';
-                        if (param.status === 'Critical') badgeColor = 'bg-[#FEECEC] text-[#D92D20] font-bold';
-                        else if (param.status === 'Low' || param.status === 'High') badgeColor = 'bg-[#FEF0C7] text-[#B54708] font-semibold';
-
-                        return (
-                          <tr
-                            key={param.id || param.name}
-                            onClick={() => setSelectedParamName(param.name)}
-                            className={`cursor-pointer transition-colors ${
-                              isSelected ? 'bg-[#EAF6F0]' : 'hover:bg-stone-50/70'
-                            }`}
-                          >
-                            <td className="py-2.5 font-bold text-slate-900">
-                              {param.name}
-                            </td>
-                            <td className="py-2.5 font-black text-slate-900">
-                              {param.value}
-                            </td>
-                            <td className="py-2.5 text-slate-500 font-medium">
-                              {param.unit}
-                            </td>
-                            <td className={`py-2.5 ${isSelected ? 'text-[#136C4F] font-bold' : 'text-slate-600'}`}>
-                              {param.referenceRange}
-                            </td>
-                            <td className="py-2.5 text-right">
-                              <span className={`inline-block px-2.5 py-0.5 rounded-[2px] text-[11px] ${badgeColor}`}>
-                                {param.status}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* RIGHT COLUMN: Laboratory Trend Analysis (5 cols) */}
-            <div className="lg:col-span-5 xl:col-span-4 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-5 md:p-6 flex flex-col justify-between space-y-4">
-              <div>
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-slate-900 tracking-tight">
-                    Laboratory Trend Analysis
-                  </h3>
-                  <span className="bg-slate-100 text-slate-600 font-mono text-[11px] px-2 py-0.5 rounded-[2px] font-semibold">
-                    {activeParam.unit || '/µL'}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 font-normal mt-0.5">
-                  Trend of {selectedParamName} over time
-                </p>
-
-                {/* Parameter & Filter controls */}
-                <div className="flex items-center justify-between gap-2 mt-4 flex-wrap">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
-                      Parameter
+            <div className="lg:col-span-5 xl:col-span-4 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-5 md:p-6 flex flex-col justify-between space-y-4 min-h-[340px]">
+              {activeParam && trendPoints.length > 0 ? (
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-slate-900 tracking-tight">
+                      Laboratory Trend Analysis
+                    </h3>
+                    <span className="bg-slate-100 text-slate-600 font-mono text-[11px] px-2 py-0.5 rounded-[2px] font-semibold">
+                      {activeParam.unit || '/µL'}
                     </span>
-                    <select
-                      value={selectedParamName}
-                      onChange={(e) => setSelectedParamName(e.target.value)}
-                      className="bg-white border border-slate-200 rounded-[2px] px-2.5 py-1 text-xs font-bold text-slate-800 shadow-2xs focus:outline-none focus:border-emerald-600 cursor-pointer max-w-[160px] truncate"
-                    >
-                      {availableParameters.map((p) => (
-                        <option key={p.name} value={p.name}>
-                          {p.name}
-                        </option>
+                  </div>
+                  <p className="text-xs text-slate-500 font-normal mt-0.5">
+                    Trend of {selectedParamName} over time
+                  </p>
+
+                  {availableParameters.length > 1 && (
+                    <div className="flex items-center justify-between gap-2 mt-4 flex-wrap">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-700 uppercase tracking-wider block mb-1">
+                          Parameter
+                        </span>
+                        <select
+                          value={selectedParamName}
+                          onChange={(e) => setSelectedParamName(e.target.value)}
+                          className="bg-white border border-slate-200 rounded-[2px] px-2.5 py-1 text-xs font-bold text-slate-800 shadow-2xs focus:outline-none focus:border-emerald-600 cursor-pointer max-w-[160px] truncate"
+                        >
+                          {availableParameters.map((p) => (
+                            <option key={p.name} value={p.name}>
+                              {p.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="flex items-center gap-1 self-end">
+                        {(['All', '1Y', '6M', '3M'] as const).map((range) => (
+                          <button
+                            key={range}
+                            onClick={() => setTrendTimeRange(range)}
+                            className={`px-2.5 py-1 text-xs font-semibold rounded-[2px] transition-colors cursor-pointer ${
+                              trendTimeRange === range
+                                ? 'bg-[#13382E] text-white'
+                                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                            }`}
+                          >
+                            {range}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mt-5 relative w-full h-[180px] select-none">
+                    <svg className="w-full h-full" viewBox="0 0 320 180" preserveAspectRatio="none">
+                      {chartGeometry.yTicks.map((tick, idx) => (
+                        <line
+                          key={idx}
+                          x1="45"
+                          y1={tick.y}
+                          x2="310"
+                          y2={tick.y}
+                          stroke="#E2E8F0"
+                          strokeDasharray="3 3"
+                        />
                       ))}
-                    </select>
+                      {chartGeometry.yTicks.map((tick, idx) => (
+                        <text
+                          key={idx}
+                          x="10"
+                          y={tick.y}
+                          fill="#64748B"
+                          fontSize="10"
+                          fontFamily="sans-serif"
+                        >
+                          {tick.valText}
+                        </text>
+                      ))}
+                      <rect
+                        x="45"
+                        y={chartGeometry.refTopY}
+                        width="265"
+                        height={chartGeometry.refHeight}
+                        fill="#EAF6F0"
+                        fillOpacity="0.75"
+                      />
+                      <path
+                        d={chartGeometry.path}
+                        fill="none"
+                        stroke="#136C4F"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                      {chartGeometry.pointsWithCoords.map((pt, idx) => {
+                        const isCritical = pt.status === 'Critical';
+                        const isWarning = pt.status === 'Low' || pt.status === 'High';
+                        const isLast = idx === chartGeometry.pointsWithCoords.length - 1;
+                        let ptColor = '#136C4F';
+                        if (isCritical) ptColor = '#D92D20';
+                        else if (isWarning) ptColor = '#B54708';
+
+                        return (
+                          <g key={idx}>
+                            <circle cx={pt.x} cy={pt.y} r={isLast || isCritical ? 5 : 4.5} fill={ptColor} />
+                            {(isLast || isCritical) && (
+                              <circle
+                                cx={pt.x}
+                                cy={pt.y}
+                                r={isCritical ? 8 : 7}
+                                fill="none"
+                                stroke={isCritical ? '#FEECEC' : '#D4EFE0'}
+                                strokeWidth={isCritical ? 3 : 2}
+                              />
+                            )}
+                          </g>
+                        );
+                      })}
+                    </svg>
+
+                    <div className="flex justify-between pl-11 pr-2 text-[10px] text-slate-500 font-medium mt-1">
+                      {chartGeometry.pointsWithCoords.map((pt, idx) => (
+                        <span key={idx}>{pt.date}</span>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-1 self-end">
-                    {(['All', '1Y', '6M', '3M'] as const).map((range) => (
-                      <button
-                        key={range}
-                        onClick={() => setTrendTimeRange(range)}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-[2px] transition-colors cursor-pointer ${
-                          trendTimeRange === range
-                            ? 'bg-[#13382E] text-white'
-                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                  <div className="flex items-center justify-between text-[11px] text-slate-600 mt-4 flex-wrap gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3.5 h-3 bg-[#EAF6F0] border border-[#C6EAD8] rounded-[1px]" />
+                      <span>Reference Range ({parsedRef.text})</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3.5 h-0.5 bg-[#136C4F]" />
+                      <span>{selectedParamName}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#D92D20]" />
+                      <span>Critical Value</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 pt-4">
+                    <div className="p-3 bg-[#F8FAF9] rounded-[2px] border border-stone-200/60 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
+                          <Activity className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                            Latest Reading
+                          </p>
+                          <h4 className="text-sm font-black text-slate-900">
+                            {activeParam.value} <span className="text-xs font-medium text-slate-600">{activeParam.unit}</span>
+                          </h4>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-xs font-semibold px-2.5 py-0.5 rounded-[2px] ${
+                          activeParam.status === 'Critical'
+                            ? 'bg-[#FEECEC] text-[#D92D20]'
+                            : activeParam.status === 'Low' || activeParam.status === 'High'
+                            ? 'bg-[#FEF0C7] text-[#B54708]'
+                            : 'bg-[#EAF6F0] text-[#136C4F]'
                         }`}
                       >
-                        {range}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* SVG Trend Chart dynamically rendered */}
-                <div className="mt-5 relative w-full h-[180px] select-none">
-                  <svg className="w-full h-full" viewBox="0 0 320 180" preserveAspectRatio="none">
-                    {/* Dotted horizontal grid lines */}
-                    {chartGeometry.yTicks.map((tick, idx) => (
-                      <line
-                        key={idx}
-                        x1="45"
-                        y1={tick.lineY}
-                        x2="310"
-                        y2={tick.lineY}
-                        stroke="#E2E8F0"
-                        strokeDasharray="3 3"
-                      />
-                    ))}
-
-                    {/* Y-axis labels */}
-                    {chartGeometry.yTicks.map((tick, idx) => (
-                      <text
-                        key={idx}
-                        x="10"
-                        y={tick.y}
-                        fill="#64748B"
-                        fontSize="10"
-                        fontFamily="sans-serif"
-                      >
-                        {tick.valText}
-                      </text>
-                    ))}
-
-                    {/* Reference Range Shaded Area */}
-                    <rect
-                      x="45"
-                      y={chartGeometry.refTopY}
-                      width="265"
-                      height={chartGeometry.refHeight}
-                      fill="#EAF6F0"
-                      fillOpacity="0.75"
-                    />
-
-                    {/* Trend Curve */}
-                    <path
-                      d={chartGeometry.path}
-                      fill="none"
-                      stroke="#136C4F"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    />
-
-                    {/* Data Points */}
-                    {chartGeometry.pointsWithCoords.map((pt, idx) => {
-                      const isCritical = pt.status === 'Critical';
-                      const isWarning = pt.status === 'Low' || pt.status === 'High';
-                      const isLast = idx === chartGeometry.pointsWithCoords.length - 1;
-
-                      let ptColor = '#136C4F';
-                      if (isCritical) ptColor = '#D92D20';
-                      else if (isWarning) ptColor = '#B54708';
-
-                      return (
-                        <g key={idx}>
-                          <circle cx={pt.x} cy={pt.y} r={isLast || isCritical ? 5 : 4.5} fill={ptColor} />
-                          {(isLast || isCritical) && (
-                            <circle
-                              cx={pt.x}
-                              cy={pt.y}
-                              r={isCritical ? 8 : 7}
-                              fill="none"
-                              stroke={isCritical ? '#FEECEC' : '#D4EFE0'}
-                              strokeWidth={isCritical ? 3 : 2}
-                            />
-                          )}
-                        </g>
-                      );
-                    })}
-                  </svg>
-
-                  {/* X-axis date labels */}
-                  <div className="flex justify-between pl-11 pr-2 text-[10px] text-slate-500 font-medium mt-1">
-                    {chartGeometry.pointsWithCoords.map((pt, idx) => (
-                      <span key={idx}>{pt.date}</span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Legend */}
-                <div className="flex items-center justify-between text-[11px] text-slate-600 mt-4 flex-wrap gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-3 bg-[#EAF6F0] border border-[#C6EAD8] rounded-[1px]" />
-                    <span>Reference Range ({parsedRef.text})</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-3.5 h-0.5 bg-[#136C4F]" />
-                    <span>{selectedParamName}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#D92D20]" />
-                    <span>Critical Value</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Stat Boxes */}
-              <div className="space-y-2.5 pt-2">
-                {/* Box 1: Latest Reading */}
-                <div className="p-3 bg-[#F8FAF9] rounded-[2px] border border-stone-200/60 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
-                      <Activity className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        Latest Reading
-                      </p>
-                      <h4 className="text-sm font-black text-slate-900">
-                        {activeParam.value} <span className="text-xs font-medium text-slate-600">{activeParam.unit}</span>
-                      </h4>
+                        {activeParam.status || 'Normal'}
+                      </span>
                     </div>
                   </div>
-                  <span
-                    className={`text-xs font-semibold px-2.5 py-0.5 rounded-[2px] ${
-                      activeParam.status === 'Critical'
-                        ? 'bg-[#FEECEC] text-[#D92D20]'
-                        : activeParam.status === 'Low' || activeParam.status === 'High'
-                        ? 'bg-[#FEF0C7] text-[#B54708]'
-                        : 'bg-[#EAF6F0] text-[#136C4F]'
-                    }`}
-                  >
-                    {activeParam.status || 'Normal'}
-                  </span>
                 </div>
-
-                {/* Box 2: Clinical Observation */}
-                <div className="p-3 bg-[#F8FAF9] rounded-[2px] border border-stone-200/60 flex items-start gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0 mt-0.5">
-                    <FileText className="w-4 h-4" />
+              ) : (
+                <div className="py-16 text-center my-auto space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto">
+                    <Activity className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                      Clinical Observation
-                    </p>
-                    <p className="text-xs text-slate-600 mt-0.5 leading-snug">
-                      {activeParam.status === 'Normal'
-                        ? 'Within reference range. No immediate concern.'
-                        : activeParam.status === 'Critical'
-                        ? `Critical alert threshold triggered (${activeParam.value} ${activeParam.unit}). Urgent clinical review and repeat verification advised.`
-                        : `Reading is outside recommended reference interval (${activeParam.referenceRange}). Recommend clinical correlation and follow-up monitoring.`}
+                    <h4 className="text-sm font-bold text-slate-800">No Biomarker Trends Available</h4>
+                    <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                      Biomarker progression curves and reference intervals will calculate automatically once consecutive diagnostic reports are uploaded for this patient.
                     </p>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -1258,47 +1059,60 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             </div>
           </div>
 
-          <div className="divide-y divide-stone-100">
-            {chronologicalReports.map((report) => (
-              <div key={report.id} className="py-4 flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-[2px] bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">{report.name}</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Reported: {formatDateTimeFriendly(report.reportedDate || report.collectionDate)} &nbsp;|&nbsp; Lab: {report.labName}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`px-2.5 py-0.5 rounded-[2px] text-xs font-semibold ${
-                      report.status === 'Critical'
-                        ? 'bg-[#FEECEC] text-[#D92D20]'
-                        : report.status === 'Unbalanced'
-                        ? 'bg-[#FEF0C7] text-[#B54708]'
-                        : 'bg-[#EAF6F0] text-[#136C4F]'
-                    }`}
-                  >
-                    {report.status}
-                  </span>
-                  <button
-                    onClick={() => navigate(`/doctor/reports`)}
-                    className="px-3 py-1 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold rounded-[2px] shadow-2xs transition-colors cursor-pointer"
-                  >
-                    View File
-                  </button>
-                </div>
+          {chronologicalReports.length === 0 ? (
+            <div className="py-14 text-center space-y-3 bg-[#FAFBFB] rounded-[4px] border border-dashed border-stone-200">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto">
+                <FileText className="w-5 h-5" />
               </div>
-            ))}
-          </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">No Diagnostic Reports Recorded</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Diagnostic reports submitted or uploaded for {patient.name} will appear here.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="divide-y divide-stone-100">
+              {chronologicalReports.map((report) => (
+                <div key={report.id} className="py-4 flex items-center justify-between gap-4 flex-wrap">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-[2px] bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">{report.name}</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Reported: {formatDateTimeFriendly(report.reportedDate || report.collectionDate)} &nbsp;|&nbsp; Lab: {report.labName || 'Diagnostic Lab'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`px-2.5 py-0.5 rounded-[2px] text-xs font-semibold ${
+                        report.status === 'Critical'
+                          ? 'bg-[#FEECEC] text-[#D92D20]'
+                          : report.status === 'Unbalanced'
+                          ? 'bg-[#FEF0C7] text-[#B54708]'
+                          : 'bg-[#EAF6F0] text-[#136C4F]'
+                      }`}
+                    >
+                      {report.status || 'Normal'}
+                    </span>
+                    <button
+                      onClick={() => navigate(`/doctor/reports`)}
+                      className="px-3 py-1 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold rounded-[2px] shadow-2xs transition-colors cursor-pointer"
+                    >
+                      View File
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Appointments Tab */}
       {activeTab === 'Appointments' && (
         <div className="bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-5 md:p-6 space-y-4">
           <div className="flex items-center justify-between">
@@ -1315,39 +1129,59 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             </button>
           </div>
 
-          <div className="divide-y divide-stone-100">
-            {chronologicalAppointments.map((appt) => (
-              <div key={appt.id} className="py-4 flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-[2px] bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
-                    <Calendar className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">{appt.reason || 'Consultation'}</h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {formatDateFriendly(appt.date)} &nbsp;·&nbsp; {appt.time} &nbsp;·&nbsp; {appt.type}
-                    </p>
-                  </div>
-                </div>
-
-                <span
-                  className={`px-2.5 py-0.5 rounded-[2px] text-xs font-semibold ${
-                    appt.status === 'Confirmed'
-                      ? 'bg-[#EAF6F0] text-[#136C4F]'
-                      : appt.status === 'Completed'
-                      ? 'bg-slate-100 text-slate-700'
-                      : 'bg-amber-50 text-amber-800'
-                  }`}
-                >
-                  {appt.status}
-                </span>
+          {chronologicalAppointments.length === 0 ? (
+            <div className="py-14 text-center space-y-3 bg-[#FAFBFB] rounded-[4px] border border-dashed border-stone-200">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto">
+                <Calendar className="w-5 h-5" />
               </div>
-            ))}
-          </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">No Appointments Scheduled Yet</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Schedule an upcoming consultation or review meeting with {patient.name}.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAppointmentModal(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#13382E] text-white text-xs font-semibold rounded-[4px] shadow-2xs hover:bg-[#0E2922] transition-colors cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Schedule Visit</span>
+              </button>
+            </div>
+          ) : (
+            <div className="divide-y divide-stone-100">
+              {chronologicalAppointments.map((appt) => (
+                <div key={appt.id} className="py-4 flex items-center justify-between gap-4 flex-wrap">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-[2px] bg-[#EAF6F0] text-[#136C4F] flex items-center justify-center shrink-0">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900">{appt.reason || 'Consultation'}</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {formatDateFriendly(appt.date)} &nbsp;·&nbsp; {appt.time} &nbsp;·&nbsp; {appt.type}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`px-2.5 py-0.5 rounded-[2px] text-xs font-semibold ${
+                      appt.status === 'Confirmed'
+                        ? 'bg-[#EAF6F0] text-[#136C4F]'
+                        : appt.status === 'Completed'
+                        ? 'bg-slate-100 text-slate-700'
+                        : 'bg-amber-50 text-amber-800'
+                    }`}
+                  >
+                    {appt.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Medicines Tab */}
       {activeTab === 'Medicines' && (
         <div className="bg-white rounded-[6px] border border-stone-200/80 shadow-2xs p-5 md:p-6 space-y-4 font-sans">
           <div className="flex items-center justify-between flex-wrap gap-3">

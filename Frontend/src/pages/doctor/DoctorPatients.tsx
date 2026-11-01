@@ -38,7 +38,8 @@ const formatDisplayDate = (dateStr?: string) => {
 
 export const DoctorPatients: React.FC = () => {
   const navigate = useNavigate();
-  const { patients, reports, doctorInfo, fetchDoctorPatients, fetchReports } = useStore();
+  const { patients, reports, doctorInfo,
+    currentUser, fetchDoctorPatients, fetchReports } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'All' | 'Needs review' | 'Follow-up due' | 'Up to date'>('All');
@@ -55,7 +56,7 @@ export const DoctorPatients: React.FC = () => {
   const unviewedCriticalReports = criticalReports.filter((r) => !r.doctorViewed);
 
   // Doctor display info
-  const doctorDisplayName = doctorInfo.name || 'Dr. Rishabh';
+  const doctorDisplayName = currentUser?.name || doctorInfo.name || 'Doctor';
   const doctorSpecialty = doctorInfo.specialty || 'General Physician';
   const doctorInitials = 'DR';
 
@@ -285,46 +286,82 @@ export const DoctorPatients: React.FC = () => {
                       {/* PATIENT */}
                       <div className="col-span-3 flex items-center">
                         <div className="w-9 h-9 rounded-full bg-[#E2EBE6] text-[#2A554A] font-bold text-sm flex items-center justify-center mr-3 shrink-0">
-                          {p.avatar || p.name[0] || 'R'}
+                          {p.avatar || p.name[0] || 'P'}
                         </div>
                         <div>
                           <p className="font-bold text-[13px] sm:text-[14px] text-stone-900 leading-tight">
                             {p.name}
                           </p>
                           <p className="text-[11px] text-stone-400 font-mono mt-0.5">
-                            {p.rsId || 'RS-FTPE4'}
+                            {p.rsId || 'ReportSetu ID'}
                           </p>
                           <p className="text-[11px] text-stone-400 mt-0.5">
-                            {p.gender || 'Male'} · {p.age ? `${p.age} years` : '23 years'}
+                            {p.gender || 'Not specified'} · {p.age ? `${p.age} years` : 'Age not recorded'}
                           </p>
                         </div>
                       </div>
 
                       {/* LATEST REPORT */}
                       <div className="col-span-3 pr-2">
-                        <p className="font-medium text-[13px] sm:text-[14px] text-stone-800 leading-tight">
-                          {p.lastReportName || 'Complete Blood Count (CBC)'}
-                        </p>
-                        <p className="text-[11px] text-[#E5484D] flex items-center gap-1 mt-0.5 font-medium">
-                          <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
-                          <span>1 value outside reference range</span>
-                        </p>
+                        {p.lastReportName ? (
+                          <>
+                            <p className="font-medium text-[13px] sm:text-[14px] text-stone-800 leading-tight">
+                              {p.lastReportName}
+                            </p>
+                            {p.status === 'Critical' ? (
+                              <p className="text-[11px] text-[#E5484D] flex items-center gap-1 mt-0.5 font-medium">
+                                <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+                                <span>Critical values detected</span>
+                              </p>
+                            ) : p.status === 'Unbalanced' ? (
+                              <p className="text-[11px] text-[#C27D00] flex items-center gap-1 mt-0.5 font-medium">
+                                <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+                                <span>Values outside reference range</span>
+                              </p>
+                            ) : (
+                              <p className="text-[11px] text-[#1E7E49] flex items-center gap-1 mt-0.5 font-medium">
+                                <span>All parameters normal</span>
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <p className="font-medium text-[13px] sm:text-[14px] text-stone-400 leading-tight">
+                              No reports submitted
+                            </p>
+                            <p className="text-[11px] text-stone-400 mt-0.5">Awaiting diagnostic upload</p>
+                          </>
+                        )}
                       </div>
 
                       {/* STATUS */}
                       <div className="col-span-2">
-                        <span className="bg-[#FEF5E7] text-[#C27D00] border border-[#FDE5B5] px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#E5A000]" />
-                          <span>{p.status || 'Unbalanced'}</span>
-                        </span>
+                        {p.status ? (
+                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5 ${
+                            p.status === 'Critical'
+                              ? 'bg-[#FDECEB] text-[#D83A31]'
+                              : p.status === 'Unbalanced'
+                              ? 'bg-[#FEF5E7] text-[#C27D00]'
+                              : 'bg-[#E5F5EC] text-[#1E7E49]'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              p.status === 'Critical' ? 'bg-[#E5484D]' : p.status === 'Unbalanced' ? 'bg-[#E5A000]' : 'bg-[#1E7E49]'
+                            }`} />
+                            <span>{p.status}</span>
+                          </span>
+                        ) : (
+                          <span className="bg-stone-100 text-stone-600 px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5">
+                            <span>Active</span>
+                          </span>
+                        )}
                       </div>
 
                       {/* LAST UPDATED */}
                       <div className="col-span-2">
                         <p className="text-[12px] text-stone-700 font-medium">
-                          {formatDisplayDate(p.lastReportTime)}
+                          {p.lastReportTime ? formatDisplayDate(p.lastReportTime) : 'No recent activity'}
                         </p>
-                        <p className="text-[11px] text-stone-400 mt-0.5">by Patient</p>
+                        {p.lastReportTime && <p className="text-[11px] text-stone-400 mt-0.5">by Patient</p>}
                       </div>
 
                       {/* ACTIONS */}

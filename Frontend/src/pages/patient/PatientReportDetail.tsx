@@ -35,26 +35,9 @@ const formatDateTimeClean = (dateStr: string | undefined): string => {
 };
 
 const cleanLabName = (name: string | undefined): string => {
-  if (!name) return 'Labsmart Software';
+  if (!name) return 'Diagnostic Laboratory';
   return name.replace(/\s*Sample\s*Letterhead/i, '').trim() || name;
 };
-
-// Default Complete Blood Count parameters with accurate clinical references
-const defaultCbcParameters: (LabParameter & { whatItMeans: string })[] = [
-  { id: 'p-1', name: 'Hemoglobin', value: '15.0', unit: 'g/dL', referenceRange: '13.0 – 17.0', status: 'Normal', whatItMeans: 'Carries vital oxygen from lungs to muscles and organ tissues.' },
-  { id: 'p-2', name: 'Total Leukocyte Count (WBC)', value: '5100', unit: '/cumm', referenceRange: '4,000 – 11,000', status: 'Normal', whatItMeans: 'Immune defense white cells defending against pathogens.' },
-  { id: 'p-3', name: 'Platelet Count', value: '3.5', unit: 'lakhs/cumm', referenceRange: '1.5 – 4.1', status: 'Normal', whatItMeans: 'Critical clotting cells preventing excessive bruising and bleeding.' },
-  { id: 'p-4', name: 'RBC Count', value: '4.8', unit: 'million/cumm', referenceRange: '4.5 – 5.5', status: 'Normal', whatItMeans: 'Total count of circulating oxygen-carrying erythrocytes.' },
-  { id: 'p-5', name: 'Packed Cell Volume (PCV)', value: '42.0', unit: '%', referenceRange: '40.0 – 50.0', status: 'Normal', whatItMeans: 'Volumetric proportion of whole blood occupied by red cells.' },
-  { id: 'p-6', name: 'Neutrophils', value: '79', unit: '%', referenceRange: '40 – 80', status: 'Normal', whatItMeans: 'First-responder immune cells active against acute bacterial strains.' },
-  { id: 'p-7', name: 'Lymphocytes', value: '18', unit: '%', referenceRange: '20 – 40', status: 'Low', whatItMeans: 'Antibody-producing white cells maintaining viral resistance.' },
-  { id: 'p-8', name: 'Eosinophils', value: '1', unit: '%', referenceRange: '1 – 6', status: 'Normal', whatItMeans: 'Allergy mediation and mucosal parasite defense cells.' },
-  { id: 'p-9', name: 'Monocytes', value: '1', unit: '%', referenceRange: '2 – 10', status: 'Critical', whatItMeans: 'Phagocytic cells clearing metabolic debris and damaged tissue.' },
-  { id: 'p-10', name: 'Basophils', value: '1', unit: '%', referenceRange: '< 2', status: 'Normal', whatItMeans: 'Histamine-releasing inflammatory mediation cells.' },
-  { id: 'p-11', name: 'Mean Corpuscular Volume (MCV)', value: '84.0', unit: 'fL', referenceRange: '83.0 – 101.0', status: 'Normal', whatItMeans: 'Average volumetric cell size of red blood cells.' },
-  { id: 'p-12', name: 'Mean Cell Hemoglobin (MCH)', value: '45.0', unit: 'pg', referenceRange: '27.0 – 32.0', status: 'High', whatItMeans: 'Average weight of hemoglobin present per erythrocyte.' },
-  { id: 'p-13', name: 'Mean Cell Hemoglobin Con. (MCHC)', value: '35.7', unit: '%', referenceRange: '31.5 – 34.5', status: 'High', whatItMeans: 'Hemoglobin concentration relative to packed red cell volume.' },
-];
 
 export const PatientReportDetail: React.FC = () => {
   const { reportId } = useParams<{ reportId: string }>();
@@ -107,19 +90,14 @@ export const PatientReportDetail: React.FC = () => {
   }, [reportId, reports]);
 
   // Consolidate parameters
-  const reportParameters = useMemo(() => {
+  const reportParameters: any[] = useMemo(() => {
     if (currentReport?.parameters && currentReport.parameters.length > 0) {
-      return currentReport.parameters.map((p: any) => {
-        const matchingDef = defaultCbcParameters.find(
-          (d) => d.name.toLowerCase() === p.name.toLowerCase()
-        );
-        return {
-          ...p,
-          whatItMeans: p.whatItMeans || matchingDef?.whatItMeans || 'Clinical laboratory biomarker measurement.',
-        };
-      });
+      return currentReport.parameters.map((p: any) => ({
+        ...p,
+        whatItMeans: p.whatItMeans || 'Clinical laboratory biomarker measurement.',
+      }));
     }
-    return defaultCbcParameters;
+    return [];
   }, [currentReport]);
 
   // Filtered parameters based on tab
@@ -135,14 +113,16 @@ export const PatientReportDetail: React.FC = () => {
 
   // Selected parameter object for right-column trend
   const activeParam = useMemo(() => {
+    if (reportParameters.length === 0) return null;
     const found = reportParameters.find(
       (p: any) => p.name.toLowerCase() === selectedParamName.toLowerCase()
     );
-    return found || reportParameters[0] || defaultCbcParameters[0];
+    return found || reportParameters[0];
   }, [reportParameters, selectedParamName]);
 
   // Parse numerical range
   const parsedRef = useMemo(() => {
+    if (!activeParam) return { min: 0, max: 100 };
     const raw = activeParam?.referenceRange || '1.5 – 4.1';
     const nums = raw
       .replace(/,/g, '')
