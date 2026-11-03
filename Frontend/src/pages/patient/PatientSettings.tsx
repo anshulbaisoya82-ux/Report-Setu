@@ -205,11 +205,11 @@ export const PatientSettings: React.FC = () => {
         {/* =======================================================================
          * LEFT COLUMN: Navigation Sidebar Menu Inside Settings (~25% width)
          * ======================================================================= */}
-        <div className="md:col-span-4 lg:col-span-3 bg-white rounded-[3px] border border-stone-200/80 p-2 shadow-2xs space-y-1">
+        <div className="md:col-span-4 lg:col-span-3 bg-white rounded-[3px] border border-stone-200/80 p-2 shadow-2xs flex md:flex-col overflow-x-auto no-scrollbar gap-1 whitespace-nowrap">
           {/* 1. Profile */}
           <button
             onClick={() => handleTabChange('profile')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
+            className={`shrink-0 md:w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
               activeTab === 'profile'
                 ? 'bg-[#EAF6F0] text-[#0E382F] font-bold shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-stone-50'
@@ -222,7 +222,7 @@ export const PatientSettings: React.FC = () => {
           {/* 2. Notifications */}
           <button
             onClick={() => handleTabChange('notifications')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
+            className={`shrink-0 md:w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
               activeTab === 'notifications'
                 ? 'bg-[#EAF6F0] text-[#0E382F] font-bold shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-stone-50'
@@ -235,7 +235,7 @@ export const PatientSettings: React.FC = () => {
           {/* 3. Privacy & Security */}
           <button
             onClick={() => handleTabChange('privacy')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
+            className={`shrink-0 md:w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
               activeTab === 'privacy'
                 ? 'bg-[#EAF6F0] text-[#0E382F] font-bold shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-stone-50'
@@ -248,7 +248,7 @@ export const PatientSettings: React.FC = () => {
           {/* 4. Language & Region */}
           <button
             onClick={() => handleTabChange('language')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
+            className={`shrink-0 md:w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
               activeTab === 'language'
                 ? 'bg-[#EAF6F0] text-[#0E382F] font-bold shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-stone-50'
@@ -261,7 +261,7 @@ export const PatientSettings: React.FC = () => {
           {/* 5. My Doctors (Now living cleanly inside Settings!) */}
           <button
             onClick={() => handleTabChange('doctors')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
+            className={`shrink-0 md:w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
               activeTab === 'doctors'
                 ? 'bg-[#EAF6F0] text-[#0E382F] font-bold shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-stone-50'
@@ -274,7 +274,7 @@ export const PatientSettings: React.FC = () => {
           {/* 6. About */}
           <button
             onClick={() => handleTabChange('about')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
+            className={`shrink-0 md:w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-xs font-semibold transition-all cursor-pointer text-left ${
               activeTab === 'about'
                 ? 'bg-[#EAF6F0] text-[#0E382F] font-bold shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-stone-50'

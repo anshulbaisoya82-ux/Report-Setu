@@ -156,7 +156,7 @@ export const DoctorReports: React.FC = () => {
   return (
     <div className="min-h-full flex flex-col text-stone-800">
       {/* Top Header - Full Width Edge-to-Edge Toolbar */}
-      <header className="w-full h-[62px] bg-white border-b border-stone-200/90 px-6 flex items-center justify-between gap-4 box-border shrink-0 sticky top-0 z-30">
+      <header className="w-full min-h-[56px] sm:h-[62px] bg-white border-b border-stone-200/90 px-4 sm:px-6 py-2 sm:py-0 flex items-center justify-between gap-3 box-border shrink-0 sticky top-0 z-30">
         {/* LEFT: Page Title */}
         <h1 className="text-xl font-bold text-stone-900 tracking-tight">Reports</h1>
 
@@ -218,7 +218,7 @@ export const DoctorReports: React.FC = () => {
           {/* Doctor Profile Chip */}
           <button
             onClick={() => navigate('/doctor/profile')}
-            className="h-[36px] flex items-center gap-2 pl-1 pr-1.5 rounded-[6px] hover:bg-stone-50 transition-colors cursor-pointer select-none"
+            className="hidden sm:flex h-[36px] items-center gap-2 pl-1 pr-1.5 rounded-[6px] hover:bg-stone-50 transition-colors cursor-pointer select-none"
           >
             <div className="w-8 h-8 rounded-full bg-[#122B22] text-white flex items-center justify-center font-bold text-xs shrink-0">
               {doctorInitials}
@@ -237,7 +237,7 @@ export const DoctorReports: React.FC = () => {
       </header>
 
       {/* Main Content Layout: 2 Columns */}
-      <div className="px-7 lg:px-8 py-5 max-w-[1400px] w-full mx-auto">
+      <div className="px-3.5 sm:px-6 lg:px-8 py-4 sm:py-5 max-w-[1400px] w-full mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5 items-start w-full">
           {/* LEFT COLUMN: Reports Table Card + Pagination */}
           <div className="min-w-0 w-full space-y-3">
@@ -293,8 +293,69 @@ export const DoctorReports: React.FC = () => {
                 </div>
               </div>
 
-              {/* Table View using semantic HTML table with fixed column widths */}
-              <div className="overflow-x-auto">
+              {/* Mobile Reports Cards List (< sm) */}
+              <div className="block sm:hidden px-3.5 pb-3.5 space-y-2.5">
+                {filteredReports.length === 0 ? (
+                  <div className="py-8 text-center text-stone-400 text-xs">
+                    No diagnostic reports found.
+                  </div>
+                ) : (
+                  filteredReports.map((r) => (
+                    <div
+                      key={r.id}
+                      className="p-3 border border-stone-200/80 rounded-[8px] bg-white space-y-2 shadow-2xs"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-bold text-[13px] text-stone-900 leading-tight">{r.name}</p>
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded-[3px] bg-stone-100 text-[10px] font-semibold text-stone-600">
+                            {r.category}
+                          </span>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 shrink-0 ${
+                          r.status === 'Critical'
+                            ? 'bg-[#FDECEB] text-[#D83A31]'
+                            : r.status === 'Unbalanced'
+                            ? 'bg-[#FEF5E7] text-[#C27D00]'
+                            : 'bg-[#E5F5EC] text-[#1E7E49]'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            r.status === 'Critical' ? 'bg-[#E5484D]' : r.status === 'Unbalanced' ? 'bg-[#E5A000]' : 'bg-[#1E7E49]'
+                          }`} />
+                          <span>{r.status}</span>
+                        </span>
+                      </div>
+
+                      <div className="bg-stone-50 rounded-[6px] p-2 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-[#13382E] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                            {r.patientAvatar || 'P'}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-stone-800 leading-tight text-[11px]">{r.patientName}</p>
+                            <p className="text-[10px] text-stone-400">{r.patientGender} · {r.patientAge}y</p>
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-stone-400">
+                          {r.dateStr} {r.timeStr}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-end pt-0.5">
+                        <button
+                          onClick={() => navigate(`/doctor/reports/${r.id}`)}
+                          className="h-[30px] px-3.5 bg-[#184E3F] text-white hover:bg-[#133F33] rounded-[6px] text-[11px] font-semibold transition-colors cursor-pointer"
+                        >
+                          Review Report →
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Desktop Table View using semantic HTML table with fixed column widths */}
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-left border-collapse table-fixed min-w-[660px]">
                   <colgroup>
                     <col className="w-[36%]" />

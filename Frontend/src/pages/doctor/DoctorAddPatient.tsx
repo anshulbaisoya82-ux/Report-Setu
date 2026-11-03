@@ -151,7 +151,7 @@ export const DoctorAddPatient: React.FC = () => {
   };
 
   return (
-    <div className="p-6 lg:p-7 max-w-[1400px] w-full mx-auto space-y-4 text-slate-800">
+    <div className="p-3.5 sm:p-6 lg:p-7 max-w-[1400px] w-full mx-auto space-y-3.5 sm:space-y-4 text-slate-800">
       {/* Back button */}
       <div>
         <button
@@ -262,7 +262,7 @@ export const DoctorAddPatient: React.FC = () => {
       {/* Two-Column Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start pt-1">
         {/* LEFT COLUMN: Main Form Card (7 cols) */}
-        <div className="lg:col-span-7 xl:col-span-8 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-6 md:p-7">
+        <div className="lg:col-span-7 xl:col-span-8 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-4 sm:p-6 md:p-7">
           {/* STEP 1: SEND REQUEST */}
           {currentStep === 'request' && (
             <div>
@@ -279,7 +279,7 @@ export const DoctorAddPatient: React.FC = () => {
                   e.preventDefault();
                   void handleSendRequest();
                 }}
-                className="flex items-center gap-3"
+                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3"
               >
                 <div className="relative flex-1">
                   <User className="w-4 h-4 text-slate-700 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -415,7 +415,7 @@ export const DoctorAddPatient: React.FC = () => {
 
               {/* 6 Digit Input Boxes */}
               <div className="space-y-4">
-                <div className="flex items-center gap-2.5" onPaste={handlePaste}>
+                <div className="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2.5" onPaste={handlePaste}>
                   {codeInputs.map((digit, idx) => (
                     <input
                       key={idx}
@@ -425,7 +425,7 @@ export const DoctorAddPatient: React.FC = () => {
                       value={digit}
                       onChange={(e) => handleCodeChange(idx, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(idx, e)}
-                      className="w-11 h-12 text-center text-lg font-bold font-mono rounded-[2px] border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white uppercase shadow-2xs"
+                      className="w-9 sm:w-11 h-11 sm:h-12 text-center text-base sm:text-lg font-bold font-mono rounded-[2px] border border-slate-300 focus:outline-none focus:border-emerald-600 bg-white uppercase shadow-2xs"
                     />
                   ))}
                 </div>

@@ -33,14 +33,17 @@ import { PatientDoctors } from './pages/patient/PatientDoctors';
 import { PatientSettings } from './pages/patient/PatientSettings';
 import { PatientProfile } from './pages/patient/PatientProfile';
 import { PatientOnboarding } from './pages/patient/PatientOnboarding';
+import { PatientFoodCheck } from './pages/patient/PatientFoodCheck';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AdminPortal } from './pages/admin/AdminPortal';
 import { RealtimeNotificationBanner } from './components/common/RealtimeNotificationBanner';
+import { ToastViewport } from './components/ui/Toast';
 
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <RealtimeNotificationBanner />
+      <ToastViewport />
       <Routes>
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
@@ -71,6 +74,7 @@ export const App: React.FC = () => {
           <Route path="reports" element={<PatientMyReports />} />
           <Route path="reports/:reportId" element={<PatientReportDetail />} />
           <Route path="medicines" element={<PatientMedicines />} />
+          <Route path="food-check" element={<PatientFoodCheck />} />
           <Route path="appointments" element={<PatientAppointments />} />
           <Route path="ask-doctor" element={<PatientAskDoctor />} />
           <Route path="doctors" element={<PatientDoctors />} />

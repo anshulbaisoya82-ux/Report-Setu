@@ -86,7 +86,7 @@ export const DoctorPatients: React.FC = () => {
   return (
     <div className="min-h-full flex flex-col text-stone-800">
       {/* Top Header - Full Width Edge-to-Edge Toolbar */}
-      <header className="w-full h-[62px] bg-white border-b border-stone-200/90 px-6 flex items-center justify-between gap-4 box-border shrink-0 sticky top-0 z-30">
+      <header className="w-full min-h-[56px] sm:h-[62px] bg-white border-b border-stone-200/90 px-4 sm:px-6 py-2 sm:py-0 flex items-center justify-between gap-3 box-border shrink-0 sticky top-0 z-30">
         {/* LEFT: Page Title */}
         <h1 className="text-xl font-bold text-stone-900 tracking-tight">Patients</h1>
 
@@ -148,7 +148,7 @@ export const DoctorPatients: React.FC = () => {
           {/* Doctor Profile Chip */}
           <button
             onClick={() => navigate('/doctor/profile')}
-            className="h-[36px] flex items-center gap-2 pl-1 pr-1.5 rounded-[8px] hover:bg-stone-50 transition-colors cursor-pointer select-none"
+            className="hidden sm:flex h-[36px] items-center gap-2 pl-1 pr-1.5 rounded-[8px] hover:bg-stone-50 transition-colors cursor-pointer select-none"
           >
             <div className="w-8 h-8 rounded-full bg-[#122B22] text-white flex items-center justify-center font-bold text-xs shrink-0">
               {doctorInitials}
@@ -167,7 +167,7 @@ export const DoctorPatients: React.FC = () => {
       </header>
 
       {/* Main Body Content Container */}
-      <div className="px-7 lg:px-8 py-5 space-y-4 max-w-[1400px] w-full mx-auto">
+      <div className="px-3.5 sm:px-6 lg:px-8 py-4 sm:py-5 space-y-4 max-w-[1400px] w-full mx-auto">
         {/* White Card: Search, Filters, and Patients Table */}
         <div className="bg-white border border-stone-200/80 rounded-[2px] shadow-2xs overflow-hidden">
           {/* Top Row: Search Input + Sort Dropdown */}
@@ -199,7 +199,7 @@ export const DoctorPatients: React.FC = () => {
           </div>
 
           {/* Filter Pills Row */}
-          <div className="px-4 sm:px-5 pb-4 flex items-center gap-2 flex-wrap">
+          <div className="px-4 sm:px-5 pb-3 sm:pb-4 flex items-center gap-2 overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap shrink-0">
             <button
               onClick={() => setActiveFilter('All')}
               className={`px-3.5 py-1.5 rounded-[2px] text-[12px] font-semibold transition-colors cursor-pointer ${
@@ -245,8 +245,86 @@ export const DoctorPatients: React.FC = () => {
             </button>
           </div>
 
-          {/* Table View */}
-          <div className="overflow-x-auto">
+          {/* Mobile Cards List (< sm) */}
+          <div className="block sm:hidden px-3.5 pb-4 space-y-2.5">
+            {filteredPatients.length === 0 ? (
+              <div className="py-8 px-4 text-center space-y-2">
+                <p className="text-xs font-semibold text-stone-600">No connected patients found</p>
+                <p className="text-[11px] text-stone-400">
+                  {searchQuery ? 'No patients matched your search query.' : 'No active patient connections.'}
+                </p>
+              </div>
+            ) : (
+              filteredPatients.map((p) => (
+                <div
+                  key={p.id}
+                  className="p-3.5 border border-stone-200/80 rounded-[8px] bg-white space-y-2.5 shadow-2xs"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-full bg-[#E2EBE6] text-[#2A554A] font-bold text-xs flex items-center justify-center shrink-0">
+                        {p.avatar || p.name[0] || 'P'}
+                      </div>
+                      <div>
+                        <p className="font-bold text-[13px] text-stone-900 leading-tight">{p.name}</p>
+                        <p className="text-[10px] text-stone-400 font-mono mt-0.5">
+                          {p.rsId || 'ReportSetu ID'} · {p.gender || 'Patient'} · {p.age ? `${p.age}y` : ''}
+                        </p>
+                      </div>
+                    </div>
+                    {p.status ? (
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1 shrink-0 ${
+                        p.status === 'Critical'
+                          ? 'bg-[#FDECEB] text-[#D83A31]'
+                          : p.status === 'Unbalanced'
+                          ? 'bg-[#FEF5E7] text-[#C27D00]'
+                          : 'bg-[#E5F5EC] text-[#1E7E49]'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          p.status === 'Critical' ? 'bg-[#E5484D]' : p.status === 'Unbalanced' ? 'bg-[#E5A000]' : 'bg-[#1E7E49]'
+                        }`} />
+                        <span>{p.status}</span>
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="bg-stone-50 rounded-[6px] p-2 text-xs">
+                    <p className="font-medium text-stone-800 leading-tight">{p.lastReportName || 'No reports submitted'}</p>
+                    {p.status === 'Critical' ? (
+                      <p className="text-[10px] text-[#E5484D] font-medium flex items-center gap-1 mt-0.5">
+                        <ArrowUpRight className="w-3 h-3 shrink-0" />
+                        <span>Critical values detected</span>
+                      </p>
+                    ) : p.status === 'Unbalanced' ? (
+                      <p className="text-[10px] text-[#C27D00] font-medium flex items-center gap-1 mt-0.5">
+                        <ArrowUpRight className="w-3 h-3 shrink-0" />
+                        <span>Values outside reference range</span>
+                      </p>
+                    ) : (
+                      <p className="text-[10px] text-stone-400 mt-0.5">
+                        {p.lastReportTime ? `Updated ${formatDisplayDate(p.lastReportTime)}` : 'Awaiting diagnostic upload'}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-0.5">
+                    <span className="text-[10px] text-stone-400">
+                      {p.lastReportTime ? formatDisplayDate(p.lastReportTime) : 'No recent activity'}
+                    </span>
+                    <button
+                      onClick={() => navigate(`/doctor/patients/${p.id}`)}
+                      className="h-[30px] px-3 bg-[#13382E] text-white hover:bg-[#184639] rounded-[6px] text-[11px] font-semibold transition-colors cursor-pointer"
+                    >
+                      View Details →
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View (>= sm) */}
+          <div className="hidden sm:block overflow-x-auto">
             <div className="min-w-[750px]">
               {/* Table Header */}
               <div className="bg-[#F8F9FA] border-y border-stone-200/80 px-5 py-2.5 grid grid-cols-12 text-[10px] font-bold tracking-wider text-stone-400 uppercase">

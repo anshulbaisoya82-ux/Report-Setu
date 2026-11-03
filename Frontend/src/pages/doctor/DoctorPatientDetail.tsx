@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { LabReport, Appointment, Prescription } from '../../types';
 import { MedicineAutocomplete, MedicineSuggestion } from '../../components/common/MedicineAutocomplete';
+import { FoodRulesCard } from '../../components/foodRules/FoodRulesEditor';
 
 interface DoctorPatientDetailProps {
   initialTab?: 'Overview' | 'Lab Reports' | 'Appointments' | 'Medicines' | 'Notes';
@@ -601,7 +602,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
   
 
   return (
-    <div className="p-6 lg:p-7 max-w-[1400px] w-full mx-auto space-y-4 text-slate-800">
+    <div className="p-3.5 sm:p-5 lg:p-7 max-w-[1400px] w-full mx-auto space-y-3.5 sm:space-y-4 text-slate-800">
       {/* Back button */}
       <div>
         <button
@@ -614,7 +615,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
       </div>
 
       {/* Top Profile Header Card */}
-      <div className="bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-5 md:p-6 pb-0">
+      <div className="bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-4 sm:p-5 md:p-6 pb-0">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
           {/* Left: Avatar, Name, Badges, Demographics */}
           <div className="flex items-start gap-4">
@@ -714,7 +715,7 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
         </div>
 
         {/* Navigation Tabs with Active Underline Bar */}
-        <div className="flex items-center gap-7 mt-6 border-b border-stone-200 text-xs font-semibold">
+        <div className="flex items-center gap-4 sm:gap-7 mt-5 sm:mt-6 border-b border-stone-200 text-xs font-semibold overflow-x-auto no-scrollbar flex-nowrap shrink-0">
           {(['Overview', `Lab Reports (${chronologicalReports.length})`, `Appointments (${chronologicalAppointments.length})`, `Medicines (${patientPrescriptions.length})`, 'Notes'] as const).map((tabTitle) => {
             const rawTab = tabTitle.startsWith('Lab Reports')
               ? 'Lab Reports'
@@ -729,7 +730,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
               <button
                 key={tabTitle}
                 onClick={() => setActiveTab(rawTab)}
-                className={`pb-2.5 transition-colors relative cursor-pointer ${
+                className={`pb-2.5 transition-colors relative cursor-pointer shrink-0 whitespace-nowrap ${
+
                   isActive ? 'text-slate-900 font-bold' : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
@@ -1203,7 +1205,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
       )}
 
       {activeTab === 'Medicines' && (
-        <div className="bg-white rounded-[6px] border border-stone-200/80 shadow-2xs p-5 md:p-6 space-y-4 font-sans">
+        <div className="space-y-4 font-sans">
+          <div className="bg-white rounded-[6px] border border-stone-200/80 shadow-2xs p-5 md:p-6 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               <h3 className="text-base font-bold text-slate-900">Active Prescriptions</h3>
@@ -1302,6 +1305,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
             </div>
           )}
         </div>
+          <FoodRulesCard patient={{ id: patient.id, name: patient.name, conditions: (patient as any).conditions }} />
+        </div>
       )}
 
       {/* Notes Tab */}
@@ -1317,8 +1322,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
       {/* MODAL 1: Schedule Appointment Modal */}
       {showAppointmentModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2px] border border-stone-200 shadow-xl max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-[2px] border border-stone-200 shadow-xl max-w-md w-full p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-stone-200">
               <h3 className="text-base font-bold text-slate-900">Schedule Appointment</h3>
               <button
@@ -1407,8 +1412,8 @@ export const DoctorPatientDetail: React.FC<DoctorPatientDetailProps> = ({ initia
 
       {/* MODAL 2: New Prescription Modal (Matching Exact Reference Layout & Design) */}
       {showPrescribeModal && (
-        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-2xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-[6px] border border-stone-200/90 shadow-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 my-8 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-2xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-[6px] border border-stone-200/90 shadow-2xl max-w-2xl w-full p-4 sm:p-6 space-y-4 max-h-[92vh] overflow-y-auto my-auto animate-in fade-in zoom-in-95 duration-150">
             {/* Header: Title, Patient Subtitle, Close Button */}
             <div className="flex items-start justify-between pb-3.5 border-b border-stone-200">
               <div>

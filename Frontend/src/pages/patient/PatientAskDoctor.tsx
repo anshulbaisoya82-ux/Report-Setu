@@ -173,11 +173,11 @@ export const PatientAskDoctor: React.FC = () => {
 
           <div className="pt-2 flex justify-center">
             <button
-              onClick={() => navigate('/patient/settings?tab=doctors')}
+              onClick={() => navigate('/patient/doctors')}
               className="px-4 py-2 bg-[#0E382F] hover:bg-[#134e40] text-white rounded-[3px] text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <UserPlus className="w-4 h-4" />
-              <span>Connect with a Doctor</span>
+              <span>Find the Right Doctor</span>
             </button>
           </div>
         </div>
@@ -193,7 +193,7 @@ export const PatientAskDoctor: React.FC = () => {
     .toUpperCase() || 'DR';
 
   return (
-    <div className="p-4 md:p-6 space-y-3.5 max-w-6xl mx-auto flex flex-col h-[calc(100vh-20px)]">
+    <div className="p-3.5 sm:p-4 md:p-6 space-y-3.5 max-w-6xl mx-auto flex flex-col min-h-[calc(100vh-140px)] lg:h-[calc(100vh-20px)]">
       {/* Top Header with title and profile badge */}
       <div className="flex items-center justify-between shrink-0">
         <div>
@@ -217,7 +217,7 @@ export const PatientAskDoctor: React.FC = () => {
       {/* Main 2-Column Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
         {/* Left Column: Chat Container (8 cols) */}
-        <div className="lg:col-span-8 bg-white rounded-[3px] border border-stone-200/90 shadow-2xs flex flex-col min-h-0 h-full overflow-hidden">
+        <div className="lg:col-span-8 bg-white rounded-[8px] sm:rounded-[3px] border border-stone-200/90 shadow-2xs flex flex-col min-h-0 h-[480px] sm:h-[560px] lg:h-full overflow-hidden">
           {/* Doctor Header Bar */}
           <div className="p-3 border-b border-stone-100 flex items-center justify-between bg-white shrink-0">
             <div className="flex items-center gap-2.5">

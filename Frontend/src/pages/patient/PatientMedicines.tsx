@@ -176,10 +176,10 @@ export const PatientMedicines: React.FC = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 pt-1">
+      <div className="flex items-center gap-2 pt-1 overflow-x-auto no-scrollbar flex-nowrap pb-1">
         <button
           onClick={() => setActiveTab('schedule')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'schedule'
               ? 'bg-[#0E382F] text-white shadow-2xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-stone-100'
@@ -191,7 +191,7 @@ export const PatientMedicines: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('active')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'active'
               ? 'bg-[#0E382F] text-white shadow-2xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-stone-100'
@@ -203,7 +203,7 @@ export const PatientMedicines: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('past')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
             activeTab === 'past'
               ? 'bg-[#0E382F] text-white shadow-2xs'
               : 'text-slate-600 hover:text-slate-900 hover:bg-stone-100'
