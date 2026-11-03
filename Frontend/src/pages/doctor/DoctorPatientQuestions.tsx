@@ -14,6 +14,7 @@ import {
   UserCheck,
   Stethoscope,
   ArrowDown,
+  ArrowLeft,
 } from 'lucide-react';
 import { doctorApi } from '../../api';
 import { PatientQuestionThread } from '../../types';
@@ -22,6 +23,7 @@ export const DoctorPatientQuestions: React.FC = () => {
   const { questionThreads, fetchQuestionThreads, sendDoctorReply, currentUser } = useStore();
   const [activeTab, setActiveTab] = useState<'all' | 'unanswered' | 'medicine' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
   const [replyText, setReplyText] = useState('');
   const [isTogglingAi, setIsTogglingAi] = useState(false);
   const [toastInfo, setToastInfo] = useState<{ message: string; sub?: string } | null>(null);
@@ -211,7 +213,7 @@ export const DoctorPatientQuestions: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-[1400px] w-full mx-auto space-y-4 text-stone-800">
+    <div className="p-3.5 sm:p-6 max-w-[1400px] w-full mx-auto space-y-3 sm:space-y-4 text-stone-800">
       {/* Toast Notification */}
       {toastInfo && (
         <div className="fixed top-6 right-6 z-50 bg-[#13382E] text-white px-5 py-3 rounded-[2px] shadow-lg flex items-center gap-3 border border-emerald-700/60 animate-in fade-in duration-200">
@@ -224,7 +226,7 @@ export const DoctorPatientQuestions: React.FC = () => {
       )}
 
       {/* Top Header Card */}
-      <div className="bg-white rounded-[2px] p-5 border border-stone-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-[2px] p-4 sm:p-5 border border-stone-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-[22px] font-black text-slate-900 tracking-tight leading-tight">
             Patient Inquiries & Triage
@@ -235,7 +237,7 @@ export const DoctorPatientQuestions: React.FC = () => {
         </div>
 
         {/* Filter Buttons Row */}
-        <div className="flex items-center gap-2 flex-wrap select-none">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar flex-nowrap sm:flex-wrap select-none shrink-0 pb-1 sm:pb-0">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-3.5 py-1.5 rounded-[2px] text-xs font-semibold transition-colors cursor-pointer shadow-2xs ${
@@ -283,9 +285,14 @@ export const DoctorPatientQuestions: React.FC = () => {
       </div>
 
       {/* Main Two-Column Fixed-Height Messaging Workspace */}
-      <div className="flex flex-col lg:flex-row gap-5 items-stretch h-[calc(100vh-240px)] min-h-[520px] max-h-[850px] overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 items-stretch h-[calc(100vh-180px)] min-h-[480px] lg:h-[calc(100vh-240px)] lg:min-h-[520px] lg:max-h-[850px] overflow-hidden">
         {/* LEFT COLUMN: Fixed Inquiry Panel with Independent Scroll */}
-        <div className="w-full lg:w-[380px] xl:w-[390px] shrink-0 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-3.5 flex flex-col h-full min-h-0 overflow-hidden">
+        <div className={`w-full lg:w-[380px] xl:w-[390px] shrink-0 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs p-3.5 flex-col h-full min-h-0 overflow-hidden ${mobileView === "list" ? "flex" : "hidden lg:flex"}`}>
+          {/* Mobile indicator */}
+          <div className="lg:hidden pb-2 mb-2 border-b border-stone-100 flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700">Patient Inquiries ({filteredThreads.length})</span>
+            <span className="text-[10px] text-slate-400">Tap an inquiry to chat</span>
+          </div>
           {/* Fixed Search Bar at Top */}
           <div className="relative shrink-0 mb-3">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -306,7 +313,7 @@ export const DoctorPatientQuestions: React.FC = () => {
               return (
                 <div
                   key={thread.id}
-                  onClick={() => setSelectedThreadId(thread.id)}
+                  onClick={() => { setSelectedThreadId(thread.id); setMobileView('chat'); }}
                   className={`p-3 rounded-[2px] transition-all cursor-pointer border ${
                     isSelected
                       ? 'bg-[#F4F6F5] border-stone-200/80 border-l-4 border-l-[#13382E]'
@@ -378,14 +385,25 @@ export const DoctorPatientQuestions: React.FC = () => {
         </div>
 
         {/* RIGHT COLUMN: Fixed-Height Conversation Workspace */}
-        <div className="flex-1 min-w-0 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs flex flex-col h-full min-h-0 overflow-hidden relative">
+        <div className={`flex-1 min-w-0 bg-white rounded-[2px] border border-stone-200/80 shadow-2xs flex-col h-full min-h-0 overflow-hidden relative ${mobileView === "chat" ? "flex" : "hidden lg:flex"}`}>
+
           {selectedThread ? (
             <>
               {/* Fixed Chat Header */}
-              <div className="p-3.5 px-4 border-b border-stone-100 flex items-center justify-between gap-3 flex-wrap shrink-0 bg-white z-10">
-                {/* Left: Avatar, Name, RS ID, Context */}
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#13382E] text-white font-bold flex items-center justify-center text-sm shrink-0">
+              <div className="p-3 sm:p-3.5 px-3 sm:px-4 border-b border-stone-100 flex items-center justify-between gap-2.5 sm:gap-3 flex-wrap shrink-0 bg-white z-10">
+                {/* Left: Back button (mobile) + Avatar, Name, RS ID, Context */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setMobileView('list')}
+                    className="lg:hidden p-1.5 -ml-1 text-slate-600 hover:text-slate-900 rounded-[4px] hover:bg-slate-100 flex items-center gap-1 text-xs font-semibold cursor-pointer"
+                    title="Back to inquiries"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span className="hidden xs:inline">Back</span>
+                  </button>
+
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#13382E] text-white font-bold flex items-center justify-center text-xs sm:text-sm shrink-0">
                     {selectedThread.patientAvatar || selectedThread.patientName.charAt(0) || 'R'}
                   </div>
 

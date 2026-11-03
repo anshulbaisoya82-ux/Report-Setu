@@ -216,7 +216,7 @@ export const DoctorProfile: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-[1400px] w-full mx-auto space-y-5 text-stone-800">
+    <div className="p-3.5 sm:p-6 max-w-[1400px] w-full mx-auto space-y-4 sm:space-y-5 text-stone-800">
       {/* Toast Alert */}
       {toastMsg && (
         <div
@@ -236,7 +236,7 @@ export const DoctorProfile: React.FC = () => {
       )}
 
       {/* Hero Overview Banner Card */}
-      <div className="relative overflow-hidden rounded-[14px] border border-[#D0E5DC] bg-gradient-to-r from-[#DFEEE7] via-[#EBF4F0] to-[#E2F0EA] p-6 shadow-2xs">
+      <div className="relative overflow-hidden rounded-[14px] border border-[#D0E5DC] bg-gradient-to-r from-[#DFEEE7] via-[#EBF4F0] to-[#E2F0EA] p-4 sm:p-6 shadow-2xs">
         {/* Subtle decorative background wave */}
         <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-35 pointer-events-none">
           <svg viewBox="0 0 400 160" fill="none" className="w-full h-full object-cover">
@@ -254,7 +254,7 @@ export const DoctorProfile: React.FC = () => {
         </div>
 
         {/* Top Right Verified Clinician Badge */}
-        <div className="absolute top-5 right-5 sm:top-6 sm:right-6 z-10">
+        <div className="absolute top-3.5 right-3.5 sm:top-6 sm:right-6 z-10">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/85 backdrop-blur-xs text-[#136C4F] border border-emerald-200/80 text-xs font-semibold shadow-2xs">
             <ShieldCheck className="w-3.5 h-3.5 text-[#136C4F]" />
             <span>Verified Clinician</span>
@@ -262,9 +262,9 @@ export const DoctorProfile: React.FC = () => {
         </div>
 
         {/* Clinician Identity Row */}
-        <div className="flex items-center gap-5 relative z-10">
+        <div className="flex flex-col xs:flex-row xs:items-center gap-3.5 sm:gap-5 relative z-10 pt-7 xs:pt-0">
           {/* Dark Green Square Avatar */}
-          <div className="w-[74px] h-[74px] rounded-[16px] bg-[#13382E] text-white flex items-center justify-center font-bold text-2xl tracking-wider shadow-md shrink-0">
+          <div className="w-14 h-14 sm:w-[74px] sm:h-[74px] rounded-[12px] sm:rounded-[16px] bg-[#13382E] text-white flex items-center justify-center font-bold text-xl sm:text-2xl tracking-wider shadow-md shrink-0">
             {getInitials(doctorDisplayName)}
           </div>
 
@@ -336,7 +336,7 @@ export const DoctorProfile: React.FC = () => {
       {/* Main Two-Column Forms Section */}
       <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* LEFT COLUMN: Practitioner Professional Identity */}
-        <div className="lg:col-span-8 bg-white rounded-[10px] p-6 border border-stone-200/80 shadow-2xs space-y-4">
+        <div className="lg:col-span-8 bg-white rounded-[10px] p-4 sm:p-6 border border-stone-200/80 shadow-2xs space-y-4">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
             <div className="flex items-center gap-2">
@@ -478,7 +478,7 @@ export const DoctorProfile: React.FC = () => {
         </div>
 
         {/* RIGHT COLUMN: Clinic & Practice */}
-        <div className="lg:col-span-4 bg-white rounded-[10px] p-6 border border-stone-200/80 shadow-2xs space-y-4">
+        <div className="lg:col-span-4 bg-white rounded-[10px] p-4 sm:p-6 border border-stone-200/80 shadow-2xs space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between pb-1">
             <div className="flex items-center gap-2">

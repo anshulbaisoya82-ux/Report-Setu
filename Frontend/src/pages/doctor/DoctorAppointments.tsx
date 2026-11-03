@@ -231,7 +231,7 @@ export const DoctorAppointments: React.FC = () => {
   return (
     <div className="min-h-full flex flex-col text-stone-800">
       {/* Top Header - Full Width Edge-to-Edge Toolbar */}
-      <header className="w-full h-[62px] bg-white border-b border-stone-200/90 px-6 flex items-center justify-between gap-4 box-border shrink-0 sticky top-0 z-30">
+      <header className="w-full min-h-[56px] sm:h-[62px] bg-white border-b border-stone-200/90 px-4 sm:px-6 py-2 sm:py-0 flex items-center justify-between gap-3 box-border shrink-0 sticky top-0 z-30">
         {/* LEFT: Page Title */}
         <h1 className="text-xl font-bold text-stone-900 tracking-tight">Clinical Appointments</h1>
 
@@ -276,7 +276,7 @@ export const DoctorAppointments: React.FC = () => {
           {/* Doctor Profile Chip */}
           <button
             onClick={() => navigate('/doctor/profile')}
-            className="h-[36px] flex items-center gap-2 pl-1 pr-1.5 rounded-[8px] hover:bg-stone-50 transition-colors cursor-pointer select-none"
+            className="hidden sm:flex h-[36px] items-center gap-2 pl-1 pr-1.5 rounded-[8px] hover:bg-stone-50 transition-colors cursor-pointer select-none"
           >
             <div className="w-8 h-8 rounded-full bg-[#122B22] text-white flex items-center justify-center font-bold text-xs shrink-0">
               {doctorInitials}
@@ -291,7 +291,7 @@ export const DoctorAppointments: React.FC = () => {
       </header>
 
       {/* Main Content Area */}
-      <div className="px-6 py-5 space-y-5 bg-[#F4F6F5] flex-1">
+      <div className="px-3.5 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5 bg-[#F4F6F5] flex-1">
         {/* Global Error Banner */}
         {actionError && (
           <div className="bg-rose-50 border border-rose-200 rounded-[6px] p-3 text-xs font-medium text-rose-800 flex items-center justify-between shadow-2xs">
@@ -404,10 +404,11 @@ export const DoctorAppointments: React.FC = () => {
           <div className="flex-1 min-w-0 bg-white rounded-[8px] p-5 sm:p-6 border border-stone-200/80 shadow-2xs flex flex-col justify-between">
             <div>
               {/* Horizontal Filter Tabs */}
-              <div className="flex items-center gap-6 border-b border-stone-200 overflow-x-auto select-none">
+              <div className="flex items-center gap-4 sm:gap-6 border-b border-stone-200 overflow-x-auto no-scrollbar flex-nowrap select-none shrink-0">
                 <button
                   onClick={() => setActiveTab('all')}
-                  className={`pb-3 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border-b-2 -mb-[1px] ${
+                  className={`pb-3 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border-b-2 -mb-[1px] shrink-0 whitespace-nowrap ${
+
                     activeTab === 'all'
                       ? 'border-[#13382E] text-[#13382E] font-bold'
                       : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -477,7 +478,7 @@ export const DoctorAppointments: React.FC = () => {
               </div>
 
               {/* Search and Sort Toolbar */}
-              <div className="flex items-center gap-3 mt-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 mt-4">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
@@ -535,9 +536,9 @@ export const DoctorAppointments: React.FC = () => {
                         key={apt.id}
                         className="bg-white border border-slate-200/90 rounded-[8px] p-4 shadow-2xs hover:border-slate-300 transition-all"
                       >
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
                           {/* Left: Avatar and Content */}
-                          <div className="flex items-start gap-3.5 flex-1 min-w-0">
+                          <div className="flex items-start gap-3 sm:gap-3.5 flex-1 min-w-0">
                             <div className="w-11 h-11 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-sm shrink-0 mt-0.5">
                               {initials}
                             </div>
@@ -579,7 +580,7 @@ export const DoctorAppointments: React.FC = () => {
                           </div>
 
                           {/* Right: Action Chip and More Button */}
-                          <div className="flex items-center gap-2 shrink-0 pt-0.5">
+                          <div className="flex items-center justify-end gap-2 shrink-0 pt-2 sm:pt-0.5 border-t sm:border-t-0 border-slate-100">
                             {apt.status === 'Completed' ? (
                               <span className="bg-[#E8F8F3] border border-[#A7E8D0] text-[#136C4F] text-xs font-semibold px-3 py-1.5 rounded-[6px] flex items-center gap-1.5">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-[#136C4F]" />
@@ -937,8 +938,8 @@ export const DoctorAppointments: React.FC = () => {
 
       {/* Reschedule Modal */}
       {rescheduleModalApt && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-[8px] max-w-md w-full p-6 shadow-xl border border-stone-200 space-y-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-[8px] max-w-md w-full p-4 sm:p-6 shadow-xl border border-stone-200 space-y-4 max-h-[92vh] overflow-y-auto my-auto">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <h3 className="font-bold text-sm text-stone-800">Reschedule Consultation</h3>
               <button

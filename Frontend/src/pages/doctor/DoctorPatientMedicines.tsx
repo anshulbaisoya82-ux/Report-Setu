@@ -17,6 +17,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { MedicineAutocomplete, MedicineSuggestion } from '../../components/common/MedicineAutocomplete';
+import { FoodRulesCard } from '../../components/foodRules/FoodRulesEditor';
 
 export const DoctorPatientMedicines: React.FC = () => {
   const navigate = useNavigate();
@@ -518,6 +519,7 @@ export const DoctorPatientMedicines: React.FC = () => {
             </button>
           </form>
         </div>
+        <FoodRulesCard className="lg:col-span-12" patient={{ id: patient.id, name: patient.name, conditions: (patient as any).conditions }} />
       </div>
     </div>
   );

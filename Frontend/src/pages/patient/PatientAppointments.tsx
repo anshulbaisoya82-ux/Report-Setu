@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../store/useStore';
 import { 
-  Calendar, Clock, MapPin, Video, Phone, 
+  Calendar, Clock, MapPin, Video, Phone, Stethoscope, 
   ChevronLeft, ChevronRight, MoreVertical, Plus, 
   X, CheckCircle, AlertCircle, RefreshCw, XCircle,
   ChevronDown
@@ -10,6 +11,7 @@ import { Appointment } from '../../types';
 import { connectionsApi } from '../../api';
 
 export const PatientAppointments: React.FC = () => {
+  const navigate = useNavigate();
   const { currentUser, appointments, requestAppointment, updateAppointmentStatus, fetchAppointments } = useStore();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showRescheduleModal, setShowRescheduleModal] = useState<Appointment | null>(null);
@@ -171,10 +173,17 @@ export const PatientAppointments: React.FC = () => {
           </p>
         </div>
 
-        <div>
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <button
+            onClick={() => navigate('/patient/doctors')}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#EAF6F0] text-[#0E382F] border border-emerald-300 rounded-[3px] text-xs font-semibold hover:bg-emerald-100 shadow-2xs transition-colors cursor-pointer text-center"
+          >
+            <Stethoscope className="w-3.5 h-3.5 text-[#10B981]" />
+            <span>Find the Right Doctor</span>
+          </button>
           <button
             onClick={() => setShowBookingModal(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0E382F] text-white rounded-[3px] text-xs font-semibold hover:bg-[#092720] shadow-2xs transition-colors cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-[#0E382F] text-white rounded-[3px] text-xs font-semibold hover:bg-[#092720] shadow-2xs transition-colors cursor-pointer text-center"
           >
             <Calendar className="w-3.5 h-3.5" />
             <span>Book Appointment</span>
@@ -234,7 +243,7 @@ export const PatientAppointments: React.FC = () => {
                 return (
                   <div
                     key={apt.id}
-                    className="p-3.5 flex items-center justify-between gap-3 hover:bg-stone-50/50 transition-colors relative"
+                    className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-stone-50/50 transition-colors relative"
                   >
                     {/* Left: Date Box + Title & Doctor */}
                     <div className="flex items-center gap-3.5 min-w-0">
@@ -407,7 +416,7 @@ export const PatientAppointments: React.FC = () => {
       {/* Booking Modal */}
       {showBookingModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3">
-          <div className="bg-white rounded-[3px] max-w-sm w-full p-4 space-y-3.5 shadow-xl border border-stone-200 animate-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[3px] max-w-sm w-full max-h-[92vh] overflow-y-auto p-4 space-y-3.5 shadow-xl border border-stone-200 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-2 border-b border-stone-100">
               <h3 className="text-xs font-bold text-slate-900">Book Doctor Consultation</h3>
               <button
@@ -506,7 +515,7 @@ export const PatientAppointments: React.FC = () => {
       {/* Reschedule Modal */}
       {showRescheduleModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3">
-          <div className="bg-white rounded-[3px] max-w-sm w-full p-4 space-y-3.5 shadow-xl border border-stone-200 animate-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[3px] max-w-sm w-full max-h-[92vh] overflow-y-auto p-4 space-y-3.5 shadow-xl border border-stone-200 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-2 border-b border-stone-100">
               <h3 className="text-xs font-bold text-slate-900">Reschedule Appointment</h3>
               <button
